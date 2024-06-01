@@ -177,11 +177,12 @@ footer {
 }
 
 /* Ñòèëè äëÿ îñíîâíîãî ðàçäåëà */
+/* Стили для основного раздела */
 .main {
     max-width: 1000px;
-    margin: 0 auto;
+    margin: 90px auto 20px; /* Увеличим отступ сверху для того чтобы контент не наезжал на шапку */
     padding: 20px;
-    min-height: 100vh;
+    min-height: calc(100vh - 90px); /* Учтем высоту шапки для определения высоты основного раздела */
     background-image: url("main-background.png");
     background-repeat: no-repeat;
     background-position: center;
