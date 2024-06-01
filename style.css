@@ -1,4 +1,4 @@
-/* Общие стили для страницы */
+/* ГЋГЎГ№ГЁГҐ Г±ГІГЁГ«ГЁ Г¤Г«Гї Г±ГІГ°Г Г­ГЁГ¶Г» */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -7,15 +7,19 @@ body {
     color: #333;
 }
 
-/* Стили для контейнера */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї ГЄГ®Г­ГІГҐГ©Г­ГҐГ°Г  */
 .container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Стили для шапки */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї ГёГ ГЇГЄГЁ */
 .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     background: linear-gradient(135deg, #4682B4, #5DADE2);
     display: flex;
     justify-content: space-between;
@@ -23,7 +27,9 @@ body {
     padding: 20px 40px;
     color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000; /* РЈСЃС‚Р°РЅР°РІР»РёРІР°РµРј z-index, С‡С‚РѕР±С‹ С€Р°РїРєР° Р±С‹Р»Р° РІС‹С€Рµ РґСЂСѓРіРёС… СЌР»РµРјРµРЅС‚РѕРІ */
 }
+
 
     .header div {
         font-size: 28px;
@@ -48,7 +54,7 @@ body {
                 transform: translateY(-2px);
             }
 
-/* Стили для основного заголовка */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї Г®Г±Г­Г®ГўГ­Г®ГЈГ® Г§Г ГЈГ®Г«Г®ГўГЄГ  */
 .main-title {
     color: #32CD32;
     text-align: center;
@@ -60,7 +66,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Стили для текста поверх изображения */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї ГІГҐГЄГ±ГІГ  ГЇГ®ГўГҐГ°Гµ ГЁГ§Г®ГЎГ°Г Г¦ГҐГ­ГЁГї */
 .text-overlay {
     position: relative;
     z-index: 1;
@@ -72,7 +78,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Стили для изображений */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї ГЁГ§Г®ГЎГ°Г Г¦ГҐГ­ГЁГ© */
 img {
     width: 100%;
     max-width: 200px;
@@ -82,7 +88,7 @@ img {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Стили для секции видео */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї Г±ГҐГЄГ¶ГЁГЁ ГўГЁГ¤ГҐГ® */
 .video {
     background-color: #D2691E;
     padding: 40px 0;
@@ -98,7 +104,7 @@ img {
         border-radius: 10px;
     }
 
-/* Стили для формы заявки */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї ГґГ®Г°Г¬Г» Г§Г ГїГўГЄГЁ */
 .application {
     background-color: #32CD32;
     padding: 40px 0;
@@ -144,7 +150,7 @@ button {
         transform: translateY(1px);
     }
 
-/* Стили для отзывов */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї Г®ГІГ§Г»ГўГ®Гў */
 .reviews {
     background-color: #fff;
     padding: 40px 0;
@@ -161,7 +167,7 @@ button {
     background-color: #fafafa;
 }
 
-/* Стили для футера */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї ГґГіГІГҐГ°Г  */
 footer {
     background-color: #4682B4;
     color: #fff;
@@ -170,7 +176,7 @@ footer {
     border-radius: 10px 10px 0 0;
 }
 
-/* Стили для основного раздела */
+/* Г‘ГІГЁГ«ГЁ Г¤Г«Гї Г®Г±Г­Г®ГўГ­Г®ГЈГ® Г°Г Г§Г¤ГҐГ«Г  */
 .main {
     max-width: 1000px;
     margin: 0 auto;
