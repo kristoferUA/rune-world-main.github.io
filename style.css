@@ -106,7 +106,7 @@ img {
 
 /* Ñòèëè äëÿ ôîðìû çàÿâêè */
 .application {
-    background-color: #32CD32;
+    background-color: #9ACD32;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -134,7 +134,7 @@ input {
 }
 
 button {
-    background-color: #32CD32;
+    background-color: #9ACD32;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
