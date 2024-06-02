@@ -1,117 +1,211 @@
+/* Общие стили для страницы */
 body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    background-color: #f0f0f0;
+    color: #333;
 }
 
+/* Стили для контейнера */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Стили для шапки */
 .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #4682B4, #5DADE2);
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: flex-start; /* Align items to the start (left) */
-    padding: 10px 20px;
-    background-color: #333;
+    padding: 20px 40px;
     color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
 }
 
-.logo {
+.header:hover {
+    background: linear-gradient(135deg, #5DADE2, #4682B4);
+}
+
+.header .logo {
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header nav {
     display: flex;
-    align-items: center;
-    margin-right: 20px; /* Add margin to separate from navigation */
+    gap: 20px;
 }
 
-.logo img {
-    width: 50px;
-    height: 50px;
+.header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.header nav a:hover {
+    color: #FFD700;
+    transform: translateY(-2px);
+}
+
+/* Стили для основного заголовка */
+.main-title {
+    color: #32CD32;
+    text-align: center;
+    font-size: 40px;
+    margin-top: 120px;
+    margin-bottom: 50px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для текста поверх изображения */
+.text-overlay {
+    position: relative;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Стили для секции видео */
+.video {
+    background-color: #D2691E;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+.video iframe {
+    width: 100%;
+    height: 360px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+/* Стили для формы заявки */
+.application {
+    background-color: #9ACD32;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+input, button {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+
+input {
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #9ACD32;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #28a428;
+    transform: translateY(-2px);
+}
+
+button:active {
+    background-color: #219e21;
+    transform: translateY(1px);
+}
+
+/* Стили для отзывов */
+.reviews {
+    background-color: #fff;
+    padding: 40px 0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.review {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+/* Стили для футера */
+footer {
+    background-color: #4682B4;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 10px 10px 0 0;
+}
+
+.footer .social-links {
+    margin-top: 20px;
+}
+
+.footer .social-icon {
     margin-right: 10px;
 }
 
-nav {
-    display: flex;
-    gap: 20px;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
+/* Стили для основного раздела */
 .main {
-    text-align: center;
-    padding: 50px 20px;
-    background-color: #f4f4f4;
-}
-
-.main-title {
-    font-size: 3em;
-    margin: 0.5em 0;
-}
-
-.text-overlay {
-    background: rgba(255, 255, 255, 0.9);
+    max-width: 1000px;
+    margin: 90px auto 20px;
     padding: 20px;
-    margin: 20px auto;
-    max-width: 800px;
+    min-height: calc(100vh - 90px);
+    background-image: url("main-background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
     border-radius: 10px;
-}
-
-.video {
-    padding: 20px;
-}
-
-.video .container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.buttons {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 20px;
-}
-
-.main-button a {
-    text-decoration: none;
-    color: #fff;
-}
-
-.main-button {
-    background-color: #333;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-}
-
-.main-button:hover {
-    background-color: #555;
-}
-
-.application, .about, .reviews, .contacts {
-    padding: 50px 20px;
-    background-color: #f4f4f4;
-}
-
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px 20px;
+    position: relative;
+    animation: fadeIn 1.5s ease-in-out;
 }
