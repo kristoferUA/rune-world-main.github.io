@@ -1,6 +1,6 @@
 /* Общие стили для страницы */
 body {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f0f0f0;
@@ -35,7 +35,7 @@ body {
     background: linear-gradient(135deg, #5DADE2, #4682B4);
 }
 
-.header div {
+.header .logo {
     font-size: 28px;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -96,16 +96,6 @@ body {
     animation: fadeIn 1.5s ease-in-out;
 }
 
-/* Стили для изображений */
-img {
-    width: 100%;
-    max-width: 200px;
-    height: auto;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
 /* Стили для секции видео */
 .video {
     background-color: #D2691E;
@@ -121,17 +111,6 @@ img {
     height: 360px;
     margin-bottom: 20px;
     border-radius: 10px;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
 }
 
 /* Стили для формы заявки */
@@ -206,6 +185,14 @@ footer {
     text-align: center;
     padding: 20px 0;
     border-radius: 10px 10px 0 0;
+}
+
+.footer .social-links {
+    margin-top: 20px;
+}
+
+.footer .social-icon {
+    margin-right: 10px;
 }
 
 /* Стили для основного раздела */
