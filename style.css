@@ -1,4 +1,4 @@
-/* Îáùèå ñòèëè äëÿ ñòðàíèöû */
+/* General styles for the page */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -7,14 +7,14 @@ body {
     color: #333;
 }
 
-/* Ñòèëè äëÿ êîíòåéíåðà */
+/* Styles for the container */
 .container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Ñòèëè äëÿ øàïêè */
+/* Styles for the header */
 .header {
     position: fixed;
     top: 0;
@@ -27,34 +27,33 @@ body {
     padding: 20px 40px;
     color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000; /* Устанавливаем z-index, чтобы шапка была выше других элементов */
+    z-index: 1000; /* Ensures the header is above other elements */
 }
 
+.header div {
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
 
-    .header div {
-        font-size: 28px;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
+.header nav {
+    display: flex;
+    gap: 20px;
+}
 
-    .header nav {
-        display: flex;
-        gap: 20px;
-    }
+.header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
 
-        .header nav a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
+.header nav a:hover {
+    color: #FFD700;
+    transform: translateY(-2px);
+}
 
-            .header nav a:hover {
-                color: #FFD700;
-                transform: translateY(-2px);
-            }
-
-/* Ñòèëè äëÿ îñíîâíîãî çàãîëîâêà */
+/* Main title styles */
 .main-title {
     color: #32CD32;
     text-align: center;
@@ -66,7 +65,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Ñòèëè äëÿ òåêñòà ïîâåðõ èçîáðàæåíèÿ */
+/* Text overlay styles */
 .text-overlay {
     position: relative;
     z-index: 1;
@@ -78,7 +77,7 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Ñòèëè äëÿ èçîáðàæåíèé */
+/* Image styles */
 img {
     width: 100%;
     max-width: 200px;
@@ -88,7 +87,7 @@ img {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Ñòèëè äëÿ ñåêöèè âèäåî */
+/* Video section styles */
 .video {
     background-color: #D2691E;
     padding: 40px 0;
@@ -97,14 +96,14 @@ img {
     margin-bottom: 20px;
 }
 
-    .video iframe {
-        width: 100%;
-        height: 360px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-    }
+.video iframe {
+    width: 100%;
+    height: 360px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
 
-/* Ñòèëè äëÿ ôîðìû çàÿâêè */
+/* Application form styles */
 .application {
     background-color: #32CD32;
     padding: 40px 0;
@@ -140,17 +139,17 @@ button {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-    button:hover {
-        background-color: #28a428;
-        transform: translateY(-2px);
-    }
+button:hover {
+    background-color: #28a428;
+    transform: translateY(-2px);
+}
 
-    button:active {
-        background-color: #219e21;
-        transform: translateY(1px);
-    }
+button:active {
+    background-color: #219e21;
+    transform: translateY(1px);
+}
 
-/* Ñòèëè äëÿ îòçûâîâ */
+/* Review styles */
 .reviews {
     background-color: #fff;
     padding: 40px 0;
@@ -167,7 +166,7 @@ button {
     background-color: #fafafa;
 }
 
-/* Ñòèëè äëÿ ôóòåðà */
+/* Footer styles */
 footer {
     background-color: #4682B4;
     color: #fff;
@@ -176,17 +175,63 @@ footer {
     border-radius: 10px 10px 0 0;
 }
 
-/* Ñòèëè äëÿ îñíîâíîãî ðàçäåëà */
-/* Стили для основного раздела */
+/* Main section styles */
 .main {
     max-width: 1000px;
-    margin: 90px auto 20px; /* Увеличим отступ сверху для того чтобы контент не наезжал на шапку */
+    margin: 90px auto 20px; /* Increase top margin to prevent content overlap with header */
     padding: 20px;
-    min-height: calc(100vh - 90px); /* Учтем высоту шапки для определения высоты основного раздела */
+    min-height: calc(100vh - 90px); /* Account for header height in main section height calculation */
     background-image: url("main-background.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
     border-radius: 10px;
     position: relative;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        padding: 10px 20px;
+    }
+
+    .header div {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .header nav {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .header nav a {
+        font-size: 16px;
+    }
+
+    .main-title {
+        font-size: 32px;
+        padding: 15px;
+    }
+
+    .video iframe {
+        height: 240px;
+    }
+
+    form {
+        width: 90%;
+    }
+
+    .reviews {
+        padding: 20px 0;
+    }
+
+    .review {
+        padding: 15px;
+    }
+
+    footer {
+        padding: 15px 0;
+    }
 }
