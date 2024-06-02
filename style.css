@@ -8,7 +8,7 @@ body {
 .header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start; /* Align items to the start (left) */
     padding: 10px 20px;
     background-color: #333;
     color: #fff;
@@ -17,6 +17,7 @@ body {
 .logo {
     display: flex;
     align-items: center;
+    margin-right: 20px; /* Add margin to separate from navigation */
 }
 
 .logo img {
