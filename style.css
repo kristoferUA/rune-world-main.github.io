@@ -1,4 +1,4 @@
-/* Îáùèå ñòèëè äëÿ ñòðàíèöû */
+/* Общие стили для страницы */
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
@@ -7,14 +7,14 @@ body {
     color: #333;
 }
 
-/* Ñòèëè äëÿ êîíòåéíåðà */
+/* Стили для контейнера */
 .container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 20px;
 }
 
-/* Ñòèëè äëÿ øàïêè */
+/* Стили для шапки */
 .header {
     position: fixed;
     top: 0;
@@ -27,46 +27,63 @@ body {
     padding: 20px 40px;
     color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000; /* Устанавливаем z-index, чтобы шапка была выше других элементов */
+    z-index: 1000;
+    transition: all 0.3s ease;
 }
 
+.header:hover {
+    background: linear-gradient(135deg, #5DADE2, #4682B4);
+}
 
-    .header div {
-        font-size: 28px;
-        font-weight: bold;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
+.header div {
+    font-size: 28px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
 
-    .header nav {
-        display: flex;
-        gap: 20px;
-    }
+.header nav {
+    display: flex;
+    gap: 20px;
+}
 
-        .header nav a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
+.header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s ease, transform 0.2s ease;
+}
 
-            .header nav a:hover {
-                color: #FFD700;
-                transform: translateY(-2px);
-            }
+.header nav a:hover {
+    color: #FFD700;
+    transform: translateY(-2px);
+}
 
-/* Ñòèëè äëÿ îñíîâíîãî çàãîëîâêà */
+/* Стили для основного заголовка */
 .main-title {
     color: #32CD32;
     text-align: center;
     font-size: 40px;
+    margin-top: 120px;
     margin-bottom: 50px;
     background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
 }
 
-/* Ñòèëè äëÿ òåêñòà ïîâåðõ èçîáðàæåíèÿ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для текста поверх изображения */
 .text-overlay {
     position: relative;
     z-index: 1;
@@ -76,9 +93,10 @@ body {
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
 }
 
-/* Ñòèëè äëÿ èçîáðàæåíèé */
+/* Стили для изображений */
 img {
     width: 100%;
     max-width: 200px;
@@ -88,29 +106,42 @@ img {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Ñòèëè äëÿ ñåêöèè âèäåî */
+/* Стили для секции видео */
 .video {
     background-color: #D2691E;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
     margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
 }
 
-    .video iframe {
-        width: 100%;
-        height: 360px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-    }
+.video iframe {
+    width: 100%;
+    height: 360px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
 
-/* Ñòèëè äëÿ ôîðìû çàÿâêè */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Стили для формы заявки */
 .application {
     background-color: #9ACD32;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
     margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
 }
 
 form {
@@ -140,23 +171,24 @@ button {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-    button:hover {
-        background-color: #28a428;
-        transform: translateY(-2px);
-    }
+button:hover {
+    background-color: #28a428;
+    transform: translateY(-2px);
+}
 
-    button:active {
-        background-color: #219e21;
-        transform: translateY(1px);
-    }
+button:active {
+    background-color: #219e21;
+    transform: translateY(1px);
+}
 
-/* Ñòèëè äëÿ îòçûâîâ */
+/* Стили для отзывов */
 .reviews {
     background-color: #fff;
     padding: 40px 0;
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1.5s ease-in-out;
 }
 
 .review {
@@ -167,7 +199,7 @@ button {
     background-color: #fafafa;
 }
 
-/* Ñòèëè äëÿ ôóòåðà */
+/* Стили для футера */
 footer {
     background-color: #4682B4;
     color: #fff;
@@ -176,17 +208,17 @@ footer {
     border-radius: 10px 10px 0 0;
 }
 
-/* Ñòèëè äëÿ îñíîâíîãî ðàçäåëà */
 /* Стили для основного раздела */
 .main {
     max-width: 1000px;
-    margin: 90px auto 20px; /* Увеличим отступ сверху для того чтобы контент не наезжал на шапку */
+    margin: 90px auto 20px;
     padding: 20px;
-    min-height: calc(100vh - 90px); /* Учтем высоту шапки для определения высоты основного раздела */
+    min-height: calc(100vh - 90px);
     background-image: url("main-background.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
     border-radius: 10px;
     position: relative;
+    animation: fadeIn 1.5s ease-in-out;
 }
