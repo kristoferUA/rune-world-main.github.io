@@ -40,7 +40,6 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: all 0.3s ease;
-    flex-wrap: wrap; /* Allow wrapping for better responsiveness */
 }
 
 .header:hover {
@@ -51,12 +50,14 @@ body {
     font-size: 24px;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    margin-right: 20px; /* Adjust this to control the space between the logo and the nav */
 }
 
 .header nav {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap; /* Ensure nav items wrap if they overflow */
+    flex-wrap: wrap;
+    margin-left: 20px; /* Adjust this to control the space between the logo and the nav */
 }
 
 .header nav a {
@@ -64,7 +65,7 @@ body {
     text-decoration: none;
     font-size: 16px;
     transition: color 0.3s ease, transform 0.2s ease;
-    padding: 5px 10px; /* Adjust padding for better spacing */
+    padding: 5px 10px;
 }
 
 .header nav a:hover {
