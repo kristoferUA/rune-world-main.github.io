@@ -6,6 +6,7 @@ body {
     background-color: #f0f0f0;
     color: #333;
 }
+
 .logo {
     display: flex;
     align-items: center;
@@ -16,7 +17,6 @@ body {
     height: 50px;
     margin-left: 10px;
 }
-
 
 /* Стили для контейнера */
 .container {
@@ -35,7 +35,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 40px;
+    padding: 10px 20px;
     color: #fff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
@@ -47,20 +47,21 @@ body {
 }
 
 .header .logo {
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .header nav {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .header nav a {
     color: #fff;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 16px;
     transition: color 0.3s ease, transform 0.2s ease;
 }
 
@@ -73,9 +74,9 @@ body {
 .main-title {
     color: #32CD32;
     text-align: center;
-    font-size: 40px;
+    font-size: 32px;
     margin-top: 120px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
     border-radius: 10px;
@@ -105,12 +106,13 @@ body {
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     animation: fadeIn 1.5s ease-in-out;
+    word-wrap: break-word;
 }
 
 /* Стили для секции видео */
 .video {
     background-color: #D2691E;
-    padding: 40px 0;
+    padding: 40px 20px;
     color: #fff;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -127,7 +129,7 @@ body {
 /* Стили для формы заявки */
 .application {
     background-color: #9ACD32;
-    padding: 40px 0;
+    padding: 40px 20px;
     color: #fff;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -174,7 +176,7 @@ button:active {
 /* Стили для отзывов */
 .reviews {
     background-color: #fff;
-    padding: 40px 0;
+    padding: 40px 20px;
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -219,4 +221,5 @@ footer {
     border-radius: 10px;
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
+    word-wrap: break-word;
 }
