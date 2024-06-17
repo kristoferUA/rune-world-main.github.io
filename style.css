@@ -31,7 +31,7 @@ body {
     top: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(135deg, #4682B4, #5DADE2);
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -42,22 +42,15 @@ body {
     transition: all 0.3s ease;
 }
 
-.header:hover {
-    background: linear-gradient(135deg, #5DADE2, #4682B4);
-}
-
 .header .logo {
     font-size: 24px;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    margin-right: 25px; /* Adjust this to control the space between the logo and the nav */
 }
 
 .header nav {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-left: 25px; /* Adjust this to control the space between the logo and the nav */
+    gap: 20px;
 }
 
 .header nav a {
@@ -97,16 +90,17 @@ body {
 .main-title {
     color: #3751d9;
     text-align: center;
-    font-size: 40px;
+    font-size: 48px;
     margin-top: 120px;
     margin-bottom: 50px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     animation: fadeIn 1.5s ease-in-out;
 }
 
+/* Анимации */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -120,8 +114,6 @@ body {
 
 /* Стили для текста поверх изображения */
 .text-overlay {
-    position: relative;
-    z-index: 1;
     background-color: rgba(0, 0, 0, 0.6);
     color: #fff;
     padding: 20px;
@@ -133,7 +125,7 @@ body {
 
 /* Стили для секции видео */
 .video {
-    background-color: #4682B4;
+    background-color: #6a11cb;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -150,7 +142,7 @@ body {
 
 /* Стили для формы заявки */
 .application {
-    background-color: #4682B4;
+    background-color: #6a11cb;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -179,7 +171,7 @@ input {
 }
 
 button {
-    background-color: #4682B4;
+    background-color: #2575fc;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -215,19 +207,11 @@ button:active {
 
 /* Стили для футера */
 footer {
-    background-color: #4682B4;
+    background-color: #6a11cb;
     color: #fff;
     text-align: center;
     padding: 20px 0;
     border-radius: 10px 10px 0 0;
-}
-
-.footer .social-links {
-    margin-top: 20px;
-}
-
-.footer .social-icon {
-    margin-right: 10px;
 }
 
 /* Стили для основного раздела */
