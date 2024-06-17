@@ -7,6 +7,16 @@ body {
     color: #333;
 }
 
+a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #FFD700; /* Optional: Change color on hover */
+}
+
 .logo {
     display: flex;
     align-items: center;
