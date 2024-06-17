@@ -133,7 +133,7 @@ body {
 
 /* Стили для секции видео */
 .video {
-    background-color: #9ACD32;
+    background-color: #4682B4;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -150,7 +150,7 @@ body {
 
 /* Стили для формы заявки */
 .application {
-    background-color: #9ACD32;
+    background-color: #4682B4;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -179,19 +179,19 @@ input {
 }
 
 button {
-    background-color: #9ACD32;
+    background-color: #4682B4;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-    background-color: #28a428;
+    background-color: #4682B4;
     transform: translateY(-2px);
 }
 
 button:active {
-    background-color: #219e21;
+    background-color: #1953b0;
     transform: translateY(1px);
 }
 
