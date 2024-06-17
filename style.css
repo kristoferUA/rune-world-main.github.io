@@ -171,19 +171,19 @@ input {
 }
 
 button {
-    background-color: #2575fc;
+    background-color: #6a11cb;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-    background-color: #1953b0;
+    background-color: #511394;
     transform: translateY(-2px);
 }
 
 button:active {
-    background-color: #1953b0;
+    background-color: #511394;
     transform: translateY(1px);
 }
 
