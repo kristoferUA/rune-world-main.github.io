@@ -1,68 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RuneWorld - Minecraft Server</title>
+    <title>RuneWorld</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
-    <!-- Header section -->
-    <header class="header">
-        <div class="logo">
-            RuneWorld
-            <img src="logo.png" alt="RuneWorld Logo" class="logo-image">
+    <header>
+        <div class="header">
+            <div class="logo">
+                RuneWorld
+                <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
+            </div>
+            <nav>
+                <a href="#application">Подать заявку</a>
+                <a href="#reviews">Отзывы</a>
+                <a href="#about">Античит</a>
+                <a href="#about">  </a>
+            </nav>
         </div>
-        <nav>
-            <a href="#main">Главная</a>
-            <a href="#video">Видео</a>
-            <a href="#application">Заявка</a>
-            <a href="#reviews">Отзывы</a>
-        </nav>
     </header>
-
-    <!-- Main section -->
-    <div class="main" id="main">
-        <h1 class="main-title">Добро пожаловать на сервер RuneWorld!</h1>
+    <div class="main">
+        <h1 class="main-title">RuneWorld</h1>
         <div class="text-overlay">
-            <p>RuneWorld - это уникальный Minecraft сервер, предлагающий игрокам захватывающие приключения и множество возможностей. Присоединяйтесь к нам и исследуйте удивительный мир RuneWorld!</p>
+            <h3>О сервере RuneWorld</h3>
+            <p>Сервер RuneWorld - это майнкрафт сервер с ламповой атмосферой, хорошим хостингом, дружелюбными игроками и добрыми админами. Наш сервер работает на хостинге Minecraft Realms благодаря чему, все игроки имеют бесперебойный доступ к серверу, из любой страны. На нашем сервере всегда низкий пинг в любой точке мира, так как сервер держится на хостинге от Microsoft. На нашем сервере ламповая атмосфера и добрые игроки, проводятся ивенты, строятся мега-проекты, развивается инфраструктура. На нашем сервере есть сезоны, которые завершаются и начинаются каждый год, актуальный сезон - это третий сезон. Присоединяйтесь к нам и станьте частью нашего дружного сообщества!</p>
+        </div>
+        <section class="video">
+            <div class="container">
+                <h2>YouTube канал сервера RuneWorld</h2>
+                <p><a href="https://www.youtube.com/@rune_craft2287?si=9OCK7hWKA1nPm93C" target="_blank">Посетить канал RuneWorld на YouTube</a></p>
+            </div>
+        </section>
+        <div class="buttons">
+            <button class="main-button"><a href="#application">Подать заявку</a></button>
+            <button class="main-button"><a href="#contacts">Контакты</a></button>
         </div>
     </div>
-
-    <!-- Video section -->
-    <section class="section video" id="video">
-        <h2 class="section-title">Видео</h2>
-        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </section>
-
-    <!-- Application section -->
-    <section class="section application" id="application">
-        <h2 class="section-title">Подать заявку</h2>
-        <form>
-            <input type="text" placeholder="Ваше имя" required>
-            <input type="email" placeholder="Ваш email" required>
-            <button type="submit">Отправить</button>
-        </form>
-    </section>
-
-    <!-- Reviews section -->
-    <section class="section reviews" id="reviews">
-        <h2 class="section-title">Отзывы</h2>
-        <div class="review">
-            <p>"Это лучший Minecraft сервер, на котором я когда-либо играл!" - Игрок1</p>
-        </div>
-        <div class="review">
-            <p>"Захватывающий геймплей и отличное сообщество." - Игрок2</p>
-        </div>
-        <div class="review">
-            <p>"Обожаю RuneWorld! Здесь всегда интересно." - Игрок3</p>
+    <section class="application" id="application">
+        <div class="container">
+            <h2>Подать заявку</h2>
+            <p>Заполните форму и мы свяжемся с вами</p>
+            <form action="https://formspree.io/f/mvoejaqe" method="POST">
+                <input type="text" name="name" placeholder="Ваш ник" required>
+                <input type="email" name="email" placeholder="Ваш email" required>
+                <input type="text" name="discord" placeholder="Ваш ник в дискорде" required>
+                <input type="text" name="telegram" placeholder="Ваш юзернейм в Telegram" required>
+                <button type="submit">Отправить</button>
+            </form>
         </div>
     </section>
-
-    <!-- Footer section -->
-    <footer class="footer">
-        <p>RuneWorld &copy; 2024. Все права защищены.</p>
+    <section class="about" id="about">
+        <div class="container">
+            <h2>Античит</h2>
+            <p>Для обеспечения честной игры и поддержания справедливости на сервере RuneWorld внедрена передовая античит система. Мы используем самые современные алгоритмы для обнаружения и блокировки нечестных игроков, которые пытаются получить преимущество с помощью запрещённых модификаций и читов. Наша античит система регулярно обновляется, чтобы эффективно противостоять новым угрозам и методам взлома. Мы стремимся создать условия, при которых каждый игрок может наслаждаться игрой в равных условиях, без угрозы столкнуться с мошенничеством и нечестными методами. Присоединяйтесь к RuneWorld и наслаждайтесь игрой, зная, что ваша честность защищена!</p>
+        </div>
+    </section>
+    <section class="reviews" id="reviews">
+        <div class="container">
+            <h2>Отзывы</h2>
+            <div class="review">
+                <p>Kristofer UA: "RuneWorld - это лучший сервер, на котором я когда-либо играл! Здесь всегда доброжелательная атмосфера, низкий пинг и отличные ивенты. Админы действительно заботятся о комфорте игроков, и это чувствуется на каждом шагу. Всем рекомендую!"</p>
+            </div>
+            <div class="review">
+                <p>Rune_craft2287: "Играю на RuneWorld уже больше года и могу сказать, что это действительно особенное место. Сезоны придают игре динамичность, а мега-проекты всегда вдохновляют на создание чего-то нового. Безопасность и античит система на высоте, играйте спокойно!"</p>
+            </div>
+            <div class="review">
+                <p>reallyadrevo: "Сервер RuneWorld стал для меня настоящим домом в мире Minecraft. Здесь всегда можно найти новых друзей и получить массу удовольствия от игры. Особая благодарность админам за их труд и заботу о безопасности сервера. Лучший выбор для всех майнкрафтеров!"</p>
+                </div>
+        </div>
+    </section>
+     <section class="video">
+            <div class="container">
+                <h2>Фонд сервера</h2>
+                <p><a href="https://send.monobank.ua/jar/ADnoVeXKrG" target="_blank">Пожертвование серверу на оплату хостинга</a></p>
+            </div>
+        </section>
+    <section class="contacts" id="contacts">
+            <h2>Контакты администрации</h2>
+            <p><strong>Телефон:</strong> +38(068)-300-69-61</p>
+            <p><strong>Email:</strong> admruneworld@gmail.com</p>
+        </div>
+    </section>
+    <footer>
+        <div class="footer">
+            <p>&copy; 2024 RUNEWORLD</p>
+        </div>
     </footer>
 </body>
 </html>
