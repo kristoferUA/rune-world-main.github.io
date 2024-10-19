@@ -5,7 +5,6 @@ body {
     padding: 0;
     background-color: #f0f0f0;
     color: #333;
-    overflow-x: hidden; /* Отключение горизонтальной прокрутки */
 }
 
 a {
@@ -31,8 +30,8 @@ a:hover {
 
 /* Стили для контейнера */
 .container {
-    width: 1000px; /* Фиксированная ширина */
-    margin: 0 auto; /* Центрирование контейнера */
+    max-width: 1000px;
+    margin: 0 auto;
     padding: 20px;
 }
 
@@ -41,7 +40,7 @@ a:hover {
     position: fixed;
     top: 0;
     left: 0;
-    width: 1000px; /* Фиксированная ширина */
+    width: 100%;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
     justify-content: space-between;
@@ -75,6 +74,26 @@ a:hover {
 .header nav a:hover {
     color: #FFD700;
     transform: translateY(-2px);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .header nav a {
+        font-size: 14px;
+        padding: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header nav a {
+        font-size: 12px;
+        padding: 5px;
+    }
 }
 
 /* Стили для основного заголовка */
@@ -122,12 +141,10 @@ a:hover {
     border-radius: 10px;
     margin-bottom: 20px;
     animation: slideIn 1.5s ease-in-out;
-    width: 1000px; /* Фиксированная ширина */
-    margin: 0 auto; /* Центрирование */
 }
 
 .video iframe {
-    width: 1000px; /* Фиксированная ширина */
+    width: 100%;
     height: 360px;
     margin-bottom: 20px;
     border-radius: 10px;
@@ -135,21 +152,19 @@ a:hover {
 
 /* Стили для формы заявки */
 .application {
-    background-color: #6a11cb; /* Фиолетовый фон */
+    background-color: #6a11cb;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
     margin-bottom: 20px;
     animation: slideIn 1.5s ease-in-out;
-    width: 1000px; /* Фиксированная ширина */
-    margin: 0 auto; /* Центрирование */
 }
 
 form {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 500px; /* Фиксированная ширина */
+    max-width: 500px;
     margin: 0 auto;
 }
 
@@ -184,14 +199,12 @@ button:active {
 
 /* Стили для отзывов */
 .reviews {
-    background-color: #fff; /* Белый фон */
+    background-color: #fff;
     padding: 40px 0;
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     animation: fadeIn 1.5s ease-in-out;
-    width: 1000px; /* Фиксированная ширина */
-    margin: 0 auto; /* Центрирование */
 }
 
 .review {
@@ -204,18 +217,16 @@ button:active {
 
 /* Стили для футера */
 footer {
-    background-color: #6a11cb; /* Фиолетовый фон */
+    background-color: #6a11cb;
     color: #fff;
     text-align: center;
     padding: 20px 0;
     border-radius: 10px 10px 0 0;
-    width: 1000px; /* Фиксированная ширина */
-    margin: 0 auto; /* Центрирование */
 }
 
 /* Стили для основного раздела */
 .main {
-    width: 1000px; /* Фиксированная ширина */
+    max-width: 1000px;
     margin: 90px auto 20px;
     padding: 20px;
     min-height: calc(100vh - 90px);
