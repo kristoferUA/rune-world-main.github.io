@@ -17,7 +17,7 @@
             </div>
             <nav>
                 <a href="index.html">Главная</a>
-                <a href="seasons.html"> </a>
+                <a href="seasons.html"></a>
             </nav>
         </div>
     </header>
@@ -32,13 +32,16 @@
                 <li><a href="maps/season3.zip" download>Сезон 3</a> - Актуальный сезон, скачать можно будет после его завершения</li>
             </ul>
         </div>
+    </div>
 
-        <!-- Время до начала 4 сезона -->
-        <div class="timer-section">
-            <h2>            Время до начала 4 сезона:</h2>
-            <div class="timer">
-                <script src="//megatimer.ru/get/8a9f0fbde04c56848755b7fd0ceaee70.js"></script>
-            </div>
+    <!-- Раздел с таймером -->
+    <div class="timer-section">
+        <h2>Время до начала 4 сезона:</h2>
+        <div id="timer">
+            <span id="d"></span> дней 
+            <span id="h"></span> часов 
+            <span id="m"></span> минут 
+            <span id="s"></span> секунд
         </div>
     </div>
 
@@ -47,5 +50,50 @@
             <p>&copy; 2024 RUNEWORLD</p>
         </div>
     </footer>
+
+    <!-- Скрипт для таймера -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var _second = 1000;
+            var _minute = _second * 60;
+            var _hour = _minute * 60;
+            var _day = _hour * 24;
+
+            // Текущее время
+            var now = new Date();
+
+            // Установим время окончания: 254 дня, 18 часов, 4 минуты, 46 секунд от текущего момента
+            var end = new Date(now.getTime() + (254 * _day) + (18 * _hour) + (4 * _minute) + (46 * _second));
+
+            function showRemaining() {
+                var now = new Date();
+                var distance = end - now;
+
+                if (distance < 0) {
+                    document.getElementById('timer').innerText = "Время истекло";
+                    return;
+                }
+
+                var days = Math.floor(distance / _day);
+                var hours = Math.floor((distance % _day) / _hour);
+                if (hours < 10) hours = '0' + hours;
+
+                var minutes = Math.floor((distance % _hour) / _minute);
+                if (minutes < 10) minutes = '0' + minutes;
+
+                var seconds = Math.floor((distance % _minute) / _second);
+                if (seconds < 10) seconds = '0' + seconds;
+
+                // Обновление DOM элементов
+                document.getElementById('d').innerText = days;
+                document.getElementById('h').innerText = hours;
+                document.getElementById('m').innerText = minutes;
+                document.getElementById('s').innerText = seconds;
+            }
+
+            showRemaining();
+            setInterval(showRemaining, 1000);
+        });
+    </script>
 </body>
 </html>
