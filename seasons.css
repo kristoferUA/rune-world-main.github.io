@@ -104,3 +104,69 @@ body {
 .main-button:hover {
     background-color: #2980b9;
 }
+/* ... остальной код CSS ... */
+
+.main {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.main h1 {
+    font-size: 36px;
+    color: #3751d9;
+    margin-bottom: 20px;
+}
+
+.text-overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* Темный слой под текст */
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.text-overlay h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.text-overlay p {
+    font-size: 16px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.seasons {
+    text-align: left;
+    padding: 20px;
+}
+
+.seasons ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.seasons li {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.seasons li a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.seasons li a:hover {
+    text-decoration: underline;
+    font-weight: bold; /* Добавили жирный шрифт при наведении */
+}
+
+.season-item {
+    border-bottom: 1px solid #ddd; /* Разделительная линия между сезонами */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
