@@ -30,8 +30,8 @@ a:hover {
 
 /* Стили для контейнера */
 .container {
-    max-width: 1000px;
-    margin: 0 auto;
+    width: 1000px; /* Фиксированная ширина */
+    margin: 0 auto; /* Центрирование контейнера */
     padding: 20px;
 }
 
@@ -40,7 +40,7 @@ a:hover {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 1000px; /* Фиксированная ширина */
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
     justify-content: space-between;
@@ -141,10 +141,12 @@ a:hover {
     border-radius: 10px;
     margin-bottom: 20px;
     animation: slideIn 1.5s ease-in-out;
+    width: 1000px; /* Фиксированная ширина */
+    margin: 0 auto; /* Центрирование */
 }
 
 .video iframe {
-    width: 100%;
+    width: 1000px; /* Фиксированная ширина */
     height: 360px;
     margin-bottom: 20px;
     border-radius: 10px;
@@ -152,19 +154,21 @@ a:hover {
 
 /* Стили для формы заявки */
 .application {
-    background-color: #6a11cb;
+    background-color: #6a11cb; /* Фиолетовый фон */
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
     margin-bottom: 20px;
     animation: slideIn 1.5s ease-in-out;
+    width: 1000px; /* Фиксированная ширина */
+    margin: 0 auto; /* Центрирование */
 }
 
 form {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 500px;
+    max-width: 500px; /* Фиксированная ширина */
     margin: 0 auto;
 }
 
@@ -199,12 +203,14 @@ button:active {
 
 /* Стили для отзывов */
 .reviews {
-    background-color: #fff;
+    background-color: #fff; /* Белый фон */
     padding: 40px 0;
     border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     animation: fadeIn 1.5s ease-in-out;
+    width: 1000px; /* Фиксированная ширина */
+    margin: 0 auto; /* Центрирование */
 }
 
 .review {
@@ -217,16 +223,18 @@ button:active {
 
 /* Стили для футера */
 footer {
-    background-color: #6a11cb;
+    background-color: #6a11cb; /* Фиолетовый фон */
     color: #fff;
     text-align: center;
     padding: 20px 0;
     border-radius: 10px 10px 0 0;
+    width: 1000px; /* Фиксированная ширина */
+    margin: 0 auto; /* Центрирование */
 }
 
 /* Стили для основного раздела */
 .main {
-    max-width: 1000px;
+    width: 1000px; /* Фиксированная ширина */
     margin: 90px auto 20px;
     padding: 20px;
     min-height: calc(100vh - 90px);
@@ -237,4 +245,4 @@ footer {
     border-radius: 10px;
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
-}
+    }
