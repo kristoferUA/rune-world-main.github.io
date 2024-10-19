@@ -1,0 +1,106 @@
+/* CSS для страницы с картами сезонов */
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #f0f0f0; /* Цвет фона */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #5a4eaf;
+    padding: 10px 20px;
+}
+
+.header .logo {
+    font-size: 24px;
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+.header nav a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 400;
+}
+
+.main {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.main h1 {
+    font-size: 36px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+.text-overlay {
+    background-color: rgba(0, 0, 0, 0.5); /* Темный слой под текст */
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+.text-overlay h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.text-overlay p {
+    font-size: 16px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.seasons {
+    text-align: left;
+    padding: 20px;
+}
+
+.seasons ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.seasons li {
+    font-size: 18px;
+    margin: 10px 0;
+}
+
+.seasons li a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.seasons li a:hover {
+    text-decoration: underline;
+}
+
+/* Кнопки */
+.main-button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.main-button a {
+    color: white;
+    text-decoration: none;
+}
+
+.main-button:hover {
+    background-color: #2980b9;
+}
