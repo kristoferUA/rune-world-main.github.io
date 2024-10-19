@@ -5,6 +5,7 @@ body {
     padding: 0;
     background-color: #f0f0f0;
     color: #333;
+    overflow-x: hidden; /* Отключение горизонтальной прокрутки */
 }
 
 a {
@@ -30,7 +31,7 @@ a:hover {
 
 /* Стили для контейнера */
 .container {
-    max-width: 1000px;
+    width: 1000px; /* Фиксированная ширина */
     margin: 0 auto;
     padding: 20px;
 }
@@ -40,7 +41,7 @@ a:hover {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
+    width: 1000px; /* Фиксированная ширина */
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
     justify-content: space-between;
@@ -74,26 +75,6 @@ a:hover {
 .header nav a:hover {
     color: #FFD700;
     transform: translateY(-2px);
-}
-
-/* Media queries for responsive design */
-@media (max-width: 768px) {
-    .header nav a {
-        font-size: 14px;
-        padding: 5px;
-    }
-}
-
-@media (max-width: 480px) {
-    .header nav {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .header nav a {
-        font-size: 12px;
-        padding: 5px;
-    }
 }
 
 /* Стили для основного заголовка */
@@ -144,7 +125,7 @@ a:hover {
 }
 
 .video iframe {
-    width: 100%;
+    width: 1000px; /* Фиксированная ширина */
     height: 360px;
     margin-bottom: 20px;
     border-radius: 10px;
@@ -164,7 +145,7 @@ form {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 500px;
+    max-width: 500px; /* Фиксированная ширина */
     margin: 0 auto;
 }
 
@@ -226,7 +207,7 @@ footer {
 
 /* Стили для основного раздела */
 .main {
-    max-width: 1000px;
+    width: 1000px; /* Фиксированная ширина */
     margin: 90px auto 20px;
     padding: 20px;
     min-height: calc(100vh - 90px);
@@ -237,4 +218,4 @@ footer {
     border-radius: 10px;
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
-}
+        }
