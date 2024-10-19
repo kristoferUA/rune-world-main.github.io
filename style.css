@@ -238,3 +238,50 @@ footer {
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
 }
+/* !!!Стили для блока с текстом на странице сезонов */
+.main-title {
+    font-size: 48px;
+    color: #2f4fdf;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6); /* Прозрачный черный фон */
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;
+}
+
+ul li a {
+    color: #dfd72f;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+ul li a:hover {
+    text-decoration: underline;
+}
+
+/* Фон изображения для страницы с картами сезонов */
+body {
+    background-image: url('background-image.jpg'); /* Заменить на твой фон */
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+}
+
