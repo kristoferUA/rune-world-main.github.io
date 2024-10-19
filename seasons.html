@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="seasons.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <style>
+        /* Основные стили для адаптивности */
         body {
             margin: 0;
             padding: 0;
@@ -30,6 +31,7 @@
             display: inline-block;
         }
 
+        /* Медиазапросы для адаптивности */
         @media only screen and (max-width: 600px) {
             .main-title {
                 font-size: 1.5rem;
@@ -44,7 +46,7 @@
             }
 
             .timer {
-                width: 100%; 
+                width: 100%; /* Таймер на всю ширину экрана */
                 max-width: 100%;
             }
         }
@@ -78,8 +80,9 @@
         <!-- Время до начала 4 сезона -->
         <div class="timer-section">
             <h2>Время до начала 4 сезона:</h2>
-            <!-- Прямо вставляем таймер -->
-            <iframe src="//megatimer.ru/get/8a9f0fbde04c56848755b7fd0ceaee70.html" frameborder="0" width="100%" height="100px"></iframe>
+            <div class="timer">
+                <script src="//megatimer.ru/get/8a9f0fbde04c56848755b7fd0ceaee70.js"></script>
+            </div>
         </div>
     </div>
 
