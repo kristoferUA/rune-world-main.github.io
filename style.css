@@ -32,7 +32,7 @@ a:hover {
 /* Стили для контейнера */
 .container {
     width: 1000px; /* Фиксированная ширина */
-    margin: 0 auto;
+    margin: 0 auto; /* Центрирование контейнера */
     padding: 20px;
 }
 
@@ -135,7 +135,7 @@ a:hover {
 
 /* Стили для формы заявки */
 .application {
-    background-color: #6a11cb;
+    background-color: #6a11cb; /* Фиолетовый фон */
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -184,7 +184,7 @@ button:active {
 
 /* Стили для отзывов */
 .reviews {
-    background-color: #fff;
+    background-color: #fff; /* Белый фон */
     padding: 40px 0;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -204,11 +204,13 @@ button:active {
 
 /* Стили для футера */
 footer {
-    background-color: #6a11cb;
+    background-color: #6a11cb; /* Фиолетовый фон */
     color: #fff;
     text-align: center;
     padding: 20px 0;
     border-radius: 10px 10px 0 0;
+    width: 1000px; /* Фиксированная ширина */
+    margin: 0 auto; /* Центрирование */
 }
 
 /* Стили для основного раздела */
