@@ -14,7 +14,7 @@ a {
 }
 
 a:hover {
-    color: #FFD700; /* Изменение цвета при наведении */
+    color: #FFD700; /* Optional: Change color on hover */
 }
 
 .logo {
@@ -76,21 +76,11 @@ a:hover {
     transform: translateY(-2px);
 }
 
-/* Адаптивный дизайн */
-@media (max-width: 1024px) {
-    .container {
-        padding: 15px;
-    }
-}
-
+/* Media queries for responsive design */
 @media (max-width: 768px) {
     .header nav a {
         font-size: 14px;
         padding: 5px;
-    }
-
-    .container {
-        padding: 10px;
     }
 }
 
@@ -103,14 +93,6 @@ a:hover {
     .header nav a {
         font-size: 12px;
         padding: 5px;
-    }
-
-    .main-title {
-        font-size: 36px;
-    }
-
-    .video iframe {
-        height: 240px;
     }
 }
 
@@ -125,4 +107,134 @@ a:hover {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 1.5s ease
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для текста поверх изображения */
+.text-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Стили для секции видео */
+.video {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+.video iframe {
+    width: 100%;
+    height: 360px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+/* Стили для формы заявки */
+.application {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+input, button {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+
+input {
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #6a11cb;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #511394;
+    transform: translateY(-2px);
+}
+
+button:active {
+    background-color: #511394;
+    transform: translateY(1px);
+}
+
+/* Стили для отзывов */
+.reviews {
+    background-color: #fff;
+    padding: 40px 0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.review {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+/* Стили для футера */
+footer {
+    background-color: #6a11cb;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Стили для основного раздела */
+.main {
+    max-width: 1000px;
+    margin: 90px auto 20px;
+    padding: 20px;
+    min-height: calc(100vh - 90px);
+    background-image: url("main-background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 10px;
+    position: relative;
+    animation: fadeIn 1.5s ease-in-out;
+}
