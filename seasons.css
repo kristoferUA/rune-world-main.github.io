@@ -39,7 +39,7 @@ a:hover {
 .header {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 0; /* Убедитесь, что элемент не выходит за пределы слева */
     width: 100%;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
@@ -50,6 +50,8 @@ a:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: all 0.3s ease;
+    box-sizing: border-box; /* Учитывать паддинги и бордюры в общей ширине */
+    overflow: hidden; /* Препятствует выходу элементов за пределы */
 }
 
 .header .logo {
