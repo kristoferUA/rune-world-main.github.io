@@ -1,3 +1,8 @@
+@media (max-width: 768px) {
+    .header {
+        padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
+    }
+}
 /* Общие стили для страницы */
 body {
     font-family: 'Montserrat', sans-serif;
