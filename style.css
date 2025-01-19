@@ -1,3 +1,15 @@
+/* Применяем градиент как у шапки для мобильного меню */
+.mobile-menu {
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+}
+
+/* Скрываем старое десктопное меню на мобильных устройствах */
+@media (max-width: 768px) {
+    .desktop-menu {
+        display: none;
+    }
+}
 /* Стили для мобильного меню */
 .menu-button {
     display: none;
@@ -23,13 +35,14 @@
     transition: opacity 0.3s ease;
 }
 
+/* Исправляем перекрытие шапкой */
 .mobile-menu {
     position: fixed;
     top: 0;
     right: -300px;
     width: 300px;
     height: 100%;
-    background-color: #fff;
+    z-index: 1000; /* Чтобы меню всегда было поверх */
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
     padding: 20px;
     display: flex;
