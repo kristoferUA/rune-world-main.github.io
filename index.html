@@ -10,20 +10,30 @@
 </head>
 <body>
     <header>
-        <div class="header">
-            <div class="logo">
-                RuneWorld
-                <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
-            </div>
-            <nav>
-                <a href="#application">Подать заявку</a>
-                <a href="#reviews">Отзывы</a>
-                <a href="#about">Античит</a>
-                <a href="seasons.html">Карты сезонов</a>
-                <a href="#about">  </a>
-            </nav>
+    <div class="header">
+        <div class="logo">
+            RuneWorld
+            <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
         </div>
-    </header>
+        <button class="menu-button" id="menu-button">Меню</button>
+        <nav class="desktop-menu">
+            <a href="#application">Подать заявку</a>
+            <a href="#reviews">Отзывы</a>
+            <a href="#about">Античит</a>
+            <a href="seasons.html">Карты сезонов</a>
+            <a href="#about">  </a>
+        </nav>
+    </div>
+</header>
+<div class="mobile-menu-overlay" id="mobile-menu-overlay">
+    <div class="mobile-menu" id="mobile-menu">
+        <button class="close-menu" id="close-menu">×</button>
+        <a href="#application">Подать заявку</a>
+        <a href="#reviews">Отзывы</a>
+        <a href="#about">Античит</a>
+        <a href="seasons.html">Карты сезонов</a>
+    </div>
+</div>
     <div class="main">
         <h1 class="main-title">RuneWorld</h1>
         <div class="text-overlay">
@@ -94,3 +104,24 @@
     </footer>
 </body>
 </html>
+<script>
+    const menuButton = document.getElementById('menu-button');
+    const closeMenuButton = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+    menuButton.addEventListener('click', () => {
+        mobileMenu.classList.add('open');
+        mobileMenuOverlay.classList.add('open');
+    });
+
+    closeMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuOverlay.classList.remove('open');
+    });
+
+    mobileMenuOverlay.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuOverlay.classList.remove('open');
+    });
+</script>
