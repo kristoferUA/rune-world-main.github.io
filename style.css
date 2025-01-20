@@ -1,106 +1,97 @@
 /* Применяем градиент как у шапки для мобильного меню */
 .mobile-menu {
-    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  color: #fff;
 }
 
 @media (max-width: 768px) {
-    .header {
-        padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
-    }
+  .header {
+    padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
+  }
 }
 
 @media (max-width: 768px) {
-    .desktop-menu {
-        display: none; /* Скрыть навигацию */
-        visibility: hidden; /* Не занимать место */
-        position: absolute; /* Не мешать другим элементам */
-    }
+  .desktop-menu {
+    display: none; /* Скрыть навигацию */
+    visibility: hidden; /* Не занимать место */
+    position: absolute; /* Не мешать другим элементам */
+  }
 }
-/* Стили для кнопки меню только на мобильных устройствах */
-@media (max-width: 768px) {
-    .menu-button {
-    position: absolute; /* Добавляем абсолютное позиционирование */
-    top: 50%; /* Выравниваем по вертикали */
-    transform: translateY(-50%); /* Смещаем кнопку на половину её высоты вверх */
-    left: 78%; /* Выравниваем по горизонтали */
-    }
-}
+
+/* Стили для мобильного меню */
 .menu-button {
-    display: block;
-    background-color: #6a11cb;
-    color: #fff;
-    font-size: 16px;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    top: 50%; /* Выравниваем по вертикали */
-    transform: translateY(-50%); /* Смещаем кнопку на половину её высоты вверх */
-    left: 78%; /* Выравниваем по горизонтали */
+  display: none;
+  background-color: #6a11cb;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  border-radius: 5px;
 }
+
 .mobile-menu-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1100;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 /* Исправляем перекрытие шапкой */
 .mobile-menu {
-    position: fixed;
-    top: 0;
-    right: -300px;
-    width: 300px;
-    height: 100%;
-    z-index: 1000; /* Чтобы меню всегда было поверх */
-    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    transition: right 0.3s ease;
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  z-index: 1000; /* Чтобы меню всегда было поверх */
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: right 0.3s ease;
 }
 
 .mobile-menu a {
-    color: #fff;
-    text-decoration: none;
-    font-size: 18px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
 }
 
 .close-menu {
-    background: none;
-    border: none;
-    font-size: 24px;
-    align-self: flex-end;
-    cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 24px;
+  align-self: flex-end;
+  cursor: pointer;
 }
 
 .mobile-menu.open {
-    right: 0;
+  right: 0;
 }
 
 .mobile-menu-overlay.open {
-    display: block;
-    opacity: 1;
+  display: block;
+  opacity: 1;
 }
 
 /* Показываем кнопку "Меню" только на мобильных устройствах */
 @media (max-width: 768px) {
-    .menu-button {
-        display: block;
-    }
-
-    .desktop-menu {
-        display: none;
-    }
+  .menu-button {
+    display: block;
+  }
+  .desktop-menu {
+    display: none;
+  }
 }
+
 
 /* Общие стили для страницы */
 body {
