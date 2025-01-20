@@ -128,19 +128,16 @@
     menuButton.addEventListener('click', () => {
         mobileMenu.classList.add('open');
         mobileMenuOverlay.classList.add('open');
-        body.classList.add('body-no-scroll');
     });
 
     closeMenuButton.addEventListener('click', () => {
         mobileMenu.classList.remove('open');
         mobileMenuOverlay.classList.remove('open');
-        body.classList.remove('body-no-scroll');
     });
 
     mobileMenuOverlay.addEventListener('click', () => {
         mobileMenu.classList.remove('open');
         mobileMenuOverlay.classList.remove('open');
-        body.classList.remove('body-no-scroll');
     });
 </script>
 <script>
@@ -152,24 +149,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
 
     // Відкрити меню
-    menuButton.addEventListener('click', () => {
+    menuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Щоб кліки на кнопку не закривали меню
         mobileMenu.classList.add('active');
         overlay.classList.add('active');
         body.classList.add('body-no-scroll'); // Заборона прокрутки
     });
 
     // Закрити меню (при натисканні на кнопку закриття)
-    closeMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.remove('active');
-        overlay.classList.remove('active');
-        body.classList.remove('body-no-scroll'); // Дозволити прокрутку
+    closeMenuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Щоб кліки на кнопку не викликали глобальне закриття
+        closeMenu();
     });
 
     // Закрити меню (при натисканні на overlay)
     overlay.addEventListener('click', () => {
+        closeMenu();
+    });
+
+    // Закрити меню (при кліку в будь-якому місці документа)
+    document.addEventListener('click', () => {
+        closeMenu();
+    });
+
+    // Функція для закриття меню та відновлення прокрутки
+    function closeMenu() {
         mobileMenu.classList.remove('active');
         overlay.classList.remove('active');
         body.classList.remove('body-no-scroll'); // Дозволити прокрутку
-    });
+    }
 });
 </script>
