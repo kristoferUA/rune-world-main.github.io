@@ -34,6 +34,19 @@
         left: 78%; /* Выравниваем по горизонтали */
     }
 }
+.menu-button {
+        display: block;
+        background-color: #6a11cb;
+        color: #fff;
+        font-size: 16px;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        top: 50%; /* Выравниваем по вертикали */
+        transform: translateY(-50%); /* Смещаем кнопку на половину её высоты вверх */
+        left: 78%; /* Выравниваем по горизонтали */
+    }
 .mobile-menu-overlay {
     display: none;
     position: fixed;
