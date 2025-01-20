@@ -1,3 +1,9 @@
+/* Применяем градиент как у шапки для мобильного меню */
+.mobile-menu {
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+}
+
 @media (max-width: 768px) {
     .header {
         padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
@@ -53,7 +59,7 @@
 }
 
 .mobile-menu a {
-    color: #333;
+    color: #fff;
     text-decoration: none;
     font-size: 18px;
 }
