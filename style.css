@@ -17,22 +17,23 @@
         position: absolute; /* Не мешать другим элементам */
     }
 }
-/* Стили для кнопки меню */
-.menu-button {
-    display: block;
-    background-color: #6a11cb;
-    color: #fff;
-    font-size: 16px;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    border-radius: 5px;
-    position: absolute;
-    top: 50%; /* Выравниваем по вертикали */
-    transform: translateY(-50%); /* Смещаем кнопку на половину её высоты вверх */
-    left: 78%
+/* Стили для кнопки меню только на мобильных устройствах */
+@media (max-width: 768px) {
+    .menu-button {
+        display: block;
+        background-color: #6a11cb;
+        color: #fff;
+        font-size: 16px;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        position: absolute; /* Добавляем абсолютное позиционирование */
+        top: 50%; /* Выравниваем по вертикали */
+        transform: translateY(-50%); /* Смещаем кнопку на половину её высоты вверх */
+        left: 78%; /* Выравниваем по горизонтали */
+    }
 }
-
 .mobile-menu-overlay {
     display: none;
     position: fixed;
