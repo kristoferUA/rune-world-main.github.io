@@ -35,6 +35,7 @@
                 <a href="#about">Античит</a>
                 <a href="ukrseasons.html">Карти сезонів</a>
                 <a href="index.html">Російська версія</a>
+                <div class="menu-overlay" id="menu-overlay"></div>
             </nav>
         </div>
     </header>
@@ -138,4 +139,44 @@
         mobileMenu.classList.remove('open');
         mobileMenuOverlay.classList.remove('open');
     });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const menuButton = document.getElementById('menu-button');
+    const closeMenuButton = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('menu-overlay');
+    const body = document.body;
+
+    // Відкрити меню
+    menuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Щоб кліки на кнопку не закривали меню
+        mobileMenu.classList.add('active');
+        overlay.classList.add('active');
+        body.classList.add('body-no-scroll'); // Заборона прокрутки
+    });
+
+    // Закрити меню (при натисканні на кнопку закриття)
+    closeMenuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); // Щоб кліки на кнопку не викликали глобальне закриття
+        closeMenu();
+    });
+
+    // Закрити меню (при натисканні на overlay)
+    overlay.addEventListener('click', () => {
+        closeMenu();
+    });
+
+    // Закрити меню (при кліку в будь-якому місці документа)
+    document.addEventListener('click', () => {
+        closeMenu();
+    });
+
+    // Функція для закриття меню та відновлення прокрутки
+    function closeMenu() {
+        mobileMenu.classList.remove('active');
+        overlay.classList.remove('active');
+        body.classList.remove('body-no-scroll'); // Дозволити прокрутку
+    }
+});
 </script>
