@@ -21,7 +21,7 @@
 /* Стили для мобильного меню */
 .menu-button {
   display: none;
-  background-color: #6a11cb;
+  background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
   color: #fff;
   font-size: 16px;
   border: none;
