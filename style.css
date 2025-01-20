@@ -1,3 +1,12 @@
+button, .menu-button, .close-menu, a {
+  user-select: none; /* Отключает выделение текста */
+  outline: none; /* Убирает обводку при фокусе */
+}
+
+button:focus, .menu-button:focus, .close-menu:focus, a:focus {
+  outline: none; /* Убирает обводку при нажатии */
+}
+
 /* Применяем градиент как у шапки для мобильного меню */
 .mobile-menu {
   background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
