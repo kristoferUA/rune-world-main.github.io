@@ -40,7 +40,7 @@
     background: rgba(0, 0, 0, 0.5);
     z-index: 900;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.5s ease;
 }
 
 /* Исправляем перекрытие шапкой */
@@ -58,7 +58,7 @@
     gap: 20px;
     background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
     color: #fff;
-    transition: right 0.4s ease, opacity 0.4s ease;
+    transition: right 0.5s ease, opacity 0.5s ease;
     opacity: 0;
 }
 
