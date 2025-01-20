@@ -35,6 +35,7 @@
             <a href="#about">Античит</a>
             <a href="seasons.html">Карты сезонов</a>
             <a href="ukrindex.html">Украинская версия</a>
+            <div class="menu-overlay" id="menu-overlay"></div>
         </nav>
     </div>
 </header>
@@ -127,15 +128,18 @@
     menuButton.addEventListener('click', () => {
         mobileMenu.classList.add('open');
         mobileMenuOverlay.classList.add('open');
+        body.classList.add('body-no-scroll');
     });
 
     closeMenuButton.addEventListener('click', () => {
         mobileMenu.classList.remove('open');
         mobileMenuOverlay.classList.remove('open');
+        body.classList.remove('body-no-scroll');
     });
 
     mobileMenuOverlay.addEventListener('click', () => {
         mobileMenu.classList.remove('open');
         mobileMenuOverlay.classList.remove('open');
+        body.classList.remove('body-no-scroll');
     });
 </script>
