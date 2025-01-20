@@ -180,3 +180,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const formSubmitButton = document.querySelector('form button[type="submit"]'); // Знаходимо кнопку форми
+        const cooldownTime = 30 * 1000; // 30 секунд у мілісекундах
+
+        formSubmitButton.addEventListener('click', (event) => {
+            if (formSubmitButton.disabled) {
+                event.preventDefault(); // Забороняємо подачу заявки, якщо кулдаун активний
+                return;
+            }
+
+            // Дезактивуємо кнопку
+            formSubmitButton.disabled = true;
+            formSubmitButton.textContent = 'Подождите 30 секунд...';
+
+            // Через 30 секунд активуємо кнопку знову
+            setTimeout(() => {
+                formSubmitButton.disabled = false;
+                formSubmitButton.textContent = 'Отправить';
+            }, cooldownTime);
+        });
+    });
+</script>
