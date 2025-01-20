@@ -1,10 +1,7 @@
 button, .menu-button, .close-menu, a {
+  -webkit-tap-highlight-color: transparent; /* Отключает подсветку при нажатии */
   user-select: none; /* Отключает выделение текста */
-  outline: none; /* Убирает обводку при фокусе */
-}
-
-button:focus, .menu-button:focus, .close-menu:focus, a:focus {
-  outline: none; /* Убирает обводку при нажатии */
+  touch-action: manipulation; /* Улучшает поведение при взаимодействии */
 }
 
 /* Применяем градиент как у шапки для мобильного меню */
