@@ -334,7 +334,7 @@ footer {
 /* Стили для основного раздела */
 .main {
     max-width: 1000px;
-    margin: 90px auto 20px;
+    margin: 60px auto 20px;
     padding: 20px;
     min-height: calc(100vh - 90px);
     background-image: url("main-background.png");
