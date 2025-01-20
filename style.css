@@ -86,6 +86,10 @@
 @media (max-width: 768px) {
   .menu-button {
     display: block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 78%
   }
   .desktop-menu {
     display: none;
