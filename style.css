@@ -29,6 +29,7 @@ button, .menu-button, .close-menu, a {
   display: none;
   background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
   color: #fff;
+  text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.3);
   font-size: 16px;
   border: none;
   padding: 10px 15px;
