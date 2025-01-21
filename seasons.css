@@ -1,3 +1,40 @@
+.seasons-buttons {
+    list-style: none;
+    padding: 0;
+}
+
+.seasons-buttons li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.seasons-buttons button {
+    background-color: #3751d9;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px;
+}
+
+.seasons-buttons button:hover {
+    background-color: #4c6cf0;
+    transform: translateY(-2px);
+}
+
+.seasons-buttons button:disabled {
+    background-color: #7a7a7a;
+    cursor: not-allowed;
+}
+
+.seasons-buttons button:disabled:hover {
+    transform: none;
+}
+
 @media (max-width: 768px) {
     .header {
         padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
