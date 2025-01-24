@@ -75,10 +75,11 @@
 
             // Позиционирование меню
             const button = event.target;
-            const rect = button.getBoundingClientRect();
+            const buttonRect = button.getBoundingClientRect();
 
-            menu.style.top = `${rect.top + window.scrollY}px`;
-            menu.style.left = `${rect.right + 20}px`;
+            const menuOffset = 10; // Отступ между кнопкой и меню
+            menu.style.top = `${window.scrollY + buttonRect.top}px`;
+            menu.style.left = `${window.scrollX + buttonRect.right + menuOffset}px`;
             menu.style.display = 'block';
         }
     </script>
