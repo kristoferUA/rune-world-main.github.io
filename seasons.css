@@ -24,6 +24,9 @@
     font-size: 16px;
     transition: background-color 0.3s ease;
 }
+.player-list button:hover {
+    background-color: #6a11cb;
+}
 
 .player-list button:hover {
     background-color: #6a11cb;
@@ -39,6 +42,8 @@
     border-radius: 10px;
     text-align: left;
     min-width: 250px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .mobile-menu .arrow {
