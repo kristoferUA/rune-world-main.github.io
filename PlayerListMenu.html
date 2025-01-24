@@ -51,19 +51,19 @@
 
     <script>
         const playerData = {
+            'runecraft2287': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
             'kristoferUA': {
                 stats: 'Время в игре: 2000ч',
                 description: 'Характеристика: технический администратор, разработчик, средний билдер, креативный человек, коммуникабельный.'
             },
-            'runecraft2287': { stats: 'Нет данных', description: 'Нет данных' },
-            'luotettawa4503': { stats: 'Нет данных', description: 'Нет данных' },
-            'nickmoytash': { stats: 'Нет данных', description: 'Нет данных' },
-            'denis12096': { stats: 'Нет данных', description: 'Нет данных' },
-            'ggvplv1189': { stats: 'Нет данных', description: 'Нет данных' },
-            'moki9707': { stats: 'Нет данных', description: 'Нет данных' },
-            'sasha123490': { stats: 'Нет данных', description: 'Нет данных' },
-            'sokibtw': { stats: 'Нет данных', description: 'Нет данных' },
-            'vlad_merea': { stats: 'Нет данных', description: 'Нет данных' }
+            'luotettawa4503': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'nickmoytash': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'denis12096': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'ggvplv1189': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'moki9707': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'sasha123490': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'sokibtw': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'vlad_merea': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
         };
 
         function showPlayerMenu(playerId) {
@@ -74,7 +74,7 @@
             const player = playerData[playerId];
 
             nameElem.textContent = playerId.replace(/_/g, ' ');
-            statsElem.textContent = `${player.stats}\n${player.description}`;
+            statsElem.textContent = ${player.stats}\n${player.description};
 
             menu.style.display = 'block';
         }
