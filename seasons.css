@@ -1,3 +1,34 @@
+.mobile-menu {
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    text-align: left;
+}
+.player-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.player-list li {
+    margin: 10px 0;
+}
+
+.player-list button {
+    padding: 10px 20px;
+    background-color: #2575fc;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.player-list button:hover {
+    background-color: #6a11cb;
+}
 .seasons-buttons {
     list-style: none;
     padding: 0;
