@@ -23,26 +23,23 @@
 
     <div class="main">
         <h1 class="main-title">Список игроков</h1>
-        <div class="player-container">
-            <div class="player-list">
-                <ul>
-                    <li><button onclick="showPlayerMenu(event, 'runecraft2287')">Runecraft2287</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'kristoferUA')">kristofer UA</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'luotettawa4503')">Luotettawa4503</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'nickmoytash')">NickMoytash</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'denis12096')">Denis12096</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'ggvplv1189')">GGvpLV1189</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'moki9707')">Moki9707</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'sasha123490')">Sasha123490</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'sokibtw')">sokibtw</button></li>
-                    <li><button onclick="showPlayerMenu(event, 'vlad_merea')">Vlad_merea</button></li>
-                </ul>
-            </div>
-            <div id="player-menu" class="mobile-menu" style="display: none;">
-                <div class="arrow"></div>
-                <h2 id="player-name"></h2>
-                <p id="player-stats"></p>
-            </div>
+        <div class="player-list">
+            <ul>
+                <li><button onclick="showPlayerMenu('runecraft2287')">Runecraft2287</button></li>
+                <li><button onclick="showPlayerMenu('kristoferUA')">kristofer UA</button></li>
+                <li><button onclick="showPlayerMenu('luotettawa4503')">Luotettawa4503</button></li>
+                <li><button onclick="showPlayerMenu('nickmoytash')">NickMoytash</button></li>
+                <li><button onclick="showPlayerMenu('denis12096')">Denis12096</button></li>
+                <li><button onclick="showPlayerMenu('ggvplv1189')">GGvpLV1189</button></li>
+                <li><button onclick="showPlayerMenu('moki9707')">Moki9707</button></li>
+                <li><button onclick="showPlayerMenu('sasha123490')">Sasha123490</button></li>
+                <li><button onclick="showPlayerMenu('sokibtw')">sokibtw</button></li>
+                <li><button onclick="showPlayerMenu('vlad_merea')">Vlad_merea</button></li>
+            </ul>
+        </div>
+        <div id="player-menu" class="mobile-menu" style="display: none;">
+            <h2 id="player-name"></h2>
+            <p id="player-stats"></p>
         </div>
     </div>
 
@@ -60,10 +57,16 @@
                 description: 'Характеристика: технический администратор, разработчик, средний билдер, креативный человек, коммуникабельный.'
             },
             'luotettawa4503': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
-            // Остальные игроки...
+            'nickmoytash': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'denis12096': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'ggvplv1189': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'moki9707': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'sasha123490': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'sokibtw': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
+            'vlad_merea': { stats: 'Статистика: нет данных', description: 'Характеристика: нет данных' },
         };
 
-        function showPlayerMenu(event, playerId) {
+        function showPlayerMenu(playerId) {
             const menu = document.getElementById('player-menu');
             const nameElem = document.getElementById('player-name');
             const statsElem = document.getElementById('player-stats');
@@ -71,15 +74,8 @@
             const player = playerData[playerId];
 
             nameElem.textContent = playerId.replace(/_/g, ' ');
-            statsElem.textContent = `${player.stats}\n${player.description}`;
+            statsElem.textContent = ${player.stats}\n${player.description};
 
-            // Позиционирование меню
-            const button = event.target;
-            const buttonRect = button.getBoundingClientRect();
-
-            const menuOffset = 10; // Отступ между кнопкой и меню
-            menu.style.top = `${window.scrollY + buttonRect.top}px`;
-            menu.style.left = `${window.scrollX + buttonRect.right + menuOffset}px`;
             menu.style.display = 'block';
         }
     </script>
