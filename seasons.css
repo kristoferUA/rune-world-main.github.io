@@ -1,11 +1,10 @@
-.mobile-menu {
-    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
-    color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    display: inline-block;
-    text-align: left;
+.player-container {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    position: relative;
 }
+
 .player-list ul {
     list-style: none;
     padding: 0;
@@ -28,6 +27,29 @@
 
 .player-list button:hover {
     background-color: #6a11cb;
+}
+
+/* Меню игрока */
+.mobile-menu {
+    position: absolute;
+    display: none;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: left;
+    min-width: 250px;
+}
+
+.mobile-menu .arrow {
+    position: absolute;
+    top: 10px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 10px 0;
+    border-color: transparent #6a11cb transparent transparent;
 }
 .seasons-buttons {
     list-style: none;
