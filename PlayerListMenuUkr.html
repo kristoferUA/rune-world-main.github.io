@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список гравців - RuneWorld</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="seasons.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <div class="header">
+            <div class="logo">
+                RuneWorld
+                <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
+            </div>
+            <nav>
+                <a href="index.html">Головна</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="main">
+        <h1 class="main-title">Список гравців</h1>
+        <div class="player-list">
+            <ul>
+                <li><button onclick="showPlayerMenu('runecraft2287')">Runecraft2287</button></li>
+                <li><button onclick="showPlayerMenu('💾kristoferUA💻')">kristofer UA</button></li>
+                <li><button onclick="showPlayerMenu('luotettawa4503')">Luotettawa4503</button></li>
+                <li><button onclick="showPlayerMenu('nickmoytash')">NickMoytash</button></li>
+                <li><button onclick="showPlayerMenu('denis12096')">Denis12096</button></li>
+                <li><button onclick="showPlayerMenu('ggvplv1189')">GGvpLV1189</button></li>
+                <li><button onclick="showPlayerMenu('moki9707')">Moki9707</button></li>
+                <li><button onclick="showPlayerMenu('sasha123490')">Sasha123490</button></li>
+                <li><button onclick="showPlayerMenu('sokibtw')">sokibtw</button></li>
+                <li><button onclick="showPlayerMenu('vlad_merea')">Vlad_merea</button></li>
+            </ul>
+        </div>
+        <div id="player-menu" class="mobile-menu" style="display: none;">
+            <h2 id="player-name"></h2>
+            <p id="player-stats"></p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer">
+            <p>&copy; 2025 RUNEWORLD</p>
+        </div>
+    </footer>
+
+    <script>
+        const playerData = {
+            'runecraft2287': { stats: 'Час у грі: 5760 год |', description: 'Характеристика: творець сервера, стрімер, ютубер, задрот виживання в майнкрафті, люблю копатися в шахті, будувати ферми, допомагати іншим гравцям, добрий, дуже люблю хованки та міні-ігри на The Hive' },
+            '💾kristoferUA💻': {
+                stats: 'Час у грі: 2160 год |',
+                description: 'Характеристика: ☢️😈Я технічний адміністратор сервера, розробник і кодер сервера, олд (граю з першого сезону), середній будівельник, креативний, комунікабельний.😈☢️'
+            },
+            'luotettawa4503': { stats: 'Час у грі: 802 год |', description: 'Характеристика: Люблю виживання без грифа, будувати ферми, грати у міні-ігри на The Hive, допомагаю іншим гравцям, чесний і добрий, засуджую нецензурну лексику.' },
+            'nickmoytash': { stats: 'Час у грі: 644 год |', description: 'Характеристика: немає даних' },
+            'denis12096': { stats: 'Час у грі: 278 год |', description: 'Характеристика: Я звичайний гравець, який грає на RuneWorld з першого сезону. Займаюся будівництвом панельних будинків і доглядаю за ішаками.' },
+            'ggvplv1189': { stats: 'Час у грі: 17 год |', description: 'Характеристика: П’яний майстер без пива.' },
+            'moki9707': { stats: 'Час у грі: 2119 год |', description: 'Характеристика: немає даних' },
+            'sasha123490': { stats: 'Час у грі: 384 год |', description: 'Характеристика: Я пупсик, живу в Білорусі, люблю грати на сервері The Hive, також граю на RuneWorld 3. Був у Москві. Засуджую чіти, люблю довбити дівчат у колготках.' },
+            'sokibtw': { stats: 'Час у грі: 2052 год |', description: 'Характеристика: Радіант у Valorant, 10 рівень Faceit, добре стріляю камшоти.' },
+            'vlad_merea': { stats: 'Час у грі: 1076 год |', description: 'Характеристика: немає даних' },
+        };
+
+        function showPlayerMenu(playerId) {
+            const menu = document.getElementById('player-menu');
+            const nameElem = document.getElementById('player-name');
+            const statsElem = document.getElementById('player-stats');
+
+            const player = playerData[playerId];
+
+            nameElem.textContent = playerId.replace(/_/g, ' ');
+            statsElem.textContent = `${player.stats}\n${player.description}`;
+
+            menu.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
