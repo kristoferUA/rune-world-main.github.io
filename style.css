@@ -1,10 +1,10 @@
-.about, .contacts {
+.contacts {
     opacity: 0;
     transform: translateX(-100%);
-    transition: transform 0.8s ease-out, opacity 0.8s ease-out;
+    transition: opacity 1s ease-out, transform 1s ease-out;
 }
 
-.about.visible, .contacts.visible {
+.contacts.visible {
     opacity: 1;
     transform: translateX(0);
 }
