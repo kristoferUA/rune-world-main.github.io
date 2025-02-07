@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const reviews = document.querySelectorAll(".review");
 
     function checkVisibility() {
-        reviews.forEach(review => {
+        reviews.forEach((review, index) => {
             const rect = review.getBoundingClientRect();
             if (rect.top < window.innerHeight && rect.bottom >= 0) {
                 review.classList.add("visible");
@@ -226,6 +226,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); // Для проверки сразу при загрузке страницы
+    checkVisibility(); // Викликаємо при завантаженні сторінки
 });
 </script>
