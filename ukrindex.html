@@ -90,13 +90,13 @@
     <section class="reviews" id="reviews">
         <div class="container">
             <h2>Відгуки</h2>
-            <div class="review">
+            <div class="review" id="review-1">
                 <p>Kristofer UA: "RuneWorld - це найкращий сервер, на якому я коли-небудь грав! Тут завжди доброзичлива атмосфера, низький пінг і чудові івенти. Адміни дійсно дбають про комфорт гравців, і це відчувається на кожному кроці. Усім рекомендую!"</p>
             </div>
-            <div class="review">
+            <div class="review" id="review-2">
                 <p>Rune_craft2287: "Граю на RuneWorld вже понад рік і можу сказати, що це дійсно особливе місце. Сезони надають грі динамічності, а мега-проєкти завжди надихають на створення чогось нового. Безпека та античит-система на висоті, грайте спокійно!"</p>
             </div>
-            <div class="review">
+            <div class="review" id="review-3">
                 <p>reallyadrevo: "Сервер RuneWorld став для мене справжнім домом у світі Minecraft. Тут завжди можна знайти нових друзів і отримати масу задоволення від гри. Особлива подяка адмінам за їхню працю та турботу про безпеку сервера. Найкращий вибір для всіх майнкрафтерів!"</p>
             </div>
         </div>
@@ -180,5 +180,52 @@
         overlay.classList.remove('active');
         body.classList.remove('body-no-scroll'); // Дозволити прокрутку
     }
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const contactSection = document.querySelector(".about");
+
+    function checkVisibility() {
+        const rect = contactSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+            contactSection.classList.add("visible");
+        }
+    }
+
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); // Викликаємо при завантаженні сторінки
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const contactSection = document.querySelector(".contacts");
+
+    function checkVisibility() {
+        const rect = contactSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+            contactSection.classList.add("visible");
+        }
+    }
+
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); // Викликаємо при завантаженні сторінки
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const reviews = document.querySelectorAll(".review");
+
+    function checkVisibility() {
+        reviews.forEach((review, index) => {
+            const rect = review.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                review.classList.add("visible");
+            }
+        });
+    }
+
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); // Викликаємо при завантаженні сторінки
 });
 </script>
