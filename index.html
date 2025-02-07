@@ -182,3 +182,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const aboutSection = document.querySelector('.about');
+    const contactsSection = document.querySelector('.contacts');
+
+    function checkVisibility() {
+        const triggerHeight = window.innerHeight * 0.75;
+
+        if (aboutSection.getBoundingClientRect().top < triggerHeight) {
+            aboutSection.classList.add('visible');
+        }
+        if (contactsSection.getBoundingClientRect().top < triggerHeight) {
+            contactsSection.classList.add('visible');
+        }
+    }
+
+    window.addEventListener('scroll', checkVisibility);
+    checkVisibility(); // Проверяем при загрузке
+});
+</script>
