@@ -1,7 +1,7 @@
 .review {
     opacity: 0;
-    transform: translateY(50px);
-    transition: opacity 1s ease-out, transform 1s ease-out;
+    transform: translateY(100px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
 }
 
 .review.visible {
