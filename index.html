@@ -183,22 +183,19 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const aboutSection = document.querySelector('.about');
-    const contactsSection = document.querySelector('.contacts');
+document.addEventListener("DOMContentLoaded", function () {
+    const sections = document.querySelectorAll(".about, .contacts");
 
     function checkVisibility() {
-        const triggerHeight = window.innerHeight * 0.75;
-
-        if (aboutSection.getBoundingClientRect().top < triggerHeight) {
-            aboutSection.classList.add('visible');
-        }
-        if (contactsSection.getBoundingClientRect().top < triggerHeight) {
-            contactsSection.classList.add('visible');
-        }
+        sections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top < window.innerHeight * 0.75) {
+                section.classList.add("visible");
+            }
+        });
     }
 
-    window.addEventListener('scroll', checkVisibility);
-    checkVisibility(); // Проверяем при загрузке
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); // Викликати при завантаженні сторінки
 });
 </script>
