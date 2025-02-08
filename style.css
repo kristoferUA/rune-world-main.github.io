@@ -1,3 +1,7 @@
+.application h2,
+.application p {
+    text-align: center;
+}
 .review {
     opacity: 0;
     transform: translateY(100px);
