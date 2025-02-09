@@ -1,5 +1,4 @@
-.application h2,
-.application p {
+.application h2, .application p {
     text-align: center;
 }
 .review {
@@ -216,6 +215,11 @@ body {
     padding: 0;
     background-color: #f0f0f0;
     color: #333;
+}
+a1 {
+    color: #0000ff;
+    text-decoration: none;
+    transition: color 0.3s ease;
 }
 
 a {
