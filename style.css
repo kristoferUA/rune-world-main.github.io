@@ -1,3 +1,11 @@
+.email-link {
+    color: blue; /* Змінює колір саме цього посилання на синій */
+    text-decoration: underline; /* Підкреслення для стилю */
+}
+
+.email-link:hover {
+    color: darkblue; /* Трохи темніше при наведенні */
+}
 .application h2, .application p {
     text-align: center;
 }
