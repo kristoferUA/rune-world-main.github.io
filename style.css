@@ -1,3 +1,12 @@
+.main-button a {
+    display: block; /* Робить посилання блоковим елементом */
+    width: 100%; /* Займає всю ширину кнопки */
+    height: 100%; /* Займає всю висоту кнопки */
+    text-align: center; /* Вирівнює текст */
+    padding: 10px 20px; /* Додає відступи */
+    text-decoration: none; /* Прибирає підкреслення */
+    color: white; /* Колір тексту */
+}
 .email-link {
     color: blue; /* Змінює колір саме цього посилання на синій */
     text-decoration: underline; /* Підкреслення для стилю */
