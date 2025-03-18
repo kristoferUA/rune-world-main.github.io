@@ -1,0 +1,325 @@
+.player-list {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.player-list ul {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+}
+
+.player-list li {
+    margin: 10px 0;
+}
+
+.player-list button {
+    padding: 10px 20px;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.player-list button:hover {
+    background-color: #6a11cb;
+}
+
+.mobile-menu {
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    display: inline-block;
+    text-align: left;
+}
+.seasons-buttons {
+    list-style: none;
+    padding: 0;
+}
+
+.seasons-buttons li {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.seasons-buttons button {
+    background-color: #3751d9;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px;
+}
+
+.seasons-buttons button:hover {
+    background-color: #4c6cf0;
+    transform: translateY(-2px);
+}
+
+.seasons-buttons button:disabled {
+    background-color: #7a7a7a;
+    cursor: not-allowed;
+}
+
+.seasons-buttons button:disabled:hover {
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
+    }
+}
+/* Общие стили для страницы */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    color: #fff;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #FFD700; /* Optional: Change color on hover */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+}
+
+/* Стили для контейнера */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Стили для шапки */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0; /* Убедитесь, что элемент не выходит за пределы слева */
+    width: 100%;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Учитывать паддинги и бордюры в общей ширине */
+    overflow: hidden; /* Препятствует выходу элементов за пределы */
+}
+
+.header .logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header nav {
+    display: flex;
+    gap: 20px;
+}
+
+.header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 5px 10px;
+}
+
+.header nav a:hover {
+    color: #FFD700;
+    transform: translateY(-2px);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .header nav a {
+        font-size: 14px;
+        padding: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header nav a {
+        font-size: 12px;
+        padding: 5px;
+    }
+}
+
+/* Стили для основного заголовка */
+.main-title {
+    color: #3751d9;
+    text-align: center;
+    font-size: 35px;
+    margin-top: 120px;
+    margin-bottom: 50px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для текста поверх изображения */
+.text-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Стили для секции видео */
+.video {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+.video iframe {
+    width: 100%;
+    height: 360px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+/* Стили для формы заявки */
+.application {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+input, button {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+
+input {
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #6a11cb;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #511394;
+    transform: translateY(-2px);
+}
+
+button:active {
+    background-color: #511394;
+    transform: translateY(1px);
+}
+
+/* Стили для отзывов */
+.reviews {
+    background-color: #fff;
+    padding: 40px 0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.review {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+/* Стили для футера */
+footer {
+    background-color: #6a11cb;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Стили для основного раздела */
+.main {
+    max-width: 1000px;
+    margin: 60px auto 20px;
+    padding: 20px;
+    min-height: calc(100vh - 90px);
+    background-image: url("main-background.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 10px;
+    position: relative;
+    animation: fadeIn 1.5s ease-in-out;
+}
