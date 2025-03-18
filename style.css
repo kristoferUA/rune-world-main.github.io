@@ -139,7 +139,7 @@ button, .menu-button, .close-menu, a {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 977px) {
   .desktop-menu {
     display: none; /* Скрыть навигацию */
     visibility: hidden; /* Не занимать место */
