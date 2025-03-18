@@ -1,3 +1,29 @@
+.swords {
+    display: none; /* По умолчанию скрываем мечи */
+}
+
+.sword-left, .sword-right {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 100px;
+    height: auto;
+}
+
+.sword-left {
+    left: -120px;
+}
+
+.sword-right {
+    right: -120px;
+}
+
+/* Показываем мечи только на больших экранах */
+@media (min-width: 768px) {
+    .swords {
+        display: block;
+    }
+}
 
 .clan-description h2 {
     color: #6a11cb;
