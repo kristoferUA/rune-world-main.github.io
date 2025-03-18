@@ -133,7 +133,7 @@ button, .menu-button, .close-menu, a {
   color: #fff;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 977px) {
   .header {
     padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
   }
