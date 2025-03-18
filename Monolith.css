@@ -1,3 +1,31 @@
+
+.clan-description h2 {
+    color: #6a11cb;
+    margin-bottom: 15px;
+}
+.clan-description {
+    color: #fff;
+    text-align: justify;
+}
+.clan-art {
+    height: 200px;
+    background-color: #333;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+}
+.clan-section {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px auto;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
 .player-list {
     display: flex;
     justify-content: center;
@@ -86,7 +114,7 @@ body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    background-color: #1a1a1a;
     color: #fff;
 }
 
@@ -97,7 +125,7 @@ a {
 }
 
 a:hover {
-    color: #FFD700; /* Optional: Change color on hover */
+    color: #FFD700;
 }
 
 .logo {
@@ -122,7 +150,7 @@ a:hover {
 .header {
     position: fixed;
     top: 0;
-    left: 0; /* Убедитесь, что элемент не выходит за пределы слева */
+    left: 0;
     width: 100%;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
@@ -133,8 +161,8 @@ a:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: all 0.3s ease;
-    box-sizing: border-box; /* Учитывать паддинги и бордюры в общей ширине */
-    overflow: hidden; /* Препятствует выходу элементов за пределы */
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .header .logo {
@@ -183,7 +211,7 @@ a:hover {
 
 /* Стили для основного заголовка */
 .main-title {
-    color: #3751d9;
+    color: #fff;
     text-align: center;
     font-size: 35px;
     margin-top: 120px;
@@ -322,4 +350,14 @@ footer {
     border-radius: 10px;
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
+}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
