@@ -315,7 +315,7 @@ footer {
     margin: 60px auto 20px;
     padding: 20px;
     min-height: calc(100vh - 90px);
-    background-image: url("main-background.png");
+    background-image: url("MonolithBackground.jpg");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
