@@ -6,16 +6,17 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 100px;
+    width: 150px; /* Увеличиваем размер мечей */
     height: auto;
+    z-index: 0;
 }
 
 .sword-left {
-    left: -120px;
+    left: -200px; /* Отступ от текста до середины черного поля */
 }
 
 .sword-right {
-    right: -120px;
+    right: -200px; /* Отступ от текста до середины черного поля */
 }
 
 /* Показываем мечи только на больших экранах */
@@ -24,7 +25,6 @@
         display: block;
     }
 }
-
 .clan-description h2 {
     color: #6a11cb;
     margin-bottom: 15px;
