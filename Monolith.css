@@ -20,7 +20,7 @@
 }
 
 /* Показываем мечи только на больших экранах */
-@media (min-width: 768px) {
+@media (min-width: 1200px) {
     .swords {
         display: block;
     }
