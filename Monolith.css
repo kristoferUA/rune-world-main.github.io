@@ -142,6 +142,7 @@ body {
     padding: 0;
     background-color: #1a1a1a;
     color: #fff;
+    overflow-x: hidden; /* Скрываем горизонтальный скролл */
 }
 
 a {
