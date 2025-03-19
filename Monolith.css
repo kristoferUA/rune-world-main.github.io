@@ -76,7 +76,7 @@ form {
 }
 
 /* Показываем мечи только на больших экранах */
-@media (min-width: 1200px) {
+@media (min-width: 1653px) {
     .swords {
         display: block;
     }
