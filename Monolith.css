@@ -370,6 +370,7 @@ form {
 }
 
 input, button {
+    background-color: rgb(26 26 26);
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 5px;
