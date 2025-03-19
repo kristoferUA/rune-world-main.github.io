@@ -51,6 +51,7 @@ form {
 }
 .application h2, .application p {
     text-align: center;
+    color: #6a11cb;
 }
 .swords {
     display: none; /* По умолчанию скрываем мечи */
