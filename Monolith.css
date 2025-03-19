@@ -54,28 +54,53 @@ form {
     text-align: center;
     color: #6a11cb;
 }
+/* Анімація для мечів */
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%) translateY(-50%);
+    }
+    to {
+        transform: translateX(0) translateY(-50%);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%) translateY(-50%);
+    }
+    to {
+        transform: translateX(0) translateY(-50%);
+    }
+}
+
+/* Стилі для мечів */
 .swords {
-    display: none; /* По умолчанию скрываем мечи */
+    display: none; /* По замовчуванню ховаємо мечі */
 }
 
 .sword-left, .sword-right {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 200px; /* Увеличиваем размер мечей */
+    width: 200px; /* Збільшуємо розмір мечів */
     height: auto;
     z-index: 0;
+    animation-duration: 1.5s; /* Тривалість анімації */
+    animation-timing-function: ease-out; /* Плавність анімації */
+    animation-fill-mode: forwards; /* Зберігаємо кінцевий стан анімації */
 }
 
 .sword-left {
-    left: -310px; /* Отступ от текста до середины черного поля */
+    left: -310px; /* Відступ від тексту до середини чорного поля */
+    animation-name: slideInLeft; /* Анімація для лівого меча */
 }
 
 .sword-right {
-    right: -310px; /* Отступ от текста до середины черного поля */
+    right: -310px; /* Відступ від тексту до середини чорного поля */
+    animation-name: slideInRight; /* Анімація для правого меча */
 }
 
-/* Показываем мечи только на больших экранах */
+/* Показуємо мечі тільки на великих екранах */
 @media (min-width: 1653px) {
     .swords {
         display: block;
