@@ -6,7 +6,7 @@ form {
     margin: 0 auto;
 }
 .application {
-    background-color: rgb(26 26 26);
+    background-color: rgba(0, 0, 0, 0.6);
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
