@@ -252,20 +252,19 @@ document.addEventListener("DOMContentLoaded", function () {
     gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
 
     let tl = gsap.timeline({ 
-      paused: true,
+      paused: true, 
       defaults: { ease: "menuEase", duration: 0.5 },
-      onReverseComplete: () => {
-        gsap.set([mobileMenu, mobileMenuOverlay, menuLinks], { 
-          xPercent: 100,
-          autoAlpha: 0,
-          display: 'none',
-          y: 50
-        });
-      }
+      onReverseComplete: resetMenuState
     });
 
+    function resetMenuState() {
+      gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
+      gsap.set(mobileMenu, { xPercent: 100 });
+      gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+    }
+
     // Анимация открытия
-    tl.set(mobileMenuOverlay, { display: 'block' })
+    tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
       .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
       .to(mobileMenu, { xPercent: 0 }, 0)
       .to(menuLinks, { 
@@ -275,42 +274,20 @@ document.addEventListener("DOMContentLoaded", function () {
         duration: 0.3
       }, "<+=0.2");
 
-    // Новая временная шкала для быстрого закрытия
-    let closeTl = gsap.timeline({ paused: true })
-      .to(menuLinks, {
-        y: 50,
-        autoAlpha: 0,
-        duration: 0.2,
-        stagger: 0.05
-      }, 0)
-      .to(mobileMenu, { xPercent: 100, duration: 0.4 }, 0)
-      .to(mobileMenuOverlay, { autoAlpha: 0, duration: 0.4 }, 0)
-      .set([mobileMenu, mobileMenuOverlay], { display: 'none' });
-
     menuButton.addEventListener('click', () => {
-      if (tl.progress() > 0 && !tl.reversed()) return;
-      
-      // Сбрасываем анимацию закрытия если она была
-      closeTl.pause().progress(0);
-      // Восстанавливаем начальное состояние
-      gsap.set(mobileMenuOverlay, { display: 'block' });
-      gsap.set(mobileMenu, { xPercent: 100 });
-      gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
-      
+      // Если анимация закрытия активна, сначала завершаем ее
+      if (tl.reversed()) {
+        tl.progress(0);
+      }
       tl.play();
     });
 
     const closeMenu = () => {
-      // Если меню уже закрывается или закрыто, ничего не делаем
-      if (tl.reversed() || tl.progress() === 0) return;
-      
-      // Если анимация открытия еще идет, завершаем ее
+      // Если анимация открытия активна, сначала завершаем ее
       if (tl.isActive()) {
         tl.progress(1);
       }
-      
-      // Используем быструю анимацию закрытия
-      closeTl.play();
+      tl.reverse();
     };
 
     closeMenuButton.addEventListener('click', closeMenu);
@@ -327,5 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     });
+  });
+</script>
   });
 </script>
