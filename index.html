@@ -246,7 +246,25 @@ document.addEventListener("DOMContentLoaded", function () {
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
     const menuLinks = mobileMenu.querySelectorAll("a");
 
-    let tl = gsap.timeline({ paused: true, defaults: { ease: "menuEase", duration: 0.7 } });
+    // Видаляємо всі інші обробники подій, щоб уникнути конфліктів
+    menuButton.replaceWith(menuButton.cloneNode(true));
+    closeMenuButton.replaceWith(closeMenuButton.cloneNode(true));
+    mobileMenuOverlay.replaceWith(mobileMenuOverlay.cloneNode(true));
+
+    // Оновлюємо посилання на елементи після клонування
+    const newMenuButton = document.getElementById('menu-button');
+    const newCloseMenuButton = document.getElementById('close-menu');
+    const newMobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+    let tl = gsap.timeline({ 
+      paused: true, 
+      defaults: { ease: "menuEase", duration: 0.7 },
+      onReverseComplete: () => {
+        // Після завершення зворотної анімації приховуємо елементи
+        gsap.set(mobileMenu, { xPercent: 100 });
+        gsap.set(mobileMenuOverlay, { display: 'none' });
+      }
+    });
 
     tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
       .set(mobileMenu, { xPercent: 100 })
@@ -254,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .to(mobileMenu, { xPercent: 0 }, 0)
       .from(menuLinks, { y: 50, autoAlpha: 0, stagger: 0.1 }, "<+=0.2");
 
-    menuButton.addEventListener('click', () => {
+    newMenuButton.addEventListener('click', () => {
       tl.play();
     });
 
@@ -262,7 +280,7 @@ document.addEventListener("DOMContentLoaded", function () {
       tl.reverse();
     };
 
-    closeMenuButton.addEventListener('click', closeMenu);
-    mobileMenuOverlay.addEventListener('click', closeMenu);
+    newCloseMenuButton.addEventListener('click', closeMenu);
+    newMobileMenuOverlay.addEventListener('click', closeMenu);
   });
 </script>
