@@ -276,12 +276,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     menuButton.addEventListener('click', () => {
-      // Если анимация закрытия активна, сначала завершаем ее
-      if (tl.reversed()) {
-        tl.progress(0);
-      }
-      tl.play();
-    });
+  if (tl.reversed()) {
+    tl.progress(0);
+  }
+  tl.timeScale(1); // Вернуть нормальную скорость при открытии
+  tl.play();
+});
 
     const closeMenu = () => {
   if (tl.isActive()) {
