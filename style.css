@@ -180,38 +180,39 @@ button, .menu-button, .close-menu, a {
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1100;
-  opacity: 0;
-  transition: opacity 0.3s ease;
 }
 
 /* Исправляем перекрытие шапкой */
 .mobile-menu {
   position: fixed;
   top: 0;
-  right: -300px;
+  right: 0;
   width: 300px;
   height: 100%;
-  z-index: 1000; /* Чтобы меню всегда было поверх */
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  z-index: 1101;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  transition: right 0.3s ease;
+  transform: translateX(100%);
 }
 
 .mobile-menu a {
   color: #fff;
   text-decoration: none;
   font-size: 18px;
+  opacity: 0;
 }
 
 .close-menu {
   background: none;
   border: none;
+  color: #fff;
   font-size: 24px;
   align-self: flex-end;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 
 .mobile-menu.open {
