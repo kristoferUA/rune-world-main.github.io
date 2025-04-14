@@ -248,24 +248,52 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let tl = gsap.timeline({ 
       paused: true, 
-      defaults: { ease: "menuEase", duration: 0.7 },
+      defaults: { ease: "menuEase", duration: 0.5 },
       onReverseComplete: () => {
         mobileMenuOverlay.style.display = 'none';
+        gsap.set(mobileMenu, { xPercent: 100 }); // Сбрасываем позицию после анимации
+        gsap.set(menuLinks, { y: 50, autoAlpha: 0 }); // Сбрасываем позиции ссылок
       }
     });
 
+    // Анимация открытия
     tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
       .set(mobileMenu, { xPercent: 100 })
+      .set(menuLinks, { y: 50, autoAlpha: 0 })
       .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
       .to(mobileMenu, { xPercent: 0 }, 0)
-      .from(menuLinks, { y: 50, autoAlpha: 0, stagger: 0.1 }, "<+=0.2");
+      .to(menuLinks, { 
+        y: 0, 
+        autoAlpha: 1, 
+        stagger: 0.1,
+        duration: 0.3
+      }, "<+=0.2");
 
     menuButton.addEventListener('click', () => {
       tl.play();
     });
 
     const closeMenu = () => {
-      tl.reverse();
+      // Анимация закрытия - все элементы двигаются одновременно
+      gsap.to([mobileMenu, menuLinks], {
+        xPercent: 100,
+        y: 50,
+        autoAlpha: 0,
+        duration: 0.5,
+        ease: "menuEase",
+        onComplete: () => {
+          mobileMenuOverlay.style.display = 'none';
+          gsap.set(mobileMenu, { xPercent: 100 });
+          gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+        }
+      });
+      
+      // Также анимируем исчезновение overlay
+      gsap.to(mobileMenuOverlay, {
+        autoAlpha: 0,
+        duration: 0.5,
+        ease: "menuEase"
+      });
     };
 
     closeMenuButton.addEventListener('click', closeMenu);
