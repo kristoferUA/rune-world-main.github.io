@@ -250,16 +250,15 @@ document.addEventListener("DOMContentLoaded", function () {
       paused: true, 
       defaults: { ease: "menuEase", duration: 0.5 },
       onReverseComplete: () => {
-        mobileMenuOverlay.style.display = 'none';
-        gsap.set(mobileMenu, { xPercent: 100 }); // Сбрасываем позицию после анимации
-        gsap.set(menuLinks, { y: 50, autoAlpha: 0 }); // Сбрасываем позиции ссылок
+        // Приводим элементы в исходное состояние для следующего открытия
+        gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
+        gsap.set(mobileMenu, { xPercent: 100 });
+        gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
       }
     });
 
     // Анимация открытия
     tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
-      .set(mobileMenu, { xPercent: 100 })
-      .set(menuLinks, { y: 50, autoAlpha: 0 })
       .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
       .to(mobileMenu, { xPercent: 0 }, 0)
       .to(menuLinks, { 
@@ -269,31 +268,24 @@ document.addEventListener("DOMContentLoaded", function () {
         duration: 0.3
       }, "<+=0.2");
 
+    // Инициализация - скрываем меню при загрузке
+    gsap.set(mobileMenu, { xPercent: 100 });
+    gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+
     menuButton.addEventListener('click', () => {
-      tl.play();
+      // Проверяем, не активно ли уже меню
+      if (tl.progress() === 0 || tl.reversed()) {
+        tl.play();
+      }
     });
 
     const closeMenu = () => {
-      // Анимация закрытия - все элементы двигаются одновременно
-      gsap.to([mobileMenu, menuLinks], {
-        xPercent: 100,
-        y: 50,
-        autoAlpha: 0,
-        duration: 0.5,
-        ease: "menuEase",
-        onComplete: () => {
-          mobileMenuOverlay.style.display = 'none';
-          gsap.set(mobileMenu, { xPercent: 100 });
-          gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
-        }
-      });
-      
-      // Также анимируем исчезновение overlay
-      gsap.to(mobileMenuOverlay, {
-        autoAlpha: 0,
-        duration: 0.5,
-        ease: "menuEase"
-      });
+      // Если анимация открытия еще не завершена, завершаем ее
+      if (tl.isActive()) {
+        tl.progress(1);
+      }
+      // Запускаем анимацию закрытия
+      tl.reverse();
     };
 
     closeMenuButton.addEventListener('click', closeMenu);
@@ -301,7 +293,16 @@ document.addEventListener("DOMContentLoaded", function () {
     
     // Закрытие меню при клике на ссылки
     menuLinks.forEach(link => {
-      link.addEventListener('click', closeMenu);
+      link.addEventListener('click', () => {
+        closeMenu();
+        // Дополнительно: плавный скролл к якорю
+        const targetId = link.getAttribute('href');
+        if (targetId && targetId.startsWith('#')) {
+          setTimeout(() => {
+            document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
+          }, 500); // Задержка для завершения анимации закрытия
+        }
+      });
     });
   });
 </script>
