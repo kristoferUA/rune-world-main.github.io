@@ -171,67 +171,85 @@ button, .menu-button, .close-menu, a {
   box-shadow: 0px 0px 20px rgba(71, 184, 255, 0.5), 0px 5px 5px -1px rgba(58, 125, 233, 0.25), inset 4px 4px 8px rgba(175, 230, 255, 0.5), inset -4px -4px 8px rgba(19, 95, 216, 0.35);
 }
 
+/* Улучшенные стили для мобильного меню */
 .mobile-menu-overlay {
-  display: none;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1100;
+  z-index: 1000;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Исправляем перекрытие шапкой */
+.mobile-menu-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
 .mobile-menu {
   position: fixed;
   top: 0;
-  right: -300px;
-  width: 300px;
+  right: -100%;
+  width: 80%;
+  max-width: 300px;
   height: 100%;
-  z-index: 1000; /* Чтобы меню всегда было поверх */
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  z-index: 1001;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   transition: right 0.3s ease;
-}
-
-.mobile-menu a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 18px;
-}
-
-.close-menu {
-  background: none;
-  border: none;
-  font-size: 24px;
-  align-self: flex-end;
-  cursor: pointer;
+  overflow-y: auto;
 }
 
 .mobile-menu.open {
   right: 0;
 }
 
-.mobile-menu-overlay.open {
-  display: block;
-  opacity: 1;
+.close-menu {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  align-self: flex-end;
+  cursor: pointer;
+  margin-bottom: 20px;
 }
 
-/* Показываем кнопку "Меню" только на мобильных устройствах */
+.mobile-menu a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.mobile-menu a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Удаляем дублирующиеся стили для кнопки меню */
+.menu-button {
+  display: none;
+  /* остальные стили остаются без изменений */
+}
+
 @media (max-width: 768px) {
   .menu-button {
     display: block;
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    left: 78%
+    right: 20px;
   }
+}
   .desktop-menu {
     display: none;
   }
