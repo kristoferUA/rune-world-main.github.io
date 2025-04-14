@@ -284,12 +284,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const closeMenu = () => {
-      // Если анимация открытия активна, сначала завершаем ее
-      if (tl.isActive()) {
-        tl.progress(1);
-      }
-      tl.reverse();
-    };
+  if (tl.isActive()) {
+    tl.progress(1);
+  }
+  tl.timeScale(2); // Ускоряем обратную анимацию
+  tl.reverse();
+};
+
 
     closeMenuButton.addEventListener('click', closeMenu);
     mobileMenuOverlay.addEventListener('click', closeMenu);
