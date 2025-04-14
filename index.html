@@ -246,7 +246,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
     const menuLinks = mobileMenu.querySelectorAll("a");
 
-    let tl = gsap.timeline({ paused: true, defaults: { ease: "menuEase", duration: 0.7 } });
+    let tl = gsap.timeline({ 
+      paused: true, 
+      defaults: { ease: "menuEase", duration: 0.7 },
+      onReverseComplete: () => {
+        mobileMenuOverlay.style.display = 'none';
+      }
+    });
 
     tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
       .set(mobileMenu, { xPercent: 100 })
@@ -264,5 +270,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     closeMenuButton.addEventListener('click', closeMenu);
     mobileMenuOverlay.addEventListener('click', closeMenu);
+    
+    // Закрытие меню при клике на ссылки
+    menuLinks.forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
   });
 </script>
