@@ -239,34 +239,30 @@ document.addEventListener("DOMContentLoaded", function () {
   gsap.registerPlugin(CustomEase);
   CustomEase.create("menuEase", "0.65, 0.01, 0.05, 0.99");
 
-document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const menuButton = document.getElementById('menu-button');
     const closeMenuButton = document.getElementById('close-menu');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-    const body = document.body;
+    const menuLinks = mobileMenu.querySelectorAll("a");
 
-    // Открытие меню
+    let tl = gsap.timeline({ paused: true, defaults: { ease: "menuEase", duration: 0.7 } });
+
+    tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
+      .set(mobileMenu, { xPercent: 100 })
+      .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
+      .to(mobileMenu, { xPercent: 0 }, 0)
+      .from(menuLinks, { y: 50, autoAlpha: 0, stagger: 0.1 }, "<+=0.2");
+
     menuButton.addEventListener('click', () => {
-        mobileMenu.classList.add('open');
-        mobileMenuOverlay.classList.add('open');
-        body.classList.add('no-scroll');
+      tl.play();
     });
 
-    // Закрытие меню
-    function closeMenu() {
-        mobileMenu.classList.remove('open');
-        mobileMenuOverlay.classList.remove('open');
-        body.classList.remove('no-scroll');
-    }
+    const closeMenu = () => {
+      tl.reverse();
+    };
 
     closeMenuButton.addEventListener('click', closeMenu);
     mobileMenuOverlay.addEventListener('click', closeMenu);
-
-    // Закрытие при клике на ссылку в меню
-    const menuLinks = mobileMenu.querySelectorAll('a');
-    menuLinks.forEach(link => {
-        link.addEventListener('click', closeMenu);
-    });
-});
+  });
 </script>
