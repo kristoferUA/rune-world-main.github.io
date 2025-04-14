@@ -231,3 +231,38 @@ document.addEventListener("DOMContentLoaded", function () {
     checkVisibility(); // Викликаємо при завантаженні сторінки
 });
 </script>
+
+
+<script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
+<script>
+  gsap.registerPlugin(CustomEase);
+  CustomEase.create("menuEase", "0.65, 0.01, 0.05, 0.99");
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuButton = document.getElementById('menu-button');
+    const closeMenuButton = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const menuLinks = mobileMenu.querySelectorAll("a");
+
+    let tl = gsap.timeline({ paused: true, defaults: { ease: "menuEase", duration: 0.7 } });
+
+    tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
+      .set(mobileMenu, { xPercent: 100 })
+      .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
+      .to(mobileMenu, { xPercent: 0 }, 0)
+      .from(menuLinks, { y: 50, autoAlpha: 0, stagger: 0.1 }, "<+=0.2");
+
+    menuButton.addEventListener('click', () => {
+      tl.play();
+    });
+
+    const closeMenu = () => {
+      tl.reverse();
+    };
+
+    closeMenuButton.addEventListener('click', closeMenu);
+    mobileMenuOverlay.addEventListener('click', closeMenu);
+  });
+</script>
