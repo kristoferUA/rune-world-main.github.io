@@ -244,25 +244,29 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeMenuButton = document.getElementById('close-menu');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-    const menuLinks = mobileMenu.querySelectorAll("a");
+    const body = document.body;
 
-    let tl = gsap.timeline({ paused: true, defaults: { ease: "menuEase", duration: 0.7 } });
-
-    tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
-      .set(mobileMenu, { xPercent: 100 })
-      .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
-      .to(mobileMenu, { xPercent: 0 }, 0)
-      .from(menuLinks, { y: 50, autoAlpha: 0, stagger: 0.1 }, "<+=0.2");
-
+    // Открытие меню
     menuButton.addEventListener('click', () => {
-      tl.play();
+        mobileMenu.classList.add('open');
+        mobileMenuOverlay.classList.add('open');
+        body.classList.add('no-scroll');
     });
 
-    const closeMenu = () => {
-      tl.reverse();
-    };
+    // Закрытие меню
+    function closeMenu() {
+        mobileMenu.classList.remove('open');
+        mobileMenuOverlay.classList.remove('open');
+        body.classList.remove('no-scroll');
+    }
 
     closeMenuButton.addEventListener('click', closeMenu);
     mobileMenuOverlay.addEventListener('click', closeMenu);
-  });
+
+    // Закрытие при клике на ссылку в меню
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(link => {
+        link.addEventListener('click', closeMenu);
+    });
+});
 </script>
