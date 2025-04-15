@@ -1,9 +1,22 @@
 .logo-link {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  align-items: center;
+    text-decoration: none;
+    color: inherit;
 }
+
+.logo-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link .logo {
+    cursor: pointer;
+}
+
+.logo-link .logo:hover {
+    background-color: transparent; /* убираем любые фоны при ховере */
+    color: inherit; /* предотвращаем подсветку текста */
+}
+
 
 .buttons {
     display: flex;
@@ -265,7 +278,7 @@ a {
     transition: color 0.3s ease;
 }
 
-a:hover {
+a:not(.logo-link):hover {
     color: #FFD700; /* Optional: Change color on hover */
 }
 
