@@ -1,3 +1,4 @@
+@media (max-width: 10000px) {
 .runelogo {
     border-radius: 10px;
     margin-top: 120px;
@@ -8,12 +9,36 @@
     color: #fff;
     font-size: 20px;
 }
+}
 /* Стили для арта клана */
+@media (max-width: 10000px) {
+.runelogo-image {
+    width: 65%; /* Арт будет занимать всю ширину контейнера */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 10px; /* Скругляем углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
+}
+}
+@media (max-width: 977px) {
+.runelogo {
+    border-radius: 10px;
+    margin-top: 100px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+}
+}
+/* Стили для арта клана */
+@media (max-width: 977px) {
 .runelogo-image {
     width: 90%; /* Арт будет занимать всю ширину контейнера */
     height: auto; /* Сохраняем пропорции */
     border-radius: 10px; /* Скругляем углы */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
+}
 }
 .logo-link {
     text-decoration: none;
