@@ -1,3 +1,20 @@
+.runelogo {
+    background-color: #333;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+}
+/* Стили для арта клана */
+.runelogo-image {
+    width: 100%; /* Арт будет занимать всю ширину контейнера */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 10px; /* Скругляем углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
+}
 .logo-link {
     text-decoration: none;
     color: inherit;
