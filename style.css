@@ -1,3 +1,10 @@
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
 .buttons {
     display: flex;
     gap: 10px;
