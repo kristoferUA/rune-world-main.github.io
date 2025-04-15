@@ -286,7 +286,7 @@ button, .menu-button, .close-menu, a {
 }
 
 /* Показываем кнопку "Меню" только на мобильных устройствах */
-@media (max-width: 768px) {
+@media (max-width: 977px) {
   .menu-button {
     display: block;
     position: absolute;
