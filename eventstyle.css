@@ -1,0 +1,549 @@
+@media (max-width: 10000px) {
+.runelogo {
+    border-radius: 10px;
+    margin-top: 120px;
+    margin-bottom: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+}
+}
+/* Стили для арта клана */
+@media (max-width: 10000px) {
+.runelogo-image {
+    width: 65%; /* Арт будет занимать всю ширину контейнера */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 10px; /* Скругляем углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
+}
+}
+@media (max-width: 977px) {
+.runelogo {
+    border-radius: 10px;
+    margin-top: 100px;
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 20px;
+}
+}
+/* Стили для арта клана */
+@media (max-width: 977px) {
+.runelogo-image {
+    width: 90%; /* Арт будет занимать всю ширину контейнера */
+    height: auto; /* Сохраняем пропорции */
+    border-radius: 10px; /* Скругляем углы */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
+}
+}
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link .logo {
+    cursor: pointer;
+}
+
+.logo-link .logo:hover {
+    background-color: transparent; /* убираем любые фоны при ховере */
+    color: inherit; /* предотвращаем подсветку текста */
+}
+
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.main-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6a11cb;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.main-button:hover {
+    background-color: #0056b3;
+}
+
+.email-link {
+    color: blue; /* Змінює колір саме цього посилання на синій */
+    text-decoration: underline; /* Підкреслення для стилю */
+}
+
+.email-link:hover {
+    color: darkblue; /* Трохи темніше при наведенні */
+}
+.application h2, .application p {
+    text-align: center;
+}
+.review {
+    opacity: 0;
+    transform: translateY(100px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.review.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.about.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.contacts {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.contacts.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.but-appl {
+    --clr-font-main: hsla(0 0% 20% / 100);
+    --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+    --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+    --btn-bg-color: hsla(360 100% 100% / 1);
+    --radii: 0.5em;
+    cursor: pointer;
+    padding: 0.9em 1.4em;
+    min-width: 120px;
+    min-height: 44px;
+    font-size: var(--size, 1rem);
+    font-weight: 500;
+    transition: 0.8s;
+    background-size: 280% auto;
+    background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+    border: none;
+    border-radius: var(--radii);
+    color: var(--btn-bg-color);
+    box-shadow: 0px 0px 20px rgba(71, 184, 255, 0.5), 0px 5px 5px -1px rgba(58, 125, 233, 0.25), inset 4px 4px 8px rgba(175, 230, 255, 0.5), inset -4px -4px 8px rgba(19, 95, 216, 0.35);
+}
+
+.but-appl:hover {
+  background-position: right top;
+}
+
+.but-appl:is(:focus, :focus-visible, :active) {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--btn-bg-color),
+    0 0 0 6px var(--btn-bg-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .but-appl {
+    transition: linear;
+  }
+}
+/* Стиль для overlay */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998; /* Зробіть його нижче за меню */
+    display: none; /* Ховаємо за замовчуванням */
+}
+
+/* Коли меню активне, overlay з'являється */
+.menu-overlay.active {
+    display: block;
+}
+
+/* Заборона прокручування для body */
+.body-no-scroll {
+    overflow: hidden;
+}
+
+button, .menu-button, .close-menu, a {
+  -webkit-tap-highlight-color: transparent; /* Отключает подсветку при нажатии */
+  user-select: none; /* Отключает выделение текста */
+  touch-action: manipulation; /* Улучшает поведение при взаимодействии */
+}
+
+/* Применяем градиент как у шапки для мобильного меню */
+.mobile-menu {
+  background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+  color: #fff;
+}
+
+@media (max-width: 977px) {
+  .header {
+    padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
+  }
+}
+
+@media (max-width: 977px) {
+  .desktop-menu {
+    display: none; /* Скрыть навигацию */
+    visibility: hidden; /* Не занимать место */
+    position: absolute; /* Не мешать другим элементам */
+  }
+}
+
+/* Стили для мобильного меню */
+.menu-button {
+    --clr-font-main: hsla(0 0% 20% / 100);
+    --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+    --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+    --btn-bg-color: hsla(360 100% 100% / 1);
+    --radii: 0.5em;
+  display: none;
+  background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+  color: #fff;
+  text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: 0.8s;
+  background-size: 280% auto;
+  background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+  border: none;
+  border-radius: var(--radii);
+  color: var(--btn-bg-color);
+  box-shadow: 0px 0px 20px rgba(71, 184, 255, 0.5), 0px 5px 5px -1px rgba(58, 125, 233, 0.25), inset 4px 4px 8px rgba(175, 230, 255, 0.5), inset -4px -4px 8px rgba(19, 95, 216, 0.35);
+}
+
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1100;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Исправляем перекрытие шапкой */
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100%;
+  z-index: 1000; /* Чтобы меню всегда было поверх */
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: right 0.3s ease;
+}
+
+.mobile-menu a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.close-menu {
+  background: none;
+  border: none;
+  font-size: 24px;
+  align-self: flex-end;
+  cursor: pointer;
+}
+
+.mobile-menu.open {
+  right: 0;
+}
+
+.mobile-menu-overlay.open {
+  display: block;
+  opacity: 1;
+}
+
+/* Показываем кнопку "Меню" только на мобильных устройствах */
+@media (max-width: 977px) {
+  .menu-button {
+    display: block;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 78%
+  }
+  .desktop-menu {
+    display: none;
+  }
+}
+
+
+/* Общие стили для страницы */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    color: #333;
+}
+a1 {
+    color: #0000ff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:not(.logo-link):hover {
+    color: #FFD700; /* Optional: Change color on hover */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo-image {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+}
+
+/* Стили для контейнера */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Общие стили для хедера */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0; /* Убедитесь, что элемент не выходит за пределы слева */
+    width: 100%;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Учитывать паддинги и бордюры в общей ширине */
+    overflow: hidden; /* Препятствует выходу элементов за пределы */
+}
+
+.header .logo {
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.header nav {
+    display: flex;
+    gap: 20px;
+}
+
+.header nav a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s ease, transform 0.2s ease;
+    padding: 5px 10px;
+}
+
+.header nav a:hover {
+    color: #FFD700;
+    transform: translateY(-2px);
+}
+
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .header nav a {
+        font-size: 14px;
+        padding: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header nav a {
+        font-size: 12px;
+        padding: 5px;
+    }
+}
+
+/* Стили для основного заголовка */
+.main-title {
+    color: #3751d9;
+    text-align: center;
+    font-size: 48px;
+    margin-top: 120px;
+    margin-bottom: 50px;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Стили для текста поверх изображения */
+.text-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+/* Стили для секции видео */
+.video {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+.video iframe {
+    width: 100%;
+    height: 360px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+/* Стили для формы заявки */
+.application {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+input, button {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
+}
+
+input {
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #6a11cb;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #511394;
+    transform: translateY(-2px);
+}
+
+button:active {
+    background-color: #511394;
+    transform: translateY(1px);
+}
+
+/* Стили для отзывов */
+.reviews {
+    background-color: #fff;
+    padding: 40px 0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+.review {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+/* Стили для футера */
+footer {
+    background-color: #6a11cb;
+    color: #fff;
+    text-align: center;
+    padding: 20px 0;
+    border-radius: 10px 10px 0 0;
+}
+
+/* Стили для основного раздела */
+.main {
+    max-width: 1000px;
+    margin: 60px auto 20px;
+    padding: 20px;
+    min-height: calc(100vh - 90px);
+    background-image: url("escapefromstevebackground.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 10px;
+    position: relative;
+    animation: fadeIn 1.5s ease-in-out;
+}
