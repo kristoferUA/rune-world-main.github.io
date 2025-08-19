@@ -15,8 +15,6 @@
 .runelogo-image {
     width: 65%; /* Арт будет занимать всю ширину контейнера */
     height: auto; /* Сохраняем пропорции */
-    border-radius: 10px; /* Скругляем углы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
 }
 }
 @media (max-width: 977px) {
