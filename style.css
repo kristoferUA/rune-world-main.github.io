@@ -1,3 +1,4 @@
+/* Медийки */
 @media (max-width: 10000px) {
 .runelogo {
     border-radius: 10px;
@@ -39,6 +40,27 @@
     border-radius: 10px; /* Скругляем углы */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .but-appl {
+    transition: linear;
+  }
+}
+
+    @media (max-width: 977px) {
+  .header {
+    padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
+  }
+}
+
+@media (max-width: 977px) {
+  .desktop-menu {
+    display: none; /* Скрыть навигацию */
+    visibility: hidden; /* Не занимать место */
+    position: absolute; /* Не мешать другим элементам */
+  }
+}
+    
 }
 .logo-link {
     text-decoration: none;
@@ -156,11 +178,6 @@
     0 0 0 6px var(--btn-bg-2);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .but-appl {
-    transition: linear;
-  }
-}
 /* Стиль для overlay */
 .menu-overlay {
     position: fixed;
@@ -195,19 +212,6 @@ button, .menu-button, .close-menu, a {
   color: #fff;
 }
 
-@media (max-width: 977px) {
-  .header {
-    padding: 10px 15px; /* Уменьшаем паддинги на мобильных устройствах */
-  }
-}
-
-@media (max-width: 977px) {
-  .desktop-menu {
-    display: none; /* Скрыть навигацию */
-    visibility: hidden; /* Не занимать место */
-    position: absolute; /* Не мешать другим элементам */
-  }
-}
 
 /* Стили для мобильного меню */
 .menu-button {
