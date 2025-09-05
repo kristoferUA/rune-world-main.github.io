@@ -220,8 +220,6 @@ button, .menu-button, .close-menu, a {
   cursor: pointer;
     text-shadow: 2px 3px 3px rgba(0, 0, 0, 0.3);
     padding: 10px 15px;
-    min-width: 120px;
-    min-height: 44px;
     font-size: 16px;
     transition: 0.8s;
     background-size: 280% auto;
