@@ -1,4 +1,9 @@
-        /* МЕДИЙКИ */
+
+
+
+
+
+                /* МЕДИЙКИ */
 
 
 
@@ -114,7 +119,7 @@
     
     
     
-    /* МЕНЮШКА */
+            /* МЕНЮШКА */
 
 
 
@@ -239,10 +244,14 @@ button, .menu-button, .close-menu, a {
 }
 
 
+        
+
+
+                /* ЛОГОТИП */
 
 
 
-    
+        
 
 }
 .logo-link {
@@ -263,6 +272,13 @@ button, .menu-button, .close-menu, a {
     background-color: transparent; /* убираем любые фоны при ховере */
     color: inherit; /* предотвращаем подсветку текста */
 }
+
+
+
+
+                /* КНОПКИ */
+
+
 
 
 .buttons {
@@ -287,48 +303,50 @@ button, .menu-button, .close-menu, a {
     background-color: #0056b3;
 }
 
-.email-link {
-    color: blue; /* Змінює колір саме цього посилання на синій */
-    text-decoration: underline; /* Підкреслення для стилю */
+input, button {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: none;
+    font-size: 16px;
 }
 
-.email-link:hover {
-    color: darkblue; /* Трохи темніше при наведенні */
+input {
+    border: 1px solid #ccc;
 }
+
+button {
+    background-color: #6a11cb;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #511394;
+    transform: translateY(-2px);
+}
+
+button:active {
+    background-color: #511394;
+    transform: translateY(1px);
+}
+
+
+
+
+
+                /* ЗАЯВКИ */
+
+
+
+
+
+
 .application h2, .application p {
     text-align: center;
 }
-.review {
-    opacity: 0;
-    transform: translateY(100px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
 
-.review.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.about {
-    opacity: 0;
-    transform: translateX(-100%);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.about.visible {
-    opacity: 1;
-    transform: translateX(0);
-}
-.contacts {
-    opacity: 0;
-    transform: translateX(-100%);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.contacts.visible {
-    opacity: 1;
-    transform: translateX(0);
-}
 .but-appl {
     --clr-font-main: hsla(0 0% 20% / 100);
     --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
@@ -360,6 +378,33 @@ button, .menu-button, .close-menu, a {
     0 0 0 3px var(--btn-bg-color),
     0 0 0 6px var(--btn-bg-2);
 }
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+/* Стили для формы заявки */
+.application {
+    background-color: #6a11cb;
+    padding: 40px 0;
+    color: #fff;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    animation: slideIn 1.5s ease-in-out;
+}
+
+
+
+
+
+                /* ОСНОВА СТРАНИЦЫ */
+
+
+
+
+
 
 
 /* Общие стили для страницы */
@@ -491,52 +536,7 @@ a:not(.logo-link):hover {
     border-radius: 10px;
 }
 
-/* Стили для формы заявки */
-.application {
-    background-color: #6a11cb;
-    padding: 40px 0;
-    color: #fff;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    animation: slideIn 1.5s ease-in-out;
-}
 
-form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
-input, button {
-    padding: 15px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: none;
-    font-size: 16px;
-}
-
-input {
-    border: 1px solid #ccc;
-}
-
-button {
-    background-color: #6a11cb;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-button:hover {
-    background-color: #511394;
-    transform: translateY(-2px);
-}
-
-button:active {
-    background-color: #511394;
-    transform: translateY(1px);
-}
 
 /* Стили для отзывов */
 .reviews {
@@ -578,4 +578,47 @@ footer {
     border-radius: 10px;
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
+}
+
+
+.email-link {
+    color: blue; /* Змінює колір саме цього посилання на синій */
+    text-decoration: underline; /* Підкреслення для стилю */
+}
+
+.email-link:hover {
+    color: darkblue; /* Трохи темніше при наведенні */
+}
+
+
+.review {
+    opacity: 0;
+    transform: translateY(100px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.review.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.about.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.contacts {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.contacts.visible {
+    opacity: 1;
+    transform: translateX(0);
 }
