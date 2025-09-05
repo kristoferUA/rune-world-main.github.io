@@ -1,4 +1,9 @@
-/* Медийки */
+        /* МЕДИЙКИ */
+
+
+
+
+
 @media (max-width: 10000px) {
 .runelogo {
     border-radius: 10px;
@@ -60,123 +65,61 @@
     position: absolute; /* Не мешать другим элементам */
   }
 }
+/* Показываем кнопку "Меню" только на мобильных устройствах */
+@media (max-width: 977px) {
+  .menu-button {
+    display: block;
+    position: absolute;
+    top: 23.5%;
+    left: 78%
+  }
+  .desktop-menu {
+    display: none;
+  }
+}
+/* Media queries for responsive design */
+@media (max-width: 768px) {
+    .header nav a {
+        font-size: 14px;
+        padding: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header nav {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header nav a {
+        font-size: 12px;
+        padding: 5px;
+    }
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
     
-}
-.logo-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.logo-link:hover {
-    text-decoration: none;
-    color: inherit;
-}
-
-.logo-link .logo {
-    cursor: pointer;
-}
-
-.logo-link .logo:hover {
-    background-color: transparent; /* убираем любые фоны при ховере */
-    color: inherit; /* предотвращаем подсветку текста */
-}
+    
+    
+    
+    
+    
+    /* МЕНЮШКА */
 
 
-.buttons {
-    display: flex;
-    gap: 10px;
-}
 
-.main-button {
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #6a11cb;
-    color: white;
-    font-size: 16px;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: background 0.3s;
-    cursor: pointer;
-}
+    
 
-.main-button:hover {
-    background-color: #0056b3;
-}
-
-.email-link {
-    color: blue; /* Змінює колір саме цього посилання на синій */
-    text-decoration: underline; /* Підкреслення для стилю */
-}
-
-.email-link:hover {
-    color: darkblue; /* Трохи темніше при наведенні */
-}
-.application h2, .application p {
-    text-align: center;
-}
-.review {
-    opacity: 0;
-    transform: translateY(100px);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.review.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.about {
-    opacity: 0;
-    transform: translateX(-100%);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.about.visible {
-    opacity: 1;
-    transform: translateX(0);
-}
-.contacts {
-    opacity: 0;
-    transform: translateX(-100%);
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-}
-
-.contacts.visible {
-    opacity: 1;
-    transform: translateX(0);
-}
-.but-appl {
-    --clr-font-main: hsla(0 0% 20% / 100);
-    --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
-    --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
-    --btn-bg-color: hsla(360 100% 100% / 1);
-    --radii: 0.5em;
-    cursor: pointer;
-    padding: 0.9em 1.4em;
-    min-width: 120px;
-    min-height: 44px;
-    font-size: var(--size, 1rem);
-    font-weight: 500;
-    transition: 0.8s;
-    background-size: 280% auto;
-    background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
-    border: none;
-    border-radius: var(--radii);
-    color: var(--btn-bg-color);
-    box-shadow: 0px 0px 20px rgba(71, 184, 255, 0.5), 0px 5px 5px -1px rgba(58, 125, 233, 0.25), inset 4px 4px 8px rgba(175, 230, 255, 0.5), inset -4px -4px 8px rgba(19, 95, 216, 0.35);
-}
-
-.but-appl:hover {
-  background-position: right top;
-}
-
-.but-appl:is(:focus, :focus-visible, :active) {
-  outline: none;
-  box-shadow:
-    0 0 0 3px var(--btn-bg-color),
-    0 0 0 6px var(--btn-bg-2);
-}
 
 /* Стиль для overlay */
 .menu-overlay {
@@ -295,17 +238,127 @@ button, .menu-button, .close-menu, a {
   opacity: 1;
 }
 
-/* Показываем кнопку "Меню" только на мобильных устройствах */
-@media (max-width: 977px) {
-  .menu-button {
-    display: block;
-    position: absolute;
-    top: 23.5%;
-    left: 78%
-  }
-  .desktop-menu {
-    display: none;
-  }
+
+
+
+
+    
+
+}
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link .logo {
+    cursor: pointer;
+}
+
+.logo-link .logo:hover {
+    background-color: transparent; /* убираем любые фоны при ховере */
+    color: inherit; /* предотвращаем подсветку текста */
+}
+
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.main-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6a11cb;
+    color: white;
+    font-size: 16px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.main-button:hover {
+    background-color: #0056b3;
+}
+
+.email-link {
+    color: blue; /* Змінює колір саме цього посилання на синій */
+    text-decoration: underline; /* Підкреслення для стилю */
+}
+
+.email-link:hover {
+    color: darkblue; /* Трохи темніше при наведенні */
+}
+.application h2, .application p {
+    text-align: center;
+}
+.review {
+    opacity: 0;
+    transform: translateY(100px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.review.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.about.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.contacts {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.contacts.visible {
+    opacity: 1;
+    transform: translateX(0);
+}
+.but-appl {
+    --clr-font-main: hsla(0 0% 20% / 100);
+    --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+    --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+    --btn-bg-color: hsla(360 100% 100% / 1);
+    --radii: 0.5em;
+    cursor: pointer;
+    padding: 0.9em 1.4em;
+    min-width: 120px;
+    min-height: 44px;
+    font-size: var(--size, 1rem);
+    font-weight: 500;
+    transition: 0.8s;
+    background-size: 280% auto;
+    background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+    border: none;
+    border-radius: var(--radii);
+    color: var(--btn-bg-color);
+    box-shadow: 0px 0px 20px rgba(71, 184, 255, 0.5), 0px 5px 5px -1px rgba(58, 125, 233, 0.25), inset 4px 4px 8px rgba(175, 230, 255, 0.5), inset -4px -4px 8px rgba(19, 95, 216, 0.35);
+}
+
+.but-appl:hover {
+  background-position: right top;
+}
+
+.but-appl:is(:focus, :focus-visible, :active) {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--btn-bg-color),
+    0 0 0 6px var(--btn-bg-2);
 }
 
 
@@ -394,26 +447,6 @@ a:not(.logo-link):hover {
     transform: translateY(-2px);
 }
 
-/* Media queries for responsive design */
-@media (max-width: 768px) {
-    .header nav a {
-        font-size: 14px;
-        padding: 5px;
-    }
-}
-
-@media (max-width: 480px) {
-    .header nav {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .header nav a {
-        font-size: 12px;
-        padding: 5px;
-    }
-}
-
 /* Стили для основного заголовка */
 .main-title {
     color: #3751d9;
@@ -428,17 +461,7 @@ a:not(.logo-link):hover {
     animation: fadeIn 1.5s ease-in-out;
 }
 
-/* Анимации */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+
 
 /* Стили для текста поверх изображения */
 .text-overlay {
