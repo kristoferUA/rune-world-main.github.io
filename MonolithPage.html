@@ -68,15 +68,25 @@
             <p>&copy; 2025 RUNEWORLD</p>
         </div>
     </footer>
- <!-- 🔹 Скрипт для прелоадера -->
-    <script>
-      window.addEventListener("load", () => {
-        const preloader = document.getElementById("preloader");
-        preloader.style.opacity = "1";
+ <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const preloader = document.getElementById("preloader");
+
+    // Проверяем, есть ли элемент на странице
+    if (!preloader) return;
+
+    // Плавно скрываем preloader после полной загрузки
+    window.addEventListener("load", () => {
+        preloader.style.transition = "opacity 0.5s ease";
+        preloader.style.opacity = "0";
+
+        // Убираем элемент из DOM через полсекунды
         setTimeout(() => {
-          preloader.style.transition = "opacity 0.5s ease";
-          preloader.style.opacity = "0";
-          setTimeout(() => preloader.style.display = "none", 500);
-        }, 300); // маленькая задержка перед исчезновением
-      });
-    </script>
+            if (preloader.parentNode) {
+                preloader.parentNode.removeChild(preloader);
+            }
+        }, 500);
+    });
+});
+</script>
+
