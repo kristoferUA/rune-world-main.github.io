@@ -290,8 +290,7 @@ button, .menu-button, .close-menu, a {
   .menu-button {
     display: block;
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 23.5%;
     left: 78%
   }
   .desktop-menu {
