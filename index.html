@@ -21,6 +21,17 @@
     <meta name="twitter:description" content="RuneWorld - ванильный сервер Minecraft с доброй атмосферой, хорошим античитом и дружелюбным комьюнити. Присоединяйтесь к нам!">
     <meta name="twitter:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg.png">
 </head>
+    <!-- 🔹 Прелоадер -->
+    <div id="preloader">
+      <div class="spinner-box">
+        <div class="configure-border-1">  
+          <div class="configure-core"></div>
+        </div>  
+        <div class="configure-border-2">
+          <div class="configure-core"></div>
+        </div> 
+      </div>
+    </div>
 <body>
     <header>
   <div class="header">
@@ -315,4 +326,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 </script>
+
+<!-- 🔹 Скрипт для прелоадера -->
+    <script>
+      window.addEventListener("load", () => {
+        const preloader = document.getElementById("preloader");
+        preloader.style.opacity = "1";
+        setTimeout(() => {
+          preloader.style.transition = "opacity 0.5s ease";
+          preloader.style.opacity = "0";
+          setTimeout(() => preloader.style.display = "none", 500);
+        }, 300); // маленькая задержка перед исчезновением
+      });
+    </script>
 
