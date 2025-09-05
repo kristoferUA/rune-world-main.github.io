@@ -460,7 +460,7 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #fb5b53;
+  background: #6912cb;
   transform-origin: center;
   animation: rotate-clockwise 3s linear infinite;
 }
@@ -476,7 +476,7 @@ footer {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgb(63, 249, 220);
+  background: rgb(38 116 252);
   transform-origin: center;
   animation: rotate-counter 3s linear infinite;
 }
