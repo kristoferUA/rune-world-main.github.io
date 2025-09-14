@@ -47,6 +47,206 @@
   }
 }
 
+
+
+/* ======================= */
+/*        КОНТАКТЫ         */
+/* ======================= */
+
+
+
+.contact-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background-image: linear-gradient(325deg, hsl(267.57deg 82.96% 43.73%) 0%, hsl(219.14deg 95.45% 56.86%) 55%, hsl(267.57deg 82.96% 43.73%) 90%);
+            background-size: 200% 200%;
+            background-position: left top;
+            border: none;
+            border-radius: 0.5em;
+            color: #fff;
+            box-shadow: 0px 0px 20px rgba(71,184,255,0.5),
+                        0px 5px 5px -1px rgba(58,125,233,0.25),
+                        inset 4px 4px 8px rgba(175,230,255,0.5),
+                        inset -4px -4px 8px rgba(19,95,216,0.35);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .contact-button:hover {
+            background-position: right top;
+            transform: translateY(-2px);
+            box-shadow: 0px 0px 25px rgba(71,184,255,0.7),
+                        0px 8px 15px -1px rgba(58,125,233,0.4),
+                        inset 4px 4px 8px rgba(175,230,255,0.6),
+                        inset -4px -4px 8px rgba(19,95,216,0.4);
+        }
+
+        .contact-button:is(:focus, :focus-visible, :active) {
+            outline: none;
+            box-shadow: 0 0 0 3px hsl(219.14deg 95.45% 56.86%),
+                        0 0 0 6px hsl(267.57deg 82.96% 43.73%);
+        }
+
+        .contact-button:active {
+            transform: translateY(1px);
+        }
+
+        .message-icon {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        /* Спливаюче віконечко */
+        .contact-popup {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 320px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(20px) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1001;
+        }
+
+        .contact-popup.show {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-header {
+            background: linear-gradient(135deg, hsl(267.57deg 82.96% 43.73%) 0%, hsl(219.14deg 95.45% 56.86%) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+        }
+
+        .popup-header::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 40px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid hsl(219.14deg 95.45% 56.86%);
+        }
+
+        .popup-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            text-align: center;
+        }
+
+        .popup-content {
+            padding: 25px 20px 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .contact-item:hover {
+            background: #e8f0ff;
+            transform: translateX(5px);
+        }
+
+        .contact-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            fill: hsl(267.57deg 82.96% 43.73%);
+        }
+
+        .contact-text {
+            flex: 1;
+        }
+
+        .contact-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .contact-value {
+            font-size: 0.95rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.1);
+        }
+
+        /* Демонстраційний контент */
+        .demo-content {
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .demo-content h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .demo-content p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+
+
+
+
 /* ======================= */
 /*        МЕНЮШКА          */
 /* ======================= */
