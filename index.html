@@ -504,7 +504,14 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault();
       return;
     }
+      
+    if (telegram.length < 3 || badPatterns.test(telegram) || cyrillic.test(telegram)) {
+      alert("Введите корректный юзернейм в Telegram (только латиница).");
+      e.preventDefault();
+      return;
+    }
   });
 </script>
+
 
 
