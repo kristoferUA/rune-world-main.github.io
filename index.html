@@ -475,8 +475,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const discord = this.querySelector("[name='discord']").value.trim();
     const telegram = this.querySelector("[name='telegram']").value.trim();
 
-    // расширенный фильтр запрещённых слов / ссылок
+   // расширенный фильтр запрещённых слов / ссылок
     const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+
+    // фильтр русских ругательств (частые матерные слова)
+    const russianSwear = /(блядь|блять|уебище|лох|долбоеб|уебан|хуесос|идиот|пидор|дегенерат|тим|тима|крис|сука|ебать|пизда|хуй|гандон|мудак|тупой|залупа)/i;
 
     if (name.length < 3 || badPatterns.test(name)) {
       alert("Введите корректный ник.");
@@ -503,3 +506,4 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 </script>
+
