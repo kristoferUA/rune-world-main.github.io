@@ -467,3 +467,39 @@ document.addEventListener("DOMContentLoaded", function () {
     </script>
 
 
+
+<script>
+  document.getElementById("applicationForm").addEventListener("submit", function (e) {
+    const name = this.name.value.trim();
+    const email = this.email.value.trim();
+    const discord = this.discord.value.trim();
+    const telegram = this.telegram.value.trim();
+
+    // Запрещаем URL, спам и слишком короткий ввод
+    const badPatterns = /(https?:\/\/|www\.|http|viagra|casino|xxx)/i;
+
+    if (name.length < 3 || badPatterns.test(name)) {
+      alert("Введите корректный ник.");
+      e.preventDefault();
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Введите корректный email.");
+      e.preventDefault();
+      return;
+    }
+
+    if (discord.length < 3 || badPatterns.test(discord)) {
+      alert("Введите корректный ник в Discord.");
+      e.preventDefault();
+      return;
+    }
+
+    if (telegram.length < 3 || badPatterns.test(telegram)) {
+      alert("Введите корректный юзернейм в Telegram.");
+      e.preventDefault();
+      return;
+    }
+  });
+</script>
