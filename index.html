@@ -475,8 +475,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const discord = this.querySelector("[name='discord']").value.trim();
     const telegram = this.querySelector("[name='telegram']").value.trim();
 
-    // запрещённые слова / ссылки
-    const badPatterns = /(https?:\/\/|www\.|http|viagra|casino|xxx)/i;
+    // расширенный фильтр запрещённых слов / ссылок
+    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
 
     if (name.length < 3 || badPatterns.test(name)) {
       alert("Введите корректный ник.");
@@ -503,5 +503,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 </script>
-
-
