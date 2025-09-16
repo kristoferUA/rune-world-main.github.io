@@ -92,7 +92,7 @@
         <div class="container">
             <h2>Подать заявку</h2>
             <p>Заполните форму и мы свяжемся с Вами</p>
-            <form action="https://formspree.io/f/mvoejaqe" method="POST">
+            <form action="#" method="POST">
                 <input type="text" name="name" placeholder="Ваш ник" required>
                 <input type="email" name="email" placeholder="Ваш email" required>
                 <input type="text" name="discord" placeholder="Ваш ник в дискорде" required>
@@ -467,6 +467,71 @@ document.addEventListener("DOMContentLoaded", function () {
     </script>
 
 
+<!-- ====== Form token obfuscation & runtime deobfuscation (XOR + base64) ====== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  // ==== ЧАСТИ КЛЮЧА (разбитые) ====
+  // Я намеренно расположил части в разных переменных — можно перенести в разные скрипты/файлы для дополнительной запутанности
+  const keyPart1 = "rune";
+  const keyPart2 = "_sec";
+  const keyPart3 = "ret_";
+  const keyPart4 = "2025!";
+
+  // ==== ЧАСТИ ЗАШИФРОВАННОГО (base64) ====
+  // Это base64 от XOR(plaintext, key)
+  const cipherPart1 = "GgEaFSxJSk";
+  const cipherPart2 = "wUCgYyQUBAUERcHAFKOV";
+  const cipherPart3 = "wIFR0AHj5DVQ==";
+
+  // Собираем ключ и зашифрованную строку
+  const key = keyPart1 + keyPart2 + keyPart3 + keyPart4;
+  const cipherB64 = cipherPart1 + cipherPart2 + cipherPart3;
+
+  // Вспомогательная: base64 -> Uint8Array
+  function b64ToUint8Array(b64) {
+    const binary = atob(b64);
+    const len = binary.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
+  }
+
+  // XOR-расшифровка: plaintext = cipher ^ key (циклически)
+  function xorDecrypt(cipherBytes, keyStr) {
+    const keyBytes = new TextEncoder().encode(keyStr);
+    const out = new Uint8Array(cipherBytes.length);
+    for (let i = 0; i < cipherBytes.length; i++) {
+      out[i] = cipherBytes[i] ^ keyBytes[i % keyBytes.length];
+    }
+    return new TextDecoder().decode(out);
+  }
+
+  try {
+    const cipherBytes = b64ToUint8Array(cipherB64);
+    const decryptedUrl = xorDecrypt(cipherBytes, key);
+
+    // Подставляем в форму
+    const form = document.getElementById('application') || document.querySelector("form[action='#']");
+    if (form) {
+      form.action = decryptedUrl;
+
+      // (Опционально) для наглядности: можно раскомментировать, чтобы кнопка была активна только после расшифровки
+      // const submitBtn = form.querySelector("button[type='submit']");
+      // if (submitBtn) submitBtn.disabled = false;
+    } else {
+      console.warn('Форма для подстановки токена не найдена.');
+    }
+  } catch (err) {
+    console.error('Ошибка при расшифровке токена формы:', err);
+  }
+});
+</script>
+<!-- ====== /obfuscation script ====== -->
+
+
+
 <script>
 document.getElementById("application").addEventListener("submit", function (e) {
     const name = this.querySelector("[name='name']").value.trim();
@@ -517,3 +582,4 @@ document.getElementById("application").addEventListener("submit", function (e) {
     }
 });
 </script>
+
