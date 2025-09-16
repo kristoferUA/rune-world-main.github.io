@@ -103,39 +103,32 @@
 /* --- Параметры --- */
 const _KEY = 's3cr3tK!';
 
+
 const encryptedChunks = [
-  "1b471702",
-  "404e640e",
-  "155c111f",
-  "40043944",
-  "161d0a1d",
-  "1c12644c",
-  "055c0618",
-  "52052e",
-  "0c5f070e",
-  "5a44260d",
-  "104a060b",
-  "5a4d6503",
-  "0b5b0f18",
-  "5a493e00",
-  "1759051e",
-  "5c442e1e"
+  '1b471702',
+  '404e640e',
+  '155c111f',
+  '40043944',
+  '161d0a1d',
+  '1c12644c',
+  '05540808',
+  '49103c'
 ];
 
-const PLACEHOLDER_ACTION = "#";
+const PLACEHOLDER_ACTION = '#';
 
 /* --- Вспомогательные функции --- */
 function hexToBytes(hex) {
   const bytes = [];
-  for (let c = 0; c < hex.length; c += 2) {
-    bytes.push(parseInt(hex.substr(c, 2), 16));
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
   }
   return bytes;
 }
 
 function xorDecryptFromHex(hexString, key) {
   const bytes = hexToBytes(hexString);
-  let out = "";
+  let out = '';
   for (let i = 0; i < bytes.length; i++) {
     const k = key.charCodeAt(i % key.length);
     out += String.fromCharCode(bytes[i] ^ k);
@@ -144,28 +137,33 @@ function xorDecryptFromHex(hexString, key) {
 }
 
 function decryptToken() {
-  const hex = encryptedChunks.join("");
+  const hex = encryptedChunks.join('');
   return xorDecryptFromHex(hex, _KEY);
 }
 
 function wipeDecrypted(referenceObj) {
-  if (referenceObj && typeof referenceObj === "object") {
+  if (referenceObj && typeof referenceObj === 'object') {
     for (const k in referenceObj) {
-      try { referenceObj[k] = null; } catch (e) {}
+      try { referenceObj[k] = null; } catch(e) {}
     }
   }
 }
 
 /* --- Основная логика --- */
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector("form[action*='formspree']");
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('appl-form');
 
-  form.action = PLACEHOLDER_ACTION;
+  // держим плейсхолдер на старте
+  try { form.action = PLACEHOLDER_ACTION; } catch(e){}
 
-  form.addEventListener("submit", function (e) {
+  form.addEventListener('submit', function (e) {
+    // расшифровываем токен (только в момент сабмита)
     const realAction = decryptToken();
-    form.action = realAction;
 
+    // подставляем реальный action
+    try { form.action = realAction; } catch (err) { console.error(err); }
+
+    // Если другой обработчик (ваш фильтр) отменил отправку — не шлём
     if (e.defaultPrevented) {
       form.action = PLACEHOLDER_ACTION;
       wipeDecrypted({ realAction });
@@ -181,10 +179,11 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
       try { wipeDecrypted({ realAction }); } catch (_) {}
-    }, 10000);
+    }, 1000);
   }, { passive: false });
 });
 </script>
+
 
      
 
