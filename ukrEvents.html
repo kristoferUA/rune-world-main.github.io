@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <!-- 🔹 Прелоадер -->
+    <div id="preloader">
+      <div class="spinner-box">
+        <div class="configure-border-1">  
+          <div class="configure-core"></div>
+        </div>  
+        <div class="configure-border-2">
+          <div class="configure-core"></div>
+        </div> 
+      </div>
+    </div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuneWorld</title>
+    <link rel="stylesheet" href="eventstyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph метатеги -->
+    <meta property="og:title" content="RuneWorld - Сервер із затишною атмосферою Minecraft">
+    <meta property="og:description" content="RuneWorld - ванільний сервер Minecraft із доброю атмосферою, низьким пінгом та дружньою спільнотою. Приєднуйтесь до нас!">
+    <meta property="og:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg1.png">
+    <meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/index.html?v=1">
+    <meta property="og:type" content="website">
+
+    <!-- Для Twitter (Twitter Cards) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RuneWorld - Сервер із затишною атмосферою Minecraft">
+    <meta name="twitter:description" content="RuneWorld - ванільний сервер Minecraft із доброю атмосферою, надійним античитом та дружньою спільнотою. Приєднуйтесь до нас!">
+    <meta name="twitter:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg.png">
+</head>
+<body>
+    <header>
+  <div class="header">
+    <a href="index.html" class="logo-link">
+    <div class="logo">
+        RuneWorld
+        <img src="iconrw.png" alt="Логотип RuneWorld" class="logo-image">
+    </div>
+</a>
+    <nav>
+                <a href="index.html">Головна</a>
+            </nav>
+  </header>
+    <div class="main">
+        <div class="runelogo">
+                <!-- Додаємо арт клану -->
+                <img src="oregon1956.png" alt="Логотип івенту" class="runelogo-image">
+            </div>
+        <div class="text-overlay">
+            <h3>Про івент</h3>
+            <p>Івент проходитиме у Minecraft Java, але нагороди видаватимуться на RuneWorld 4.  
+                1 серпня 1956 року в штаті Орегон, над національним заповідником Редвуд було помічено НЛО, імовірно експериментальний літак-розвідник СРСР. На його пошуки вислали розвідувальний загін спеціального призначення.  
+                5 серпня 1956 року армія США відправила пошуково-рятувальний загін Дельта-4, щоб знайти нещодавно зниклу розвідувальну групу.  
+                Мета місії – знайти зниклий загін протягом 6 днів, збираючи та фотографуючи всі докази, які ви знайдете.  
+                За фотографії аномалій уряд США буде доплачувати додаткові кошти.  
+                Ваш загін буде озброєний пістолетами для захисту від диких тварин, камерами для збору доказів, їжею, сигнальним пістолетом для комунікації та набором легкої броні.  
+                Щоранку на локацію буде скидатися 4 аірдропи з різним спорядженням, яке допоможе вам у виконанні місії.  
+                Пам’ятайте про комунікацію та розподіл ролей у вашій команді, адже це допоможе вижити. Бо хто знає, хто може ховатися в лісі. Бажаю удачі у пошуках!</p>
+            <p>P.S. ця сторінка у бета-версії й служитиме для піару івентів через сайт. Щоб розмістити свій івент тут – пишіть мені в телеграм: @kr1stoferUA</p>
+        </div>
+</div>
+    <section class="application" id="application">
+        <div class="container">
+            <h2>Реєстрація на івент</h2>
+            <p>Івент стартує 20.08.25 о 17:00. Бажаю успіху!</p>
+            <form action="https://formspree.io/f/mvoejaqe" method="POST">
+                <input type="text" name="name" placeholder="Ваш нік на сервері" required>
+                <input type="text" name="discord" placeholder="Ваш нік у Discord" required>
+                <button class="but-appl" id="but-appl" type="submit">На пошуки!🕹️</button>
+            </form>
+        </div>
+    </section>
+<footer>
+        <div class="footer">
+            <p>&copy; 2025 RUNEWORLD</p>
+        </div>
+    </footer>
+</body>
+</html>
+ <!-- 🔹 Скрипт для прелоадера -->
+    <script>
+      window.addEventListener("load", () => {
+        const preloader = document.getElementById("preloader");
+        preloader.style.opacity = "1";
+        setTimeout(() => {
+          preloader.style.transition = "opacity 0.5s ease";
+          preloader.style.opacity = "0";
+          setTimeout(() => preloader.style.display = "none", 500);
+        }, 300); // невелика затримка перед зникненням
+      });
+    </script>
