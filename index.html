@@ -462,14 +462,8 @@ document.addEventListener("DOMContentLoaded", function () {
 /* --- Параметры --- */
 const _KEY = 's3cr3tK!';
 const encryptedChunks = [
-  '1b471702',
-  '404e640e',
-  '155c111f',
-  '40043944',
-  '161d0a1d',
-  '1c12644c',
-  '055c0618',
-  '52052e'
+  '1b471702', '404e640e', '155c111f', '40043944', 
+  '161d0a1d', '1c12644c', '055c0618', '52052e'
 ];
 const PLACEHOLDER_ACTION = '#';
 
@@ -493,85 +487,88 @@ function xorDecryptFromHex(hexString, key) {
 }
 
 function decryptToken() {
-  return xorDecryptFromHex(encryptedChunks.join(''), _KEY);
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
 }
 
-function wipeDecrypted(obj) {
-  if (obj && typeof obj === 'object') {
-    for (const k in obj) {
-      try { obj[k] = null; } catch(e) {}
+function wipeDecrypted(referenceObj) {
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
     }
   }
-}
-
-/* --- Уведомления --- */
-function showNotification(message) {
-  const existing = document.querySelector('.notification');
-  if (existing) existing.remove();
-
-  const n = document.createElement('div');
-  n.className = 'notification';
-  n.innerHTML = `
-    <span class="notification-icon">⚠️</span>
-    ${message}
-    <button class="close-btn" onclick="this.parentElement.remove()">×</button>
-  `;
-  document.body.appendChild(n);
-  setTimeout(() => n.classList.add('show'), 100);
-  setTimeout(() => {
-    if (n.parentElement) {
-      n.classList.remove('show');
-      setTimeout(() => { if (n.parentElement) n.remove(); }, 400);
-    }
-  }, 5000);
 }
 
 /* --- Основная логика --- */
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('appl-form');
-  form.action = PLACEHOLDER_ACTION;
 
-  form.addEventListener('submit', function(e) {
-    e.preventDefault(); // предотвращаем стандартную отправку
+  form.addEventListener('submit', function (e) {
+    e.preventDefault(); // остановка стандартной отправки
 
+    // --- Проверки полей ---
     const name = this.querySelector("[name='name']").value.trim();
+    const email = this.querySelector("[name='email']").value.trim();
     const discord = this.querySelector("[name='discord']").value.trim();
+    const telegram = this.querySelector("[name='telegram']").value.trim();
+
+    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
     const cyrillic = /[а-яА-ЯёЁ]/;
     const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
     const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+    const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
 
-    // Валидация
-    if (!namePattern.test(name) || cyrillic.test(name)) {
-      showNotification("Введите корректный ник! Только латиница, цифры, дефисы и подчёркивания.");
+    if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
+      showNotification("Введите корректный ник! Используйте только латинские буквы, цифры, дефисы и подчёркивания.");
       return;
     }
-    if (!discordPattern.test(discord) || cyrillic.test(discord)) {
-      showNotification("Введите корректный Discord! Только латиница, цифры, - _ #.");
+    if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
+      showNotification("Введите корректный email! Проверьте формат адреса электронной почты.");
+      return;
+    }
+    if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
+      showNotification("Введите корректный Discord! Используйте формат username#1234.");
+      return;
+    }
+    if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
+      showNotification("Введите корректный Telegram! Используйте формат @username.");
       return;
     }
 
-    // Расшифровка токена и подстановка action
+    // --- Если проверки прошли ---
     const realAction = decryptToken();
     form.action = realAction;
 
-    // Уведомление об успешной отправке
     showNotification("✅ Форма успешно отправлена! Спасибо за заявку.");
 
-    // Отправка формы программно
     setTimeout(() => {
-      try { form.submit(); } catch(err) { console.error(err); }
+      try { form.submit(); } catch(err) { console.error('Не удалось отправить форму программно:', err); }
     }, 0);
 
-    // Через 10 секунд снова ставим плейсхолдер
     setTimeout(() => {
-      form.action = PLACEHOLDER_ACTION;
-      wipeDecrypted({ realAction });
+      try { form.action = PLACEHOLDER_ACTION; } catch(_) {}
+      try { wipeDecrypted({ realAction }); } catch(_) {}
     }, 1000);
   });
 });
+
+/* --- Уведомления --- */
+function showNotification(message) {
+  const existingNotification = document.querySelector('.notification');
+  if (existingNotification) existingNotification.remove();
+
+  const notification = document.createElement('div');
+  notification.className = 'notification';
+  notification.innerHTML = `<span class="notification-icon">⚠️</span> ${message} <button class="close-btn" onclick="this.parentElement.remove()">×</button>`;
+  document.body.appendChild(notification);
+
+  setTimeout(() => { notification.classList.add('show'); }, 100);
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.classList.remove('show');
+      setTimeout(() => { if (notification.parentElement) notification.remove(); }, 400);
+    }
+  }, 5000);
+}
 </script>
-
-
-
-
-
