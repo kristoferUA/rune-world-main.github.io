@@ -165,22 +165,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Если другой обработчик (ваш фильтр) отменил отправку — не шлём
     if (e.defaultPrevented) {
-      form.action = PLACEHOLDER_ACTION;
-      wipeDecrypted({ realAction });
-      return;
+        form.action = PLACEHOLDER_ACTION;
+        wipeDecrypted({ realAction });
+        return;
     }
 
+    // Программная отправка только если нет блокировок
     setTimeout(() => {
-      try { form.submit(); } catch (err) {
-        console.error("Не удалось отправить форму:", err);
-      }
+        if (!e.defaultPrevented) {
+            try {
+                form.submit();
+            } catch (err) {
+                console.error('Не удалось отправить форму программно:', err);
+            }
+        }
     }, 0);
 
     setTimeout(() => {
-      try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
-      try { wipeDecrypted({ realAction }); } catch (_) {}
+        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
+        try { wipeDecrypted({ realAction }); } catch (_) {}
     }, 1000);
-  }, { passive: false });
+}, { passive: false });
 });
 </script>
 
