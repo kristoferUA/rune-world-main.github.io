@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="uk">
-    <!-- 🔹 Прелоадер -->
+    <!-- Прелоадер -->
     <div id="preloader">
       <div class="spinner-box">
         <div class="configure-border-1">  
@@ -69,7 +69,6 @@
     </div>
     <div class="main">
         <div class="runelogo">
-                <!-- Добавляем арт клана -->
                 <img src="runeworld.png" alt="Логотип сервера" class="runelogo-image">
             </div>
         <div class="text-overlay">
@@ -202,35 +201,30 @@
     const overlay = document.getElementById('menu-overlay');
     const body = document.body;
 
-    // Відкрити меню
     menuButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // Щоб кліки на кнопку не закривали меню
+        event.stopPropagation(); 
         mobileMenu.classList.add('active');
         overlay.classList.add('active');
-        body.classList.add('body-no-scroll'); // Заборона прокрутки
+        body.classList.add('body-no-scroll'); 
     });
 
-    // Закрити меню (при натисканні на кнопку закриття)
     closeMenuButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // Щоб кліки на кнопку не викликали глобальне закриття
+        event.stopPropagation(); 
         closeMenu();
     });
 
-    // Закрити меню (при натисканні на overlay)
     overlay.addEventListener('click', () => {
         closeMenu();
     });
 
-    // Закрити меню (при кліку в будь-якому місці документа)
     document.addEventListener('click', () => {
         closeMenu();
     });
 
-    // Функція для закриття меню та відновлення прокрутки
     function closeMenu() {
         mobileMenu.classList.remove('active');
         overlay.classList.remove('active');
-        body.classList.remove('body-no-scroll'); // Дозволити прокрутку
+        body.classList.remove('body-no-scroll'); 
     }
 });
 </script>
@@ -246,7 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); // Викликаємо при завантаженні сторінки
+    checkVisibility(); 
 });
 </script>
 <script>
@@ -261,7 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); // Викликаємо при завантаженні сторінки
+    checkVisibility(); 
 });
 </script>
 <script>
@@ -278,7 +272,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); // Викликаємо при завантаженні сторінки
+    checkVisibility(); 
 });
 </script>
 <script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
@@ -294,7 +288,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
     const menuLinks = mobileMenu.querySelectorAll("a");
 
-    // Инициализация - скрываем меню при загрузке
     gsap.set(mobileMenu, { xPercent: 100 });
     gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
     gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
@@ -311,7 +304,6 @@ document.addEventListener("DOMContentLoaded", function () {
       gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
     }
 
-    // Анимация открытия
     tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
       .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
       .to(mobileMenu, { xPercent: 0 }, 0)
@@ -327,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (tl.reversed()) {
     tl.progress(0);
   }
-  tl.timeScale(1); // Вернуть нормальную скорость при открытии
+  tl.timeScale(1); 
   tl.play();
 });
 
@@ -335,7 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (tl.isActive()) {
     tl.progress(1);
   }
-  tl.timeScale(4); // Ускоряем обратную анимацию
+  tl.timeScale(4); 
   tl.reverse();
 };
 
@@ -356,7 +348,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 </script>
- <!-- 🔹 Скрипт для прелоадера -->
+ <!-- Скрипт для прелоадера -->
     <script>
       window.addEventListener("load", () => {
         const preloader = document.getElementById("preloader");
@@ -365,7 +357,7 @@ document.addEventListener("DOMContentLoaded", function () {
           preloader.style.transition = "opacity 0.5s ease";
           preloader.style.opacity = "0";
           setTimeout(() => preloader.style.display = "none", 500);
-        }, 300); // маленькая задержка перед исчезновением
+        }, 300); 
       });
     </script>
 <script>
@@ -392,7 +384,6 @@ document.addEventListener("DOMContentLoaded", function () {
             navigator.clipboard.writeText(text).then(function() {
                 showNotification(message);
             }).catch(function() {
-                // Fallback для старих браузерів
                 const textArea = document.createElement('textarea');
                 textArea.value = text;
                 document.body.appendChild(textArea);
@@ -404,7 +395,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         function showNotification(message) {
-            // Створюємо тимчасове повідомлення
             const notification = document.createElement('div');
             notification.textContent = message;
             notification.style.cssText = `
@@ -426,13 +416,11 @@ document.addEventListener("DOMContentLoaded", function () {
             
             document.body.appendChild(notification);
             
-            // Анімація появи
             setTimeout(() => {
                 notification.style.opacity = '1';
                 notification.style.transform = 'translateY(0)';
             }, 10);
             
-            // Видалення через 3 секунди
             setTimeout(() => {
                 notification.style.opacity = '0';
                 notification.style.transform = 'translateY(-20px)';
@@ -442,7 +430,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 3000);
         }
 
-        // Закриття при кліку поза віконечком
         document.addEventListener('click', function(event) {
             const popup = document.getElementById('contactPopup');
             const button = document.querySelector('.contact-button');
@@ -523,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     form.action = realAction;
 
-    // Если preventDefault был вызван другим обработчиком — не отправляем
+    // Если preventDefault был вызван другой херней — не отправляем
     if (e.defaultPrevented) {
         form.action = PLACEHOLDER_ACTION;
         wipeDecrypted({ realAction });
@@ -556,7 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector("#application form");
 
   form.addEventListener('submit', function(e) {
-  e.preventDefault(); // остановка отправки по умолчанию
+  e.preventDefault(); // остановка отправки по дефолту
 
   // 1. Проверки
   const name = this.querySelector("[name='name']").value.trim();
