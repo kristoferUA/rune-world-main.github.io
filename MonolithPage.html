@@ -193,15 +193,15 @@ document.addEventListener('DOMContentLoaded', () => {
      
 
 <script>
-        // Функція для показу красивого повідомлення
+        // Функция для показа красивого уведомления
         function showNotification(message, type = 'error') {
-            // Видаляємо попереднє повідомлення, якщо воно є
+            // Удаляем предыдущее уведомление, если оно есть
             const existingNotification = document.querySelector('.notification');
             if (existingNotification) {
                 existingNotification.remove();
             }
 
-            // Створюємо нове повідомлення
+            // Создаём новое уведомление
             const notification = document.createElement('div');
             notification.className = `notification ${type}`;
             
@@ -212,15 +212,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="close-btn" onclick="this.parentElement.remove()">×</button>
             `;
 
-            // Додаємо до сторінки
+            // Добавляем на страницу
             document.body.appendChild(notification);
 
-            // Показуємо з анімацією
+            // Показываем с анимацией
             setTimeout(() => {
                 notification.classList.add('show');
             }, 100);
 
-            // Автоматично приховуємо через 5 секунд
+            // Автоматически скрываем через 5 секунд
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.classList.remove('show');
@@ -249,32 +249,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
                 const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-                const questionPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // вопрос на латинице
+                const questionPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // вопрос разрешена кириллица и латиница
                 const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
 
                 if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-                    showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення (мінімум 3 символи).");
+                    showNotification("Введите корректный ник! Используйте только латинские буквы, цифры, дефисы и подчёркивания (минимум 3 символа).");
                     return;
                 }
                 if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-                    showNotification("Введіть коректний Discord! Використовуйте формат username#1234 тільки латинськими літерами.");
+                    showNotification("Введите корректный Discord! Используйте формат username#1234 только латинскими буквами.");
                     return;
                 }
                 if (!questionPattern.test(question) || badPatterns.test(question) || cyrillic.test(question)) {
-                    showNotification("Дайте коректну відповідь на питання! Використовуйте тільки латинські літери, цифри та базові знаки пунктуації.");
+                    showNotification("Дайте корректный ответ на вопрос! Используйте латинские и кириллические буквы, цифры и базовые знаки пунктуации.");
                     return;
                 }
                 if (!hoursPattern.test(hours) || badPatterns.test(hours)) {
-                    showNotification("Введіть коректну кількість годин! Можна використовувати цифри, літери та базові символи.");
+                    showNotification("Введите корректное количество часов! Можно использовать цифры, буквы и базовые символы.");
                     return;
                 }
 
-                // Якщо всі перевірки пройшли успішно
-                showNotification("Форма успішно відправлена! Дякуємо за заявку.", 'success');
+                // Если все проверки пройдены успешно
+                showNotification("Форма успешно отправлена! Спасибо за заявку.", 'success');
                 
-                // Відправляємо подію про валідність та сабмітимо форму
+                // Отправляем событие о валидности и сабмитим форму
                 e.target.dispatchEvent(new Event("valid")); 
-                // e.target.submit(); // розкоментуйте для реальної відправки
+                // e.target.submit(); // раскомментируйте для реальной отправки
             });
         });
-    </script>
+</script>
+
