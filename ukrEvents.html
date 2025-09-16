@@ -97,24 +97,18 @@
 
 
 <script>
-/* --- Параметры --- */
+/* --- Параметри --- */
 const _KEY = 's3cr3tK!';
 
-/* Зашифрованный "https://formspree.io/f/mvoejaqe" */
+/* Зашифрований "https://formspree.io/f/mvoejaqe" */
 const encryptedChunks = [
-  '1b471702',
-  '404e640e',
-  '155c111f',
-  '40043944',
-  '161d0a1d',
-  '1c12644c',
-  '055c0618',
-  '52052e'
+  '1b471702','404e640e','155c111f','40043944',
+  '161d0a1d','1c12644c','055c0618','52052e'
 ];
 
 const PLACEHOLDER_ACTION = '#';
 
-/* --- Вспомогательные функции --- */
+/* --- Допоміжні функції --- */
 function hexToBytes(hex) {
   const bytes = [];
   for (let i = 0; i < hex.length; i += 2) {
@@ -122,7 +116,6 @@ function hexToBytes(hex) {
   }
   return bytes;
 }
-
 function xorDecryptFromHex(hexString, key) {
   const bytes = hexToBytes(hexString);
   let out = '';
@@ -132,12 +125,10 @@ function xorDecryptFromHex(hexString, key) {
   }
   return out;
 }
-
 function decryptToken() {
   const hex = encryptedChunks.join('');
   return xorDecryptFromHex(hex, _KEY);
 }
-
 function wipeDecrypted(referenceObj) {
   if (referenceObj && typeof referenceObj === 'object') {
     for (const k in referenceObj) {
@@ -146,129 +137,66 @@ function wipeDecrypted(referenceObj) {
   }
 }
 
-/* --- Основная логика --- */
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('appl-form');
+/* --- Сповіщення --- */
+function showNotification(message, type = 'error') {
+  const existing = document.querySelector('.notification');
+  if (existing) existing.remove();
 
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  const icon = type === 'success' ? '✅' : '⚠️';
+  notification.innerHTML = `
+    <span class="notification-icon">${icon}</span>
+    ${message}
+    <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+  `;
+  document.body.appendChild(notification);
+
+  setTimeout(() => notification.classList.add('show'), 100);
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 400);
+    }
+  }, 5000);
+}
+
+/* --- Основна логіка --- */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("appl-form");
   form.action = PLACEHOLDER_ACTION;
 
-  form.addEventListener('submit', function (e) {
+  form.addEventListener("submit", function (e) {
     const name = this.querySelector("[name='name']").value.trim();
     const discord = this.querySelector("[name='discord']").value.trim();
 
     const cyrillic = /[а-яА-ЯёЁ]/;
+    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
 
-    // запрет кириллицы
-    if (cyrillic.test(name) || cyrillic.test(discord)) {
+    if (!namePattern.test(name) || cyrillic.test(name)) {
       e.preventDefault();
-      alert("Кириллица запрещена! Используйте только латиницу и символы.");
+      showNotification("Введіть коректний нік! Тільки латиниця, цифри, - або _. Мінімум 3 символи.", 'error');
+      return;
+    }
+    if (!discordPattern.test(discord) || cyrillic.test(discord)) {
+      e.preventDefault();
+      showNotification("Введіть коректний Discord! Використовуйте формат username#1234 тільки латиницею.", 'error');
       return;
     }
 
-    // расшифровываем токен
+    // Розшифровуємо токен
     const realAction = decryptToken();
     form.action = realAction;
 
     if (e.defaultPrevented) {
-        form.action = PLACEHOLDER_ACTION;
-        wipeDecrypted({ realAction });
-        return;
+      form.action = PLACEHOLDER_ACTION;
+      wipeDecrypted({ realAction });
+      return;
     }
 
-    // Программная отправка только если нет блокировок
-    setTimeout(() => {
-        if (!e.defaultPrevented) {
-            try {
-                form.submit();
-            } catch (err) {
-                console.error('Не удалось отправить форму программно:', err);
-            }
-        }
-    }, 0);
-
-    setTimeout(() => {
-        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
-        try { wipeDecrypted({ realAction }); } catch (_) {}
-    }, 1000);
-}, { passive: false });
+    showNotification("✅ Форма успішно відправлена! Дякуємо за заявку.", 'success');
+  });
 });
 </script>
 
-
-<script>
-        // Функція для показу красивого повідомлення
-        function showNotification(message, type = 'error') {
-            // Видаляємо попереднє повідомлення, якщо воно є
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-
-            // Створюємо нове повідомлення
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            
-            const icon = type === 'success' ? '✅' : '⚠️';
-            notification.innerHTML = `
-                <span class="notification-icon">${icon}</span>
-                ${message}
-                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
-            `;
-
-            // Додаємо до сторінки
-            document.body.appendChild(notification);
-
-            // Показуємо з анімацією
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-
-            // Автоматично приховуємо через 5 секунд
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        if (notification.parentElement) {
-                            notification.remove();
-                        }
-                    }, 400);
-                }
-            }, 5000);
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            const form = document.getElementById("appl-form");
-
-            form.addEventListener("submit", function (e) {
-                const name = this.querySelector("[name='name']").value.trim();
-                const discord = this.querySelector("[name='discord']").value.trim();
-
-                // запрет кириллицы
-                const cyrillic = /[а-яА-ЯёЁ]/;
-
-                // шаблоны
-                const namePattern = /^[a-zA-Z0-9-_]{3,}$/;     // ник: латиница, цифры, - _
-                const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/; // дискорд: латиница, цифры, - _ #
-
-                // проверки
-                if (!namePattern.test(name) || cyrillic.test(name)) {
-                    e.preventDefault();
-                    showNotification("Введіть коректний нік! Тільки латинські літери, цифри, дефіси або підкреслення. Мінімум 3 символи. Кирилиця заборонена.");
-                    return;
-                }
-
-                if (!discordPattern.test(discord) || cyrillic.test(discord)) {
-                    e.preventDefault();
-                    showNotification("Введіть коректний Discord нік! Тільки латинські літери, цифри, дефіси, підкреслення або #. Мінімум 3 символи. Кирилиця заборонена.");
-                    return;
-                }
-
-                // Якщо всі перевірки пройшли успішно
-                showNotification("Форма успішно відправлена! Дякуємо за заявку.", 'success');
-                
-                // Тут форма буде відправлена, якщо не було помилок
-                // Можете розкоментувати наступний рядок для реальної відправки:
-                // this.submit();
-            });
-        });
-    </script>
