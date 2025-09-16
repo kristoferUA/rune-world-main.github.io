@@ -91,7 +91,7 @@
         <div class="container">
             <h2>Подати заявку</h2>
             <p>Заповніть форму, і ми зв’яжемося з Вами</p>
-            <form action="https://formspree.io/f/mvoejaqe" method="POST">
+            <form id="appl-form" action="#" method="POST">
                 <input type="text" name="name" placeholder="Ваш нік" required>
                 <input type="email" name="email" placeholder="Ваш email" required>
                 <input type="text" name="discord" placeholder="Ваш нік у Discord" required>
@@ -454,6 +454,100 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     </script>
+
+
+
+
+<script>
+
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+const encryptedChunks = [
+  '1b471702',
+  '404e640e',
+  '155c111f',
+  '40043944',
+  '161d0a1d',
+  '1c12644c',
+  '055c0618',
+  '52052e'
+];
+
+const PLACEHOLDER_ACTION = '#';
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  }
+  return bytes;
+}
+
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+
+
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
+
+
+function wipeDecrypted(referenceObj) {
+
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
+    }
+  }
+}
+
+/* --- Основная логика --- */
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('appl-form');
+
+  form.action = PLACEHOLDER_ACTION;
+
+
+  form.addEventListener('submit', function (e) {
+
+    e.preventDefault();
+
+    const realAction = decryptToken();
+
+    form.action = realAction;
+
+    setTimeout(() => {
+      try {
+        form.submit();
+      } catch (err) {
+        console.error('Не удалось отправить форму программно:', err);
+      }
+    }, 0);
+
+    setTimeout(() => {
+      try {
+        form.action = PLACEHOLDER_ACTION;
+      } catch (_) {}
+
+      try {
+        wipeDecrypted({ realAction });
+      } catch (_) {}
+
+    }, 10000);
+  }, { passive: false });
+});
+</script>
+
 
 
 <script>
