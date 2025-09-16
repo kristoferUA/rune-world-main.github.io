@@ -89,24 +89,15 @@
 
 
 <script>
-/* --- Параметры --- */
+/* --- Параметри --- */
 const _KEY = 's3cr3tK!';
-
-
 const encryptedChunks = [
-  '1b471702',
-  '404e640e',
-  '155c111f',
-  '40043944',
-  '161d0a1d',
-  '1c12644c',
-  '05540808',
-  '49103c'
+  '1b471702','404e640e','155c111f','40043944',
+  '161d0a1d','1c12644c','05540808','49103c'
 ];
-
 const PLACEHOLDER_ACTION = '#';
 
-/* --- Вспомогательные функции --- */
+/* --- Допоміжні функції --- */
 function hexToBytes(hex) {
   const bytes = [];
   for (let i = 0; i < hex.length; i += 2) {
@@ -131,139 +122,80 @@ function decryptToken() {
 }
 
 function wipeDecrypted(referenceObj) {
-  if (referenceObj && typeof referenceObj === 'object') {
-    for (const k in referenceObj) {
-      try { referenceObj[k] = null; } catch(e) {}
-    }
+  if(referenceObj && typeof referenceObj==='object'){
+    for(const k in referenceObj){try{referenceObj[k]=null;}catch(e){}}
   }
 }
 
-/* --- Основная логика --- */
+/* --- Основна логіка --- */
 document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById('appl-form');
-
-  // держим плейсхолдер на старте
+  const form = document.querySelector("form[action='#']");
   try { form.action = PLACEHOLDER_ACTION; } catch(e){}
 
-  form.addEventListener('submit', function (e) {
-    // расшифровываем токен (только в момент сабмита)
-    const realAction = decryptToken();
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
 
-    // подставляем реальный action
-    try { form.action = realAction; } catch (err) { console.error(err); }
+    const name = this.querySelector("[name='name']").value.trim();
+    const discord = this.querySelector("[name='discord']").value.trim();
+    const question = this.querySelector("[name='question']").value.trim();
+    const hours = this.querySelector("[name='hours']").value.trim();
 
-    // Если другой обработчик (ваш фильтр) отменил отправку — не шлём
-    if (e.defaultPrevented) {
-        form.action = PLACEHOLDER_ACTION;
-        wipeDecrypted({ realAction });
-        return;
+    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+    const cyrillic = /[а-яА-ЯёЁ]/;
+
+    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+    const questionPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/;
+    const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/;
+
+    if(!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)){
+      showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення (мінімум 3 символи).");
+      return;
+    }
+    if(!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)){
+      showNotification("Введіть коректний Discord! Використовуйте формат username#1234 тільки латинськими буквами.");
+      return;
+    }
+    if(!questionPattern.test(question) || badPatterns.test(question)){
+      showNotification("Дайте коректну відповідь на запитання! Використовуйте латинські та кириличні літери, цифри та базові знаки пунктуації.");
+      return;
+    }
+    if(!hoursPattern.test(hours) || badPatterns.test(hours)){
+      showNotification("Введіть коректну кількість годин! Можна використовувати цифри, літери та базові символи.");
+      return;
     }
 
-    // Программная отправка только если нет блокировок
-    setTimeout(() => {
-        if (!e.defaultPrevented) {
-            try {
-                form.submit();
-            } catch (err) {
-                console.error('Не удалось отправить форму программно:', err);
-            }
-        }
-    }, 0);
+    const realAction = decryptToken();
+    try { form.action = realAction; } catch(e) { console.error(e); }
 
-    setTimeout(() => {
-        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
-        try { wipeDecrypted({ realAction }); } catch (_) {}
-    }, 1000);
-}, { passive: false });
+    showNotification("Форма успішно відправлена! Дякуємо за заявку.", 'success');
+
+    setTimeout(()=>{try{form.submit();}catch(e){}},0);
+    setTimeout(()=>{
+      try{form.action=PLACEHOLDER_ACTION;}catch(_) {}
+      try{wipeDecrypted({realAction});}catch(_) {}
+    },1000);
+  });
 });
+
+/* --- Повідомлення --- */
+function showNotification(message,type='error'){
+  const existingNotification=document.querySelector('.notification');
+  if(existingNotification) existingNotification.remove();
+
+  const notification=document.createElement('div');
+  notification.className=`notification ${type}`;
+  const icon=type==='success'?'✅':'⚠️';
+  notification.innerHTML=`<span class="notification-icon">${icon}</span>${message}<button class="close-btn" onclick="this.parentElement.remove()">×</button>`;
+  document.body.appendChild(notification);
+
+  setTimeout(()=>{notification.classList.add('show');},100);
+  setTimeout(()=>{
+    if(notification.parentElement){
+      notification.classList.remove('show');
+      setTimeout(()=>{if(notification.parentElement)notification.remove();},400);
+    }
+  },5000);
+}
 </script>
 
-
-     
-
-<script>
-        // Функція для показу красивого повідомлення
-        function showNotification(message, type = 'error') {
-            // Видаляємо попереднє повідомлення, якщо воно є
-            const existingNotification = document.querySelector('.notification');
-            if (existingNotification) {
-                existingNotification.remove();
-            }
-
-            // Створюємо нове повідомлення
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            
-            const icon = type === 'success' ? '✅' : '⚠️';
-            notification.innerHTML = `
-                <span class="notification-icon">${icon}</span>
-                ${message}
-                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
-            `;
-
-            // Додаємо до сторінки
-            document.body.appendChild(notification);
-
-            // Показуємо з анімацією
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-
-            // Автоматично приховуємо через 5 секунд
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        if (notification.parentElement) {
-                            notification.remove();
-                        }
-                    }, 400);
-                }
-            }, 5000);
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const form = document.querySelector("form[action='#']");
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const name = this.querySelector("[name='name']").value.trim();
-                const discord = this.querySelector("[name='discord']").value.trim();
-                const question = this.querySelector("[name='question']").value.trim();
-                const hours = this.querySelector("[name='hours']").value.trim();
-
-                const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
-                const cyrillic = /[а-яА-ЯёЁ]/;
-
-                const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
-                const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-                const questionPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // вопрос на латинице
-                const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
-
-                if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-                    showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення (мінімум 3 символи).");
-                    return;
-                }
-                if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-                    showNotification("Введіть коректний Discord! Використовуйте формат username#1234 тільки латинськими літерами.");
-                    return;
-                }
-                if (!questionPattern.test(question) || badPatterns.test(question) || cyrillic.test(question)) {
-                    showNotification("Дайте коректну відповідь на питання! Використовуйте тільки латинські літери, цифри та базові знаки пунктуації.");
-                    return;
-                }
-                if (!hoursPattern.test(hours) || badPatterns.test(hours)) {
-                    showNotification("Введіть коректну кількість годин! Можна використовувати цифри, літери та базові символи.");
-                    return;
-                }
-
-                // Якщо всі перевірки пройшли успішно
-                showNotification("Форма успішно відправлена! Дякуємо за заявку.", 'success');
-                
-                // Відправляємо подію про валідність та сабмітимо форму
-                e.target.dispatchEvent(new Event("valid")); 
-                // e.target.submit(); // розкоментуйте для реальної відправки
-            });
-        });
-    </script>
