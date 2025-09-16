@@ -1,6 +1,20 @@
 /* ======================= */
 /*        МЕДИЙКИ          */
 /* ======================= */
+
+@media (max-width: 768px) {
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                transform: translateY(-100px);
+            }
+
+            .notification.show {
+                transform: translateY(0);
+            }
+        }
+
 @media (max-width: 10000px) {
   .runelogo {
     border-radius: 10px;
@@ -430,6 +444,59 @@ button, .menu-button, .close-menu, a {
   box-shadow: 0 0 0 3px var(--btn-bg-color),
               0 0 0 6px var(--btn-bg-2);
 }
+/* Стилі для спливаючого повідомлення */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4757;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+            z-index: 1000;
+            transform: translateX(400px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 350px;
+            font-weight: 500;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .notification .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .notification .close-btn:hover {
+            opacity: 0.7;
+        }
+
+        .notification-icon {
+            display: inline-block;
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+
+
+
 
 /* ======================= */
 /*      ОСНОВА САЙТА       */
