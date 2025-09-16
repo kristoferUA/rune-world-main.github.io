@@ -68,7 +68,7 @@
         <div class="container">
             <h2>Регистрация на ивент</h2>
             <p>Ивент стартует 20.08.25 в 17:00. Желаю удачи!</p>
-            <form action="https://formspree.io/f/mvoejaqe" method="POST">
+            <form id="appl-form" action="#" method="POST">
                 <input type="text" name="name" placeholder="Ваш ник на сервере" required>
                 <input type="text" name="discord" placeholder="Ваш ник в дискорде" required>
                 <button class="but-appl" id="but-appl" type="submit">На поиски!🕹️</button>
@@ -94,3 +94,103 @@
         }, 300); // маленькая задержка перед исчезновением
       });
     </script>
+
+
+
+<script>
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+/* Зашифрованный "https://formspree.io/f/mvoejaqe" */
+const encryptedChunks = [
+  '1b471702',
+  '404e640e',
+  '155c111f',
+  '40043944',
+  '161d0a1d',
+  '1c12644c',
+  '055c0618',
+  '52052e'
+];
+
+const PLACEHOLDER_ACTION = '#';
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  return bytes;
+}
+
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
+
+function wipeDecrypted(referenceObj) {
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
+    }
+  }
+}
+
+/* --- Основная логика --- */
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('appl-form');
+
+  form.action = PLACEHOLDER_ACTION;
+
+  form.addEventListener('submit', function (e) {
+    const name = this.querySelector("[name='name']").value.trim();
+    const discord = this.querySelector("[name='discord']").value.trim();
+
+    const cyrillic = /[а-яА-ЯёЁ]/;
+
+    // запрет кириллицы
+    if (cyrillic.test(name) || cyrillic.test(discord)) {
+      e.preventDefault();
+      alert("Кириллица запрещена! Используйте только латиницу и символы.");
+      return;
+    }
+
+    // расшифровываем токен
+    const realAction = decryptToken();
+    form.action = realAction;
+
+    if (e.defaultPrevented) {
+        form.action = PLACEHOLDER_ACTION;
+        wipeDecrypted({ realAction });
+        return;
+    }
+
+    // Программная отправка только если нет блокировок
+    setTimeout(() => {
+        if (!e.defaultPrevented) {
+            try {
+                form.submit();
+            } catch (err) {
+                console.error('Не удалось отправить форму программно:', err);
+            }
+        }
+    }, 0);
+
+    setTimeout(() => {
+        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
+        try { wipeDecrypted({ realAction }); } catch (_) {}
+    }, 1000);
+}, { passive: false });
+});
+</script>
