@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
     const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-    const questionPattern = /^[a-zA-Zа-яА-Я0-9-_ ?!.,]{3,}$/; // вопрос на латинице
+    const questionPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // вопрос на латинице
     const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
 
     if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
