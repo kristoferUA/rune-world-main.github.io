@@ -541,42 +541,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector("#application form");
+        // Функція для показу красивого повідомлення
+        function showNotification(message) {
+            // Видаляємо попереднє повідомлення, якщо воно є
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
 
-  form.addEventListener('submit', function(e) {
-  e.preventDefault(); // остановка отправки по дефолту
+            // Створюємо нове повідомлення
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <span class="notification-icon">⚠️</span>
+                ${message}
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+            `;
 
-  // 1. Проверки
-  const name = this.querySelector("[name='name']").value.trim();
-  const email = this.querySelector("[name='email']").value.trim();
-  const discord = this.querySelector("[name='discord']").value.trim();
-  const telegram = this.querySelector("[name='telegram']").value.trim();
+            // Додаємо до сторінки
+            document.body.appendChild(notification);
 
-  const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
-  const cyrillic = /[а-яА-ЯёЁ]/;
+            // Показуємо з анімацією
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
 
-  const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
-  const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
-  const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-  const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
+            // Автоматично приховуємо через 5 секунд
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 400);
+                }
+            }, 5000);
+        }
 
-  if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-    alert("Введите корректный ник!");
-    return; // НЕ вызываем form.submit()
-  }
-  if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
-    alert("Введите корректный email!");
-    return;
-  }
-  if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-    alert("Введите корректный Discord!");
-    return;
-  }
-  if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
-    alert("Введите корректный Telegram!");
-    return;
-  }
-  });
-});
-</script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector("#application form");
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // зупинка відправки за замовчуванням
+
+                // 1. Перевірки
+                const name = this.querySelector("[name='name']").value.trim();
+                const email = this.querySelector("[name='email']").value.trim();
+                const discord = this.querySelector("[name='discord']").value.trim();
+                const telegram = this.querySelector("[name='telegram']").value.trim();
+
+                const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+                const cyrillic = /[а-яА-ЯёЁ]/;
+
+                const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+                const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
+                const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+                const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
+
+                if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
+                    showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення.");
+                    return;
+                }
+                if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
+                    showNotification("Введіть коректний email! Перевірте формат адреси електронної пошти.");
+                    return;
+                }
+                if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
+                    showNotification("Введіть коректний Discord! Використовуйте формат username#1234.");
+                    return;
+                }
+                if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
+                    showNotification("Введіть коректний Telegram! Використовуйте формат @username.");
+                    return;
+                }
+
+                // Якщо всі перевірки пройшли успішно
+                showNotification("✅ Форма успішно відправлена! Дякуємо за заявку.");
+                
+                // Тут можна додати код для відправки форми
+                // this.submit(); // розкоментуйте для реальної відправки
+            });
+        });
+    </script>
