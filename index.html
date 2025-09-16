@@ -553,15 +553,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
-        // Функція для показу красивого повідомлення
+        // Функция для показа красивого уведомления
         function showNotification(message) {
-            // Видаляємо попереднє повідомлення, якщо воно є
+            // Удаляем предыдущее уведомление, если оно есть
             const existingNotification = document.querySelector('.notification');
             if (existingNotification) {
                 existingNotification.remove();
             }
 
-            // Створюємо нове повідомлення
+            // Создаём новое уведомление
             const notification = document.createElement('div');
             notification.className = 'notification';
             notification.innerHTML = `
@@ -570,15 +570,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="close-btn" onclick="this.parentElement.remove()">×</button>
             `;
 
-            // Додаємо до сторінки
+            // Добавляем на страницу
             document.body.appendChild(notification);
 
-            // Показуємо з анімацією
+            // Показываем с анимацией
             setTimeout(() => {
                 notification.classList.add('show');
             }, 100);
 
-            // Автоматично приховуємо через 5 секунд
+            // Автоматически скрываем через 5 секунд
             setTimeout(() => {
                 if (notification.parentElement) {
                     notification.classList.remove('show');
@@ -595,9 +595,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const form = document.querySelector("#application form");
 
             form.addEventListener('submit', function(e) {
-                e.preventDefault(); // зупинка відправки за замовчуванням
+                e.preventDefault(); // остановка отправки по умолчанию
 
-                // 1. Перевірки
+                // 1. Проверки
                 const name = this.querySelector("[name='name']").value.trim();
                 const email = this.querySelector("[name='email']").value.trim();
                 const discord = this.querySelector("[name='discord']").value.trim();
@@ -612,28 +612,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
 
                 if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-                    showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення.");
+                    showNotification("Введите корректный ник! Используйте только латинские буквы, цифры, дефисы и подчёркивания.");
                     return;
                 }
                 if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
-                    showNotification("Введіть коректний email! Перевірте формат адреси електронної пошти.");
+                    showNotification("Введите корректный email! Проверьте формат адреса электронной почты.");
                     return;
                 }
                 if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-                    showNotification("Введіть коректний Discord! Використовуйте формат username#1234.");
+                    showNotification("Введите корректный Discord! Используйте формат username#1234.");
                     return;
                 }
                 if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
-                    showNotification("Введіть коректний Telegram! Використовуйте формат @username.");
+                    showNotification("Введите корректный Telegram! Используйте формат @username.");
                     return;
                 }
 
-                // Якщо всі перевірки пройшли успішно
-                showNotification("✅ Форма успішно відправлена! Дякуємо за заявку.");
+                // Если все проверки пройдены успешно
+                showNotification("✅ Форма успешно отправлена! Спасибо за заявку.");
                 
-                // Тут можна додати код для відправки форми
-                // this.submit(); // розкоментуйте для реальної відправки
+                // Здесь можно добавить код для отправки формы
+                // this.submit(); // раскомментируйте для реальной отправки
             });
         });
-    </script>
-
+</script>
