@@ -515,36 +515,37 @@ function wipeDecrypted(referenceObj) {
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('appl-form');
 
+
   form.action = PLACEHOLDER_ACTION;
 
-
   form.addEventListener('submit', function (e) {
-
-    e.preventDefault();
-
     const realAction = decryptToken();
 
     form.action = realAction;
 
+    // Если preventDefault был вызван другим обработчиком — не отправляем
+    if (e.defaultPrevented) {
+        form.action = PLACEHOLDER_ACTION;
+        wipeDecrypted({ realAction });
+        return;
+    }
+
+    // Программная отправка только если нет блокировок
     setTimeout(() => {
-      try {
-        form.submit();
-      } catch (err) {
-        console.error('Не удалось отправить форму программно:', err);
-      }
+        if (!e.defaultPrevented) {
+            try {
+                form.submit();
+            } catch (err) {
+                console.error('Не удалось отправить форму программно:', err);
+            }
+        }
     }, 0);
 
     setTimeout(() => {
-      try {
-        form.action = PLACEHOLDER_ACTION;
-      } catch (_) {}
-
-      try {
-        wipeDecrypted({ realAction });
-      } catch (_) {}
-
+        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
+        try { wipeDecrypted({ realAction }); } catch (_) {}
     }, 10000);
-  }, { passive: false });
+}, { passive: false });
 });
 </script>
 
@@ -554,44 +555,39 @@ document.addEventListener('DOMContentLoaded', () => {
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector("#application form");
 
-  form.addEventListener("submit", function (e) {
-    const name = this.querySelector("[name='name']").value.trim();
-    const email = this.querySelector("[name='email']").value.trim();
-    const discord = this.querySelector("[name='discord']").value.trim();
-    const telegram = this.querySelector("[name='telegram']").value.trim();
+  form.addEventListener('submit', function(e) {
+  e.preventDefault(); // остановка отправки по умолчанию
 
-    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
-    const cyrillic = /[а-яА-ЯёЁ]/;
+  // 1. Проверки
+  const name = this.querySelector("[name='name']").value.trim();
+  const email = this.querySelector("[name='email']").value.trim();
+  const discord = this.querySelector("[name='discord']").value.trim();
+  const telegram = this.querySelector("[name='telegram']").value.trim();
 
-    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
-    const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
-    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-    const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
+  const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+  const cyrillic = /[а-яА-ЯёЁ]/;
 
-    // ---- проверки ----
-    if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-      e.preventDefault();
-      alert("Введите корректный ник (только латиница, цифры, - или _, минимум 3 символа).");
-      return;
-    }
+  const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+  const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
+  const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+  const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
 
-    if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
-      e.preventDefault();
-      alert("Введите корректный email (только латиница, цифры, . _ - @).");
-      return;
-    }
-
-    if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-      e.preventDefault();
-      alert("Введите корректный ник в Discord (только латиница, цифры, - _ #).");
-      return;
-    }
-
-    if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
-      e.preventDefault();
-      alert("Введите корректный юзернейм в Telegram (только латиница, цифры, - _ @).");
-      return;
-    }
+  if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
+    alert("Введите корректный ник!");
+    return; // НЕ вызываем form.submit()
+  }
+  if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
+    alert("Введите корректный email!");
+    return;
+  }
+  if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
+    alert("Введите корректный Discord!");
+    return;
+  }
+  if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
+    alert("Введите корректный Telegram!");
+    return;
+  }
   });
 });
 </script>
