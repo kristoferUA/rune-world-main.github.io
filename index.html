@@ -562,56 +562,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 <script>
-document.getElementById("application").addEventListener("submit", function (e) {
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector("#application form");
+
+  form.addEventListener("submit", function (e) {
     const name = this.querySelector("[name='name']").value.trim();
     const email = this.querySelector("[name='email']").value.trim();
     const discord = this.querySelector("[name='discord']").value.trim();
     const telegram = this.querySelector("[name='telegram']").value.trim();
 
-    // фильтр ссылок и запрещённых слов
     const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
-
-    // фильтр кириллицы
     const cyrillic = /[а-яА-ЯёЁ]/;
 
-    // Общий фильтр для имени: только латиница, цифры, - и _
     const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
-
-    // Фильтр email: латиница, цифры, . _ - @
     const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
-
-    // Фильтр Discord: латиница, цифры, - _ #
     const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-
-    // Фильтр Telegram: латиница, цифры, - _ @
     const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
 
+    // ---- проверки ----
     if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-        alert("Введите корректный ник (только латиница, цифры, - или _, минимум 3 символа).");
-        e.preventDefault();
-        return;
+      e.preventDefault();
+      alert("Введите корректный ник (только латиница, цифры, - или _, минимум 3 символа).");
+      return;
     }
 
     if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
-        alert("Введите корректный email (только латиница, цифры, . _ - @).");
-        e.preventDefault();
-        return;
+      e.preventDefault();
+      alert("Введите корректный email (только латиница, цифры, . _ - @).");
+      return;
     }
 
     if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-        alert("Введите корректный ник в Discord (только латиница, цифры, - _ #).");
-        e.preventDefault();
-        return;
+      e.preventDefault();
+      alert("Введите корректный ник в Discord (только латиница, цифры, - _ #).");
+      return;
     }
 
     if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
-        alert("Введите корректный юзернейм в Telegram (только латиница, цифры, - _ @).");
-        e.preventDefault();
-        return;
+      e.preventDefault();
+      alert("Введите корректный юзернейм в Telegram (только латиница, цифры, - _ @).");
+      return;
     }
+  });
 });
 </script>
-
-
-
 
