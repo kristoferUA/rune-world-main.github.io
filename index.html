@@ -529,34 +529,33 @@ document.addEventListener('DOMContentLoaded', () => {
   form.action = PLACEHOLDER_ACTION;
 
   form.addEventListener('submit', function (e) {
-
     const realAction = decryptToken();
-
 
     form.action = realAction;
 
-
+    // Если preventDefault был вызван другим обработчиком — не отправляем
     if (e.defaultPrevented) {
-
-      form.action = PLACEHOLDER_ACTION;
-      wipeDecrypted({ realAction });
-      return;
+        form.action = PLACEHOLDER_ACTION;
+        wipeDecrypted({ realAction });
+        return;
     }
 
-
+    // Программная отправка только если нет блокировок
     setTimeout(() => {
-      try {
-        form.submit();
-      } catch (err) {
-        console.error('Не удалось отправить форму программно:', err);
-      }
+        if (!e.defaultPrevented) {
+            try {
+                form.submit();
+            } catch (err) {
+                console.error('Не удалось отправить форму программно:', err);
+            }
+        }
     }, 0);
 
     setTimeout(() => {
-      try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
-      try { wipeDecrypted({ realAction }); } catch (_) {}
+        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
+        try { wipeDecrypted({ realAction }); } catch (_) {}
     }, 10000);
-  }, { passive: false });
+}, { passive: false });
 });
 </script>
 
@@ -602,5 +601,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
+
 
 
