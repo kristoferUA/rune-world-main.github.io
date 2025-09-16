@@ -85,3 +85,139 @@
         }, 300); // маленькая задержка перед исчезновением
       });
     </script>
+<script>
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+
+const encryptedChunks = [
+  '1b471702',
+  '404e640e',
+  '155c111f',
+  '40043944',
+  '161d0a1d',
+  '1c12644c',
+  '05540808',
+  '49103c'
+];
+
+const PLACEHOLDER_ACTION = '#';
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  return bytes;
+}
+
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
+
+function wipeDecrypted(referenceObj) {
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
+    }
+  }
+}
+
+/* --- Основная логика --- */
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('appl-form');
+
+  // держим плейсхолдер на старте
+  try { form.action = PLACEHOLDER_ACTION; } catch(e){}
+
+  form.addEventListener('submit', function (e) {
+    // расшифровываем токен (только в момент сабмита)
+    const realAction = decryptToken();
+
+    // подставляем реальный action
+    try { form.action = realAction; } catch (err) { console.error(err); }
+
+    // Если другой обработчик (ваш фильтр) отменил отправку — не шлём
+    if (e.defaultPrevented) {
+        form.action = PLACEHOLDER_ACTION;
+        wipeDecrypted({ realAction });
+        return;
+    }
+
+    // Программная отправка только если нет блокировок
+    setTimeout(() => {
+        if (!e.defaultPrevented) {
+            try {
+                form.submit();
+            } catch (err) {
+                console.error('Не удалось отправить форму программно:', err);
+            }
+        }
+    }, 0);
+
+    setTimeout(() => {
+        try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
+        try { wipeDecrypted({ realAction }); } catch (_) {}
+    }, 1000);
+}, { passive: false });
+});
+</script>
+
+
+     
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector("form[action='#']"); // уже заменён на PLACEHOLDER
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = this.querySelector("[name='name']").value.trim();
+    const discord = this.querySelector("[name='discord']").value.trim();
+    const question = this.querySelector("[name='question']").value.trim();
+    const hours = this.querySelector("[name='hours']").value.trim();
+
+    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+    const cyrillic = /[а-яА-ЯёЁ]/;
+
+    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+    const questionPattern = /^[a-zA-Zа-яА-Я0-9-_ ?!.,]{3,}$/; // вопрос на латинице
+    const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
+
+    if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
+      alert("Введите корректный ник!");
+      return;
+    }
+    if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
+      alert("Введите корректный Discord!");
+      return;
+    }
+    if (!questionPattern.test(question) || badPatterns.test(question) || cyrillic.test(question)) {
+      alert("Ответьте корректно на вопрос (только латиница)!");
+      return;
+    }
+    if (!hoursPattern.test(hours) || badPatterns.test(hours)) {
+      alert("Введите корректное количество часов!");
+      return;
+    }
+
+    // Если всё ок — снимаем блокировку
+    e.target.dispatchEvent(new Event("valid")); 
+    e.target.submit();
+  });
+});
+</script>
