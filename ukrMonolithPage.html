@@ -182,45 +182,88 @@ document.addEventListener('DOMContentLoaded', () => {
      
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector("form[action='#']"); // уже заменён на PLACEHOLDER
+        // Функція для показу красивого повідомлення
+        function showNotification(message, type = 'error') {
+            // Видаляємо попереднє повідомлення, якщо воно є
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
 
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
+            // Створюємо нове повідомлення
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            
+            const icon = type === 'success' ? '✅' : '⚠️';
+            notification.innerHTML = `
+                <span class="notification-icon">${icon}</span>
+                ${message}
+                <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+            `;
 
-    const name = this.querySelector("[name='name']").value.trim();
-    const discord = this.querySelector("[name='discord']").value.trim();
-    const question = this.querySelector("[name='question']").value.trim();
-    const hours = this.querySelector("[name='hours']").value.trim();
+            // Додаємо до сторінки
+            document.body.appendChild(notification);
 
-    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
-    const cyrillic = /[а-яА-ЯёЁ]/;
+            // Показуємо з анімацією
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
 
-    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
-    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-    const questionPattern = /^[a-zA-Zа-яА-Я0-9-_ ?!.,]{3,}$/; // вопрос на латинице
-    const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
+            // Автоматично приховуємо через 5 секунд
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 400);
+                }
+            }, 5000);
+        }
 
-    if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-      alert("Введите корректный ник!");
-      return;
-    }
-    if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-      alert("Введите корректный Discord!");
-      return;
-    }
-    if (!questionPattern.test(question) || badPatterns.test(question) || cyrillic.test(question)) {
-      alert("Ответьте корректно на вопрос (только латиница)!");
-      return;
-    }
-    if (!hoursPattern.test(hours) || badPatterns.test(hours)) {
-      alert("Введите корректное количество часов!");
-      return;
-    }
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector("form[action='#']");
 
-    // Если всё ок — снимаем блокировку
-    e.target.dispatchEvent(new Event("valid")); 
-    e.target.submit();
-  });
-});
-</script>
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const name = this.querySelector("[name='name']").value.trim();
+                const discord = this.querySelector("[name='discord']").value.trim();
+                const question = this.querySelector("[name='question']").value.trim();
+                const hours = this.querySelector("[name='hours']").value.trim();
+
+                const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+                const cyrillic = /[а-яА-ЯёЁ]/;
+
+                const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+                const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+                const questionPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // вопрос на латинице
+                const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
+
+                if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
+                    showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення (мінімум 3 символи).");
+                    return;
+                }
+                if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
+                    showNotification("Введіть коректний Discord! Використовуйте формат username#1234 тільки латинськими літерами.");
+                    return;
+                }
+                if (!questionPattern.test(question) || badPatterns.test(question) || cyrillic.test(question)) {
+                    showNotification("Дайте коректну відповідь на питання! Використовуйте тільки латинські літери, цифри та базові знаки пунктуації.");
+                    return;
+                }
+                if (!hoursPattern.test(hours) || badPatterns.test(hours)) {
+                    showNotification("Введіть коректну кількість годин! Можна використовувати цифри, літери та базові символи.");
+                    return;
+                }
+
+                // Якщо всі перевірки пройшли успішно
+                showNotification("Форма успішно відправлена! Дякуємо за заявку.", 'success');
+                
+                // Відправляємо подію про валідність та сабмітимо форму
+                e.target.dispatchEvent(new Event("valid")); 
+                // e.target.submit(); // розкоментуйте для реальної відправки
+            });
+        });
+    </script>
