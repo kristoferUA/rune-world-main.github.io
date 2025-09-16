@@ -89,18 +89,18 @@
 </div>
     </div>
     <section class="application" id="application">
-        <div class="container">
-            <h2>Подать заявку</h2>
-            <p>Заполните форму и мы свяжемся с Вами</p>
-            <form action="https://formspree.io/f/mvoejaqe" method="POST">
-                <input type="text" name="name" placeholder="Ваш ник" required>
-                <input type="email" name="email" placeholder="Ваш email" required>
-                <input type="text" name="discord" placeholder="Ваш ник в дискорде" required>
-                <input type="text" name="telegram" placeholder="Ваш юзернейм в Telegram" required>
-                <button class="but-appl" id="but-appl" type="submit">Отправить</button>
-            </form>
-        </div>
-    </section>
+  <div class="container">
+    <h2>Подать заявку</h2>
+    <p>Заполните форму и мы свяжемся с Вами</p>
+    <form id="appl-form" action="#" method="POST">
+      <input type="text" name="name" placeholder="Ваш ник" required>
+      <input type="email" name="email" placeholder="Ваш email" required>
+      <input type="text" name="discord" placeholder="Ваш ник в дискорде" required>
+      <input type="text" name="telegram" placeholder="Ваш юзернейм в Telegram" required>
+      <button class="but-appl" id="but-appl" type="submit">Отправить</button>
+    </form>
+  </div>
+</section>
     <section class="about" id="about">
         <div class="container">
             <h2>Античит</h2>
@@ -467,6 +467,110 @@ document.addEventListener("DOMContentLoaded", function () {
     </script>
 
 
+
+<script>
+
+
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+const encryptedChunks = [
+  '1b471702',
+  '404e640e',
+  '155c111f',
+  '40043944',
+  '161d0a1d',
+  '1c12644c',
+  '055c0618',
+  '52052e'
+];
+
+// плейсхолдер, который будет стоять в action когда токен «скрыт»
+const PLACEHOLDER_ACTION = '#';
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  }
+  return bytes;
+}
+
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+
+/* Собрать все чанки -> один hex -> расшифровать */
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
+
+/* Очистка чувствительных данных из памяти (частично). */
+function wipeDecrypted(referenceObj) {
+  // стараемся удалить ссылку на строку
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
+    }
+  }
+}
+
+/* --- Основная логика --- */
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('appl-form');
+
+  // На старте держим action в плейсхолдере
+  form.action = PLACEHOLDER_ACTION;
+
+  // Перехватываем submit — расшифровываем, подставляем, и отправляем.
+  form.addEventListener('submit', function (e) {
+    // Останавливаем обычную синхронную отправку, чтобы гарантированно подставить action
+    e.preventDefault();
+
+    // расшифровка
+    const realAction = decryptToken();
+
+    // подставляем реальный action
+    form.action = realAction;
+
+    // сразу отправляем форму (после установки action)
+    // используем setTimeout 0 чтобы дать браузеру обновить атрибут (на всякий случай)
+    setTimeout(() => {
+      try {
+        form.submit();
+      } catch (err) {
+        console.error('Не удалось отправить форму программно:', err);
+      }
+    }, 0);
+
+    // Через 10 секунд снова «перекрываем» action и очищаем временные переменные
+    setTimeout(() => {
+      try {
+        form.action = PLACEHOLDER_ACTION;
+      } catch (_) {}
+
+      // попытка "стереть" временные данные (не гарантирует полной безопасности,
+      // но усложняет прямое прочтение памяти из скрипта)
+      try {
+        wipeDecrypted({ realAction });
+      } catch (_) {}
+
+    }, 10000); // 10000 мс = 10 секунд
+  }, { passive: false });
+});
+</script>
+
+
+
+
 <script>
 document.getElementById("application").addEventListener("submit", function (e) {
     const name = this.querySelector("[name='name']").value.trim();
@@ -517,3 +621,4 @@ document.getElementById("application").addEventListener("submit", function (e) {
     }
 });
 </script>
+
