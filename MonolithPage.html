@@ -69,7 +69,7 @@
         <div class="container">
             <h2>Вступай в наши ряды!</h2>
             <p>Заполните форму для участия в турнире. На турнире будет разыгрываться одна проходка в Монолит. Турнир будет проведен на сервере RuneWorld 18 мая в 19:00 по Киеву. Принимаются все желающие, которых нет в клане на данный момент.</p>
-            <form action="https://formspree.io/f/mvgkzzdw" method="POST">
+            <form id="appl-form" action="#" method="POST">
                 <input type="text" name="name" placeholder="Ваш ник на сервере" required>
                 <input type="text" name="discord" placeholder="Ваш ник в Discord" required>
                 <input type="text" name="question" placeholder="Почему вы хотите вступить в Монолит?" required>
@@ -97,3 +97,137 @@
       });
     </script>
 
+
+
+<script>
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+const encryptedChunks = [
+  "1b471702",
+  "404e640e",
+  "155c111f",
+  "40043944",
+  "161d0a1d",
+  "1c12644c",
+  "055c0618",
+  "52052e",
+  "0c5f070e",
+  "5a44260d",
+  "104a060b",
+  "5a4d6503",
+  "0b5b0f18",
+  "5a493e00",
+  "1759051e",
+  "5c442e1e"
+];
+
+const PLACEHOLDER_ACTION = "#";
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let c = 0; c < hex.length; c += 2) {
+    bytes.push(parseInt(hex.substr(c, 2), 16));
+  }
+  return bytes;
+}
+
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = "";
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+
+function decryptToken() {
+  const hex = encryptedChunks.join("");
+  return xorDecryptFromHex(hex, _KEY);
+}
+
+function wipeDecrypted(referenceObj) {
+  if (referenceObj && typeof referenceObj === "object") {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch (e) {}
+    }
+  }
+}
+
+/* --- Основная логика --- */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("form[action*='formspree']");
+
+  form.action = PLACEHOLDER_ACTION;
+
+  form.addEventListener("submit", function (e) {
+    const realAction = decryptToken();
+    form.action = realAction;
+
+    if (e.defaultPrevented) {
+      form.action = PLACEHOLDER_ACTION;
+      wipeDecrypted({ realAction });
+      return;
+    }
+
+    setTimeout(() => {
+      try { form.submit(); } catch (err) {
+        console.error("Не удалось отправить форму:", err);
+      }
+    }, 0);
+
+    setTimeout(() => {
+      try { form.action = PLACEHOLDER_ACTION; } catch (_) {}
+      try { wipeDecrypted({ realAction }); } catch (_) {}
+    }, 10000);
+  }, { passive: false });
+});
+</script>
+
+     
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.querySelector("form[action='#']"); // уже заменён на PLACEHOLDER
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const name = this.querySelector("[name='name']").value.trim();
+    const discord = this.querySelector("[name='discord']").value.trim();
+    const question = this.querySelector("[name='question']").value.trim();
+    const hours = this.querySelector("[name='hours']").value.trim();
+
+    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
+    const cyrillic = /[а-яА-ЯёЁ]/;
+
+    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+    const questionPattern = /^[a-zA-Zа-яА-Я0-9-_ ?!.,]{3,}$/; // вопрос на латинице
+    const hoursPattern = /^[a-zA-Zа-яА-Я0-9\s-_]{1,}$/; // разрешена кириллица
+
+    if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
+      alert("Введите корректный ник!");
+      return;
+    }
+    if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
+      alert("Введите корректный Discord!");
+      return;
+    }
+    if (!questionPattern.test(question) || badPatterns.test(question) || cyrillic.test(question)) {
+      alert("Ответьте корректно на вопрос (только латиница)!");
+      return;
+    }
+    if (!hoursPattern.test(hours) || badPatterns.test(hours)) {
+      alert("Введите корректное количество часов!");
+      return;
+    }
+
+    // Если всё ок — снимаем блокировку
+    e.target.dispatchEvent(new Event("valid")); 
+    e.target.submit();
+  });
+});
+</script>
