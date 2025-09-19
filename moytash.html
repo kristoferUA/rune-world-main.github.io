@@ -323,3 +323,75 @@ document.addEventListener("DOMContentLoaded", () => {
             new ScreenCarousel();
         });
     </script>
+<script>
+        class ScreenCarousel {
+            constructor() {
+                this.currentScreen = 0;
+                this.totalScreens = 2;
+                this.container = document.getElementById('screensContainer');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.indicators = document.querySelectorAll('.indicator');
+                
+                this.init();
+            }
+            
+            init() {
+                this.prevBtn.addEventListener('click', () => this.prevScreen());
+                this.nextBtn.addEventListener('click', () => this.nextScreen());
+                
+                this.indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => this.goToScreen(index));
+                });
+                
+                // Підтримка клавіатури
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prevScreen();
+                    if (e.key === 'ArrowRight') this.nextScreen();
+                });
+                
+                this.updateUI();
+            }
+            
+            prevScreen() {
+                if (this.currentScreen > 0) {
+                    this.currentScreen--;
+                    this.updateCarousel();
+                }
+            }
+            
+            nextScreen() {
+                if (this.currentScreen < this.totalScreens - 1) {
+                    this.currentScreen++;
+                    this.updateCarousel();
+                }
+            }
+            
+            goToScreen(index) {
+                this.currentScreen = index;
+                this.updateCarousel();
+            }
+            
+            updateCarousel() {
+                const translateX = -this.currentScreen * 50;
+                this.container.style.transform = `translateX(${translateX}%)`;
+                this.updateUI();
+            }
+            
+            updateUI() {
+                // Оновлення кнопок
+                this.prevBtn.disabled = this.currentScreen === 0;
+                this.nextBtn.disabled = this.currentScreen === this.totalScreens - 1;
+                
+                // Оновлення індикаторів
+                this.indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === this.currentScreen);
+                });
+            }
+        }
+        
+        // Ініціалізація після завантаження сторінки
+        document.addEventListener('DOMContentLoaded', () => {
+            new ScreenCarousel();
+        });
+    </script>
