@@ -1,239 +1,210 @@
 
 .screen-carousel {
-    position: relative;
-    width: 100%;
-    max-width: 800px;
-    height: 500px;
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    margin: 40px auto;
-    box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 500px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  margin: 40px auto;
 }
 
-
-        .screens-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+.screens-container {
+  display: flex;
+  width: 200%;
+  height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .screen {
-    flex: 0 0 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: white;
+  width: 50%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.screen:nth-child(1) {
+  background-image: url("qwer1.png"), linear-gradient(135deg, #6a11cb, #2575fc);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.screen:nth-child(2) {
+  background-image: url("qwer2.png"), linear-gradient(135deg, #2575fc, #6a11cb);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.3;
+}
+
+.screen-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.screen-title {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #fff, #f0f8ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.screen-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.nav-button {
+  --clr-font-main: hsla(0 0% 20% / 100);
+  --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+  --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+  --btn-bg-color: #fff;
+  --radii: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: var(--radii);
+  cursor: pointer;
+  background-size: 280% auto;
+  background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+  color: var(--btn-bg-color);
+  box-shadow: 0px 0px 20px rgba(71,184,255,0.5), 0px 5px 5px -1px rgba(58,125,233,0.25),
+              inset 4px 4px 8px rgba(175,230,255,0.5), inset -4px -4px 8px rgba(19,95,216,0.35);
+  transition: 0.8s;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.nav-button:hover {
+  background-position: right top;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-button:is(:focus, :focus-visible, :active) {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--btn-bg-color), 0 0 0 6px var(--btn-bg-2);
+}
+
+.nav-button.prev {
+  left: 20px;
+}
+
+.nav-button.next {
+  right: 20px;
+}
+
+.nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: translateY(-50%) scale(0.9);
+}
+
+.nav-button:disabled:hover {
+  background-position: left top;
+  transform: translateY(-50%) scale(0.9);
+}
+
+.indicators {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+}
+
+.indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.indicator.active {
+  background: white;
+  transform: scale(1.2);
+}
+
+.but-appl {
+  --clr-font-main: hsla(0 0% 20% / 100);
+  --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+  --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+  --btn-bg-color: #fff;
+  --radii: 0.5em;
+  cursor: pointer;
+  padding: 0.9em 1.4em;
+  min-width: 120px;
+  min-height: 44px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: 0.8s;
+  background-size: 280% auto;
+  background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+  border: none;
+  border-radius: var(--radii);
+  color: var(--btn-bg-color);
+  box-shadow: 0px 0px 20px rgba(71,184,255,0.5), 0px 5px 5px -1px rgba(58,125,233,0.25),
+              inset 4px 4px 8px rgba(175,230,255,0.5), inset -4px -4px 8px rgba(19,95,216,0.35);
+}
+
+.but-appl:hover {
+  background-position: right top;
+}
+
+.but-appl:is(:focus, :focus-visible, :active) {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--btn-bg-color), 0 0 0 6px var(--btn-bg-2);
+}
+
+  .screen-title {
     font-size: 2rem;
-    font-weight: 600;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-    position: relative;
+  }
+
+  .nav-button {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .nav-button.prev {
+    left: 10px;
+  }
+
+  .nav-button.next {
+    right: 10px;
+  }
 }
-
-
-        .screen:nth-child(1) {
-            background-image: url("qwer1.png"), linear-gradient(135deg, #6a11cb, #2575fc);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .screen:nth-child(2) {
-            background-image: url("qwer2.png"), linear-gradient(135deg, #2575fc, #6a11cb);
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .screen::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0.3;
-        }
-
-        .screen-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-        }
-
-        .screen-title {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #fff, #f0f8ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .screen-subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            font-weight: 400;
-        }
-
-            .screens-container {
-        width: 100%;
-    }
-
-    .screen {
-        flex: 0 0 100%;
-    }
-}
-
-        .nav-button {
-            --clr-font-main: hsla(0 0% 20% / 100);
-            --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
-            --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
-            --btn-bg-color: #fff;
-            --radii: 50%;
-            
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: var(--radii);
-            cursor: pointer;
-            
-            background-size: 280% auto;
-            background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
-            color: var(--btn-bg-color);
-            
-            box-shadow: 0px 0px 20px rgba(71,184,255,0.5),
-                        0px 5px 5px -1px rgba(58,125,233,0.25),
-                        inset 4px 4px 8px rgba(175,230,255,0.5),
-                        inset -4px -4px 8px rgba(19,95,216,0.35);
-            
-            transition: 0.8s;
-            z-index: 10;
-            
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-        }
-
-        .nav-button:hover {
-            background-position: right top;
-            transform: translateY(-50%) scale(1.1);
-        }
-
-        .nav-button:is(:focus, :focus-visible, :active) {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--btn-bg-color),
-                        0 0 0 6px var(--btn-bg-2);
-        }
-
-        .nav-button.prev {
-            left: 20px;
-        }
-
-        .nav-button.next {
-            right: 20px;
-        }
-
-        .nav-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: translateY(-50%) scale(0.9);
-        }
-
-        .nav-button:disabled:hover {
-            background-position: left top;
-            transform: translateY(-50%) scale(0.9);
-        }
-
-        .indicators {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
-
-        .indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .indicator.active {
-            background: white;
-            transform: scale(1.2);
-        }
-
-        .but-appl {
-            --clr-font-main: hsla(0 0% 20% / 100);
-            --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
-            --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
-            --btn-bg-color: #fff;
-            --radii: 0.5em;
-            cursor: pointer;
-            padding: 0.9em 1.4em;
-            min-width: 120px;
-            min-height: 44px;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: 0.8s;
-            background-size: 280% auto;
-            background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
-            border: none;
-            border-radius: var(--radii);
-            color: var(--btn-bg-color);
-            box-shadow: 0px 0px 20px rgba(71,184,255,0.5),
-                        0px 5px 5px -1px rgba(58,125,233,0.25),
-                        inset 4px 4px 8px rgba(175,230,255,0.5),
-                        inset -4px -4px 8px rgba(19,95,216,0.35);
-        }
-        
-        .but-appl:hover { 
-            background-position: right top; 
-        }
-        
-        .but-appl:is(:focus, :focus-visible, :active) {
-            outline: none;
-            box-shadow: 0 0 0 3px var(--btn-bg-color),
-                        0 0 0 6px var(--btn-bg-2);
-        }
-
-        @media (max-width: 768px) {
-    .screen-carousel {
-        height: 400px;
-        margin: 20px auto; 
-        padding: 0; 
-    }
-            
-            .screen-title {
-                font-size: 2rem;
-            }
-            
-            .nav-button {
-                width: 50px;
-                height: 50px;
-                font-size: 1.2rem;
-            }
-            
-            .nav-button.prev {
-                left: 10px;
-            }
-            
-            .nav-button.next {
-                right: 10px;
-            }
-        }
 
 
 
