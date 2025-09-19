@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="uk">
+    <!-- 🔹 Прелоадер -->
+    <div id="preloader">
+      <div class="spinner-box">
+        <div class="configure-border-1">  
+          <div class="configure-core"></div>
+        </div>  
+        <div class="configure-border-2">
+          <div class="configure-core"></div>
+        </div> 
+      </div>
+    </div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuneWorld</title>
+    <link rel="stylesheet" href="eventstyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph метатеги -->
+    <meta property="og:title" content="RuneWorld - Сервер з ламповою атмосферою Minecraft">
+    <meta property="og:description" content="RuneWorld - ванільний сервер Minecraft з дружньою атмосферою, низьким пінгом та доброзичливим ком’юніті. Приєднуйтесь до нас!">
+    <meta property="og:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg1.png">
+    <meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/index.html?v=1">
+    <meta property="og:type" content="website">
+
+    <!-- Для Twitter (Twitter Cards) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RuneWorld - Сервер з ламповою атмосферою Minecraft">
+    <meta name="twitter:description" content="RuneWorld - ванільний сервер Minecraft з дружньою атмосферою, хорошим античитом та доброзичливим ком’юніті. Приєднуйтесь до нас!">
+    <meta name="twitter:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg.png">
+</head>
+<body>
+    <header>
+  <div class="header">
+    <a href="index.html" class="logo-link">
+    <div class="logo">
+        RuneWorld
+        <img src="iconrw.png" alt="Логотип RuneWorld" class="logo-image">
+    </div>
+</a>
+    <nav>
+        <a href="index.html">Головна</a>
+    </nav>
+  </header>
+    <div class="main">
+        <div class="runelogo">
+                <!-- Додаємо арт клану -->
+                <img src="moytashbud.png" alt="Логотип клану" class="runelogo-image">
+        </div>
+        <div class="text-overlay">
+            <h3>Про наш клан</h3>
+            <p>«Мойташбуд» — це фірма, яка займається будівництвом панельних будинків на сервері RuneWorld. Компанія веде будівництво з 2023 року. Першим проєктом став 14-поверховий будинок серії К-14, зведений за понад два тижні. На будівництво пішла велика кількість матеріалів, будинок був оснащений системою водопостачання та ліфтом. На жаль, під час держперевороту будівля була зруйнована внаслідок обстрілу.
+
+Наступною спорудою стала 9-поверхівка серії 96, яку збудували всього за тиждень. У будинку також розміщувався трейд-холл із мешканцями та ослами.
+
+Пізніше був побудований 9-поверховий будинок серії 1-464-20А. Будівництво тривало тиждень, після чого будівлю ввели в експлуатацію. Будинок також був оснащений системою водопостачання та ліфтом.
+
+Наприкінці серпня 2025 року був зведений 9-поверховий будинок серії 113-87. Його вдалося побудувати в рекордні 3 дні завдяки великій допомозі RuneCraft2287. Будівля вийшла дуже надійною, і тепер кожен бажаючий може придбати квартиру на будь-якому поверсі.</p>
+            <p>P.S. ця сторінка у бета-версії, знайдете баг — пишіть мені в Telegram - @kr1stoferUA</p>
+        </div>
+</div>
+    <section class="application" id="application">
+        <div class="container">
+            <h2>Реєстрація в клан</h2>
+            <p>Надсилайте заявку, і ми приймемо вас до нас!</p>
+            <form id="appl-form" action="#" method="POST">
+                <input type="text" name="name" placeholder="Ваш нік на сервері" required>
+                <input type="text" name="discord" placeholder="Ваш нік у Discord" required>
+                <button class="but-appl" id="but-appl" type="submit">Вперед на будівництво!🛠️</button>
+            </form>
+        </div>
+    </section>
+<footer>
+        <div class="footer">
+            <p>&copy; 2025 RUNEWORLD</p>
+        </div>
+</footer>
+</body>
+</html>
+ <!-- 🔹 Скрипт для прелоадера -->
+<script>
+  window.addEventListener("load", () => {
+    const preloader = document.getElementById("preloader");
+    preloader.style.opacity = "1";
+    setTimeout(() => {
+      preloader.style.transition = "opacity 0.5s ease";
+      preloader.style.opacity = "0";
+      setTimeout(() => preloader.style.display = "none", 500);
+    }, 300);
+  });
+</script>
+
+
+<script>
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+/* Зашифрованный "https://formspree.io/f/mvoejaqe" */
+const encryptedChunks = [
+  '1b471702','404e640e','155c111f','40043944',
+  '161d0a1d','1c12644c','055c0618','52052e'
+];
+
+const PLACEHOLDER_ACTION = '#';
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  return bytes;
+}
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
+function wipeDecrypted(referenceObj) {
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
+    }
+  }
+}
+
+/* --- Уведомления --- */
+function showNotification(message, type = 'error') {
+  const existing = document.querySelector('.notification');
+  if (existing) existing.remove();
+
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  const icon = type === 'success' ? '✅' : '⚠️';
+  notification.innerHTML = `
+    <span class="notification-icon">${icon}</span>
+    ${message}
+    <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+  `;
+  document.body.appendChild(notification);
+
+  setTimeout(() => notification.classList.add('show'), 100);
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 400);
+    }
+  }, 5000);
+}
+
+/* --- Основная логика --- */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("appl-form");
+  form.action = PLACEHOLDER_ACTION;
+
+  form.addEventListener("submit", function (e) {
+    const name = this.querySelector("[name='name']").value.trim();
+    const discord = this.querySelector("[name='discord']").value.trim();
+
+    const cyrillic = /[а-яА-ЯёЁ]/;
+    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+
+    if (!namePattern.test(name) || cyrillic.test(name)) {
+      e.preventDefault();
+      showNotification("Введите корректный ник! Только латиница, цифры, - или _. Минимум 3 символа.", 'error');
+      return;
+    }
+    if (!discordPattern.test(discord) || cyrillic.test(discord)) {
+      e.preventDefault();
+      showNotification("Введите корректный Discord! Используйте username#1234 только латиницей.", 'error');
+      return;
+    }
+
+    // Расшифровываем токен
+    const realAction = decryptToken();
+    form.action = realAction;
+
+    if (e.defaultPrevented) {
+      form.action = PLACEHOLDER_ACTION;
+      wipeDecrypted({ realAction });
+      return;
+    }
+
+    showNotification("Форма успешно отправлена! Спасибо за заявку.", 'success');
+  });
+});
+</script>
+<style>
+    .main {
+    max-width: 1000px;
+    margin: 60px auto 20px;
+    padding: 20px;
+    min-height: calc(90vh - 70px);
+    background-image: url("moytashbg.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    border-radius: 10px;
+    position: relative;
+    animation: fadeIn 1.5s ease-in-out;
+}
+    body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #c7bdbd;
+    color: #333;
+}
+    input {
+    border: 1px solid #ccc;
+    background-color: #c7bdbd;
+}
+</style>
