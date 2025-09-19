@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <!-- 🔹 Прелоадер -->
+    <div id="preloader">
+      <div class="spinner-box">
+        <div class="configure-border-1">  
+          <div class="configure-core"></div>
+        </div>  
+        <div class="configure-border-2">
+          <div class="configure-core"></div>
+        </div> 
+      </div>
+    </div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuneWorld</title>
+    <link rel="stylesheet" href="eventstyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <!-- Open Graph метатеги -->
+    <meta property="og:title" content="RuneWorld - Сервер с ламповой атмосферой Minecraft">
+    <meta property="og:description" content="RuneWorld - ванильный сервер Minecraft с доброй атмосферой, низким пингом и дружелюбным комьюнити. Присоединяйтесь к нам!">
+    <meta property="og:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg1.png">
+    <meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/index.html?v=1">
+    <meta property="og:type" content="website">
+
+    <!-- Для Twitter (Twitter Cards) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RuneWorld - Сервер с ламповой атмосферой Minecraft">
+    <meta name="twitter:description" content="RuneWorld - ванильный сервер Minecraft с доброй атмосферой, хорошим античитом и дружелюбным комьюнити. Присоединяйтесь к нам!">
+    <meta name="twitter:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg.png">
+</head>
+<body>
+    <header>
+  <div class="header">
+    <a href="index.html" class="logo-link">
+    <div class="logo">
+        RuneWorld
+        <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
+    </div>
+</a>
+    <nav>
+                <a href="index.html">Главная</a>
+            </nav>
+  </header>
+    <div class="main">
+        <div class="runelogo">
+                <!-- Добавляем арт клана -->
+                <img src="oregon1956.png" alt="Логотип ивента" class="runelogo-image">
+            </div>
+        <div class="text-overlay">
+            <h3>Об ивенте</h3>
+            <p>Ивент будет проходить в майнкрафт Java, но награды будут выдаваться на RuneWorld 4. 
+                1 августа 1956 года в штате Орегон, над национальным заповедником Редвуд был замечен НЛО, предположительно экспериментальный самолет-разведчик СССР, на его поиски развернули разведовательный отряд специального назначения. 
+                5 августа 1956 года, армией США был отправлен поисково-спасательный отряд Дельта-4, для того что-бы отыскать недавно пропавшую развед. группу. 
+                Цель миссии - найти пропавший отряд в течении 6 дней, собирая и фотографируя все улики которые вы найдете. 
+                За фотографии аномалий правительство США будет доплачивать дополнительные средства. 
+                Ваш отряд будет вооружен пистолетами для защиты от диких животных, камерами для сбора улик, едой, сигнальным пистолетом для коммуникации и набором легкой брони. 
+                На локацию каждое утро будет сбрасываться 4 аирдропа с различным снаряжением которое вам поможет в ходе выполнения миссии. 
+                Помните о коммуникации и распределении ролей в вашей команде, ибо это поможет вам выжить. Ведь мало ли кто может таиться в лесу. Желаю удачи в поисках!</p>
+            <p>P.S. эта страница в бете, и будет служить для пиара ивентов через сайт, для размещения своего ивента сюда, пишите мне в телеграм - @kr1stoferUA</p>
+        </div>
+</div>
+    <section class="application" id="application">
+        <div class="container">
+            <h2>Регистрация на ивент</h2>
+            <p>Ивент стартует 20.08.25 в 17:00. Желаю удачи!</p>
+            <form id="appl-form" action="#" method="POST">
+                <input type="text" name="name" placeholder="Ваш ник на сервере" required>
+                <input type="text" name="discord" placeholder="Ваш ник в дискорде" required>
+                <button class="but-appl" id="but-appl" type="submit">На поиски!🕹️</button>
+            </form>
+        </div>
+    </section>
+<footer>
+        <div class="footer">
+            <p>&copy; 2025 RUNEWORLD</p>
+        </div>
+    </footer>
+</body>
+</html>
+ <!-- 🔹 Скрипт для прелоадера -->
+    <script>
+      window.addEventListener("load", () => {
+        const preloader = document.getElementById("preloader");
+        preloader.style.opacity = "1";
+        setTimeout(() => {
+          preloader.style.transition = "opacity 0.5s ease";
+          preloader.style.opacity = "0";
+          setTimeout(() => preloader.style.display = "none", 500);
+        }, 300); // маленькая задержка перед исчезновением
+      });
+    </script>
+
+
+
+<script>
+/* --- Параметры --- */
+const _KEY = 's3cr3tK!';
+
+/* Зашифрованный "https://formspree.io/f/mvoejaqe" */
+const encryptedChunks = [
+  '1b471702','404e640e','155c111f','40043944',
+  '161d0a1d','1c12644c','055c0618','52052e'
+];
+
+const PLACEHOLDER_ACTION = '#';
+
+/* --- Вспомогательные функции --- */
+function hexToBytes(hex) {
+  const bytes = [];
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes.push(parseInt(hex.substr(i, 2), 16));
+  }
+  return bytes;
+}
+function xorDecryptFromHex(hexString, key) {
+  const bytes = hexToBytes(hexString);
+  let out = '';
+  for (let i = 0; i < bytes.length; i++) {
+    const k = key.charCodeAt(i % key.length);
+    out += String.fromCharCode(bytes[i] ^ k);
+  }
+  return out;
+}
+function decryptToken() {
+  const hex = encryptedChunks.join('');
+  return xorDecryptFromHex(hex, _KEY);
+}
+function wipeDecrypted(referenceObj) {
+  if (referenceObj && typeof referenceObj === 'object') {
+    for (const k in referenceObj) {
+      try { referenceObj[k] = null; } catch(e) {}
+    }
+  }
+}
+
+/* --- Уведомления --- */
+function showNotification(message, type = 'error') {
+  const existing = document.querySelector('.notification');
+  if (existing) existing.remove();
+
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  const icon = type === 'success' ? '✅' : '⚠️';
+  notification.innerHTML = `
+    <span class="notification-icon">${icon}</span>
+    ${message}
+    <button class="close-btn" onclick="this.parentElement.remove()">×</button>
+  `;
+  document.body.appendChild(notification);
+
+  setTimeout(() => notification.classList.add('show'), 100);
+  setTimeout(() => {
+    if (notification.parentElement) {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 400);
+    }
+  }, 5000);
+}
+
+/* --- Основная логика --- */
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("appl-form");
+  form.action = PLACEHOLDER_ACTION;
+
+  form.addEventListener("submit", function (e) {
+    const name = this.querySelector("[name='name']").value.trim();
+    const discord = this.querySelector("[name='discord']").value.trim();
+
+    const cyrillic = /[а-яА-ЯёЁ]/;
+    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
+    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
+
+    if (!namePattern.test(name) || cyrillic.test(name)) {
+      e.preventDefault();
+      showNotification("Введите корректный ник! Только латиница, цифры, - или _. Минимум 3 символа.", 'error');
+      return;
+    }
+    if (!discordPattern.test(discord) || cyrillic.test(discord)) {
+      e.preventDefault();
+      showNotification("Введите корректный Discord! Используйте username#1234 только латиницей.", 'error');
+      return;
+    }
+
+    // Расшифровываем токен
+    const realAction = decryptToken();
+    form.action = realAction;
+
+    if (e.defaultPrevented) {
+      form.action = PLACEHOLDER_ACTION;
+      wipeDecrypted({ realAction });
+      return;
+    }
+
+    showNotification("Форма успешно отправлена! Спасибо за заявку.", 'success');
+  });
+});
+</script>
