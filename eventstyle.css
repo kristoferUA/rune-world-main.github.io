@@ -36,8 +36,7 @@
         }
 
         .screen:nth-child(1) {
-            /* ВСТАВИТИ ФОНОВЕ ЗОБРАЖЕННЯ ПЕРШОГО СКРІНА ТУТ */
-            background-image: url("screen1-background.png");
+            background-image: url("qwer1.png");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -46,8 +45,7 @@
         }
 
         .screen:nth-child(2) {
-            /* ВСТАВИТИ ФОНОВЕ ЗОБРАЖЕННЯ ДРУГОГО СКРІНА ТУТ */
-            background-image: url("screen2-background.png");
+            background-image: url("qwer2.png");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
