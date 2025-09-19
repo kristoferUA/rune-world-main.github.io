@@ -49,7 +49,24 @@
                 <a href="#about">Античит</a>
                 <a href="ukrseasons.html">Мапи сезонів</a>
                 <a href="PlayerListMenuUkr.html">Список гравців</a>
-                <a href="ukrMonolithPage.html">Моноліт</a>
+                <div class="dropdown-container">
+            <a href="#" class="dropdown-trigger" onclick="toggleDropdown(event)">
+                Кланы
+                <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
+                    <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                </svg>
+            </a>
+            <div class="dropdown-menu" id="clansDropdown">
+                <a href="MonolithPage.html" class="dropdown-item">
+                    <span class="dropdown-icon">⚔️</span>
+                    Монолит
+                </a>
+                <a href="moytash.html" class="dropdown-item">
+                    <span class="dropdown-icon">🏗️</span>
+                    Мойташбуд
+                </a>
+            </div>
+        </div>
                 <a href="ukrEvents.html">Івенти</a>
                 <a href="index.html">Російська версія</a>
                 <div class="menu-overlay" id="menu-overlay"></div>
@@ -563,3 +580,98 @@ function showNotification(message) {
   }, 5000);
 }
 </script>
+
+
+
+
+
+<style>
+/* Випадаюче меню */
+        .dropdown-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-trigger {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-trigger.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,248,255,0.95) 100%);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15), 
+                        0 0 0 1px rgba(255,255,255,0.2),
+                        inset 0 1px 0 rgba(255,255,255,0.8);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-50%) translateY(-10px) scale(0.95);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        .dropdown-menu::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid rgba(255,255,255,0.95);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, rgba(71,184,255,0.1) 0%, rgba(58,125,233,0.1) 100%);
+            color: #2563eb;
+            transform: translateX(3px);
+        }
+
+        .dropdown-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+</style>
