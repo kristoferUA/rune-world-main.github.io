@@ -585,6 +585,54 @@ function showNotification(message) {
 
 
 
+<script>
+        function toggleDropdown(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const trigger = event.currentTarget;
+            const dropdown = document.getElementById('clansDropdown');
+            const overlay = document.getElementById('menu-overlay');
+            
+            const isOpen = dropdown.classList.contains('show');
+            
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+            
+            function openDropdown() {
+                dropdown.classList.add('show');
+                trigger.classList.add('active');
+                overlay.classList.add('active');
+            }
+            
+            function closeDropdown() {
+                dropdown.classList.remove('show');
+                trigger.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+            
+            // Закриття при кліку на overlay
+            overlay.onclick = closeDropdown;
+        }
+
+        // Закриття меню при кліку поза ним
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('clansDropdown');
+            const trigger = document.querySelector('.dropdown-trigger');
+            const overlay = document.getElementById('menu-overlay');
+            
+            if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+                trigger.classList.remove('active');
+                overlay.classList.remove('active');
+            }
+        });
+    </script>
+
+
 <style>
 /* Випадаюче меню */
         .dropdown-container {
