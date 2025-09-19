@@ -32,14 +32,14 @@
         }
 
         .screen:nth-child(1) {
-            background-image: url("main-background.png"), linear-gradient(135deg, #6a11cb, #2575fc);
+            background-image: url("qwer1.png"), linear-gradient(135deg, #6a11cb, #2575fc);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
 
         .screen:nth-child(2) {
-            background-image: url("main-background.png"), linear-gradient(135deg, #2575fc, #6a11cb);
+            background-image: url("qwer2.png"), linear-gradient(135deg, #2575fc, #6a11cb);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
