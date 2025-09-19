@@ -1,18 +1,13 @@
 
-
-
-
-
-
-
 .screen-carousel {
             position: relative;
             width: 100%;
             max-width: 800px;
             height: 500px;
-            overflow: hidden;
             border-radius: 20px;
+            overflow: hidden;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            margin: 40px auto;
         }
 
         .screens-container {
@@ -26,31 +21,28 @@
             width: 50%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
             color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 2rem;
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
             position: relative;
         }
 
         .screen:nth-child(1) {
-            background-image: url("qwer1.png");
+            background-image: url("main-background.png"), linear-gradient(135deg, #6a11cb, #2575fc);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            /* Резервний градієнт якщо зображення не завантажиться */
-            background-color: #6a11cb;
         }
 
         .screen:nth-child(2) {
-            background-image: url("qwer2.png");
+            background-image: url("main-background.png"), linear-gradient(135deg, #2575fc, #6a11cb);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            /* Резервний градієнт якщо зображення не завантажиться */
-            background-color: #2575fc;
         }
 
         .screen::before {
@@ -82,7 +74,7 @@
         .screen-subtitle {
             font-size: 1.2rem;
             opacity: 0.9;
-            font-weight: 300;
+            font-weight: 400;
         }
 
         .nav-button {
@@ -163,7 +155,7 @@
             width: 12px;
             height: 12px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.4);
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -173,40 +165,44 @@
             transform: scale(1.2);
         }
 
-        .repo-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 20px;
-            padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
+        .but-appl {
+            --clr-font-main: hsla(0 0% 20% / 100);
+            --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+            --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+            --btn-bg-color: #fff;
+            --radii: 0.5em;
+            cursor: pointer;
+            padding: 0.9em 1.4em;
+            min-width: 120px;
+            min-height: 44px;
             font-size: 1rem;
             font-weight: 500;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            transition: 0.8s;
+            background-size: 280% auto;
+            background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+            border: none;
+            border-radius: var(--radii);
+            color: var(--btn-bg-color);
+            box-shadow: 0px 0px 20px rgba(71,184,255,0.5),
+                        0px 5px 5px -1px rgba(58,125,233,0.25),
+                        inset 4px 4px 8px rgba(175,230,255,0.5),
+                        inset -4px -4px 8px rgba(19,95,216,0.35);
         }
-
-        .repo-link:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        
+        .but-appl:hover { 
+            background-position: right top; 
         }
-
-        .repo-link svg {
-            transition: transform 0.3s ease;
-        }
-
-        .repo-link:hover svg {
-            transform: scale(1.1);
+        
+        .but-appl:is(:focus, :focus-visible, :active) {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--btn-bg-color),
+                        0 0 0 6px var(--btn-bg-2);
         }
 
         @media (max-width: 768px) {
             .screen-carousel {
                 height: 400px;
+                margin: 20px 10px;
             }
             
             .screen-title {
