@@ -1,3 +1,238 @@
+
+
+
+
+
+
+
+.screen-carousel {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .screens-container {
+            display: flex;
+            width: 200%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .screen:nth-child(1) {
+            /* ВСТАВИТИ ФОНОВЕ ЗОБРАЖЕННЯ ПЕРШОГО СКРІНА ТУТ */
+            background-image: url("screen1-background.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Резервний градієнт якщо зображення не завантажиться */
+            background-color: #6a11cb;
+        }
+
+        .screen:nth-child(2) {
+            /* ВСТАВИТИ ФОНОВЕ ЗОБРАЖЕННЯ ДРУГОГО СКРІНА ТУТ */
+            background-image: url("screen2-background.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Резервний градієнт якщо зображення не завантажиться */
+            background-color: #2575fc;
+        }
+
+        .screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .screen-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        .screen-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #f0f8ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .screen-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .nav-button {
+            --clr-font-main: hsla(0 0% 20% / 100);
+            --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
+            --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
+            --btn-bg-color: #fff;
+            --radii: 50%;
+            
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: var(--radii);
+            cursor: pointer;
+            
+            background-size: 280% auto;
+            background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
+            color: var(--btn-bg-color);
+            
+            box-shadow: 0px 0px 20px rgba(71,184,255,0.5),
+                        0px 5px 5px -1px rgba(58,125,233,0.25),
+                        inset 4px 4px 8px rgba(175,230,255,0.5),
+                        inset -4px -4px 8px rgba(19,95,216,0.35);
+            
+            transition: 0.8s;
+            z-index: 10;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .nav-button:hover {
+            background-position: right top;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .nav-button:is(:focus, :focus-visible, :active) {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--btn-bg-color),
+                        0 0 0 6px var(--btn-bg-2);
+        }
+
+        .nav-button.prev {
+            left: 20px;
+        }
+
+        .nav-button.next {
+            right: 20px;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .nav-button:disabled:hover {
+            background-position: left top;
+            transform: translateY(-50%) scale(0.9);
+        }
+
+        .indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .repo-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .repo-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .repo-link svg {
+            transition: transform 0.3s ease;
+        }
+
+        .repo-link:hover svg {
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .screen-carousel {
+                height: 400px;
+            }
+            
+            .screen-title {
+                font-size: 2rem;
+            }
+            
+            .nav-button {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+            
+            .nav-button.prev {
+                left: 10px;
+            }
+            
+            .nav-button.next {
+                right: 10px;
+            }
+        }
+
+
+
+
 /* Стилі для спливаючого повідомлення */
         .notification {
             position: fixed;
