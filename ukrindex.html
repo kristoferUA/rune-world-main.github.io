@@ -742,4 +742,27 @@ function showNotification(message) {
             z-index: 999;
             background: transparent;
         }
+        #clansDropdown {
+    background: #1a1a2e; /* темний фон */
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    z-index: 9999;
+}
+
+/* Елементи списку */
+#clansDropdown a {
+    display: block;
+    padding: 8px 12px;
+    color: #ffffff;        /* білий текст */
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* Ефект при наведенні */
+#clansDropdown a:hover {
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    color: #fff;
+}
 </style>
