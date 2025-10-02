@@ -1,33 +1,453 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <!-- 🔹 Прелоадер -->
-    <div id="preloader">
-      <div class="spinner-box">
-        <div class="configure-border-1">  
-          <div class="configure-core"></div>
-        </div>  
-        <div class="configure-border-2">
-          <div class="configure-core"></div>
-        </div> 
-      </div>
-    </div>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список игроков - RuneWorld</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="seasons.css">
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        /* Импорт стилей из seasons.css */
+        .logo-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-link:hover {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .logo-link .logo {
+            cursor: pointer;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            color: #fff;
+        }
+
+        a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        a:not(.logo-link):hover {
+            color: #FFD700;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-image {
+            width: 50px;
+            height: 50px;
+            margin-left: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease, transform 0.2s ease;
+            padding: 5px 10px;
+        }
+
+        .header nav a:hover {
+            color: #FFD700;
+            transform: translateY(-2px);
+        }
+
+        .main {
+            max-width: 1000px;
+            margin: 60px auto 20px;
+            padding: 20px;
+            min-height: calc(100vh - 90px);
+            background-image: url("main-background.png");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            border-radius: 10px;
+            position: relative;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .main-title {
+            color: #3751d9;
+            text-align: center;
+            font-size: 35px;
+            margin-top: 120px;
+            margin-bottom: 50px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        footer {
+            background-color: #6a11cb;
+            color: #fff;
+            text-align: center;
+            padding: 20px 0;
+            border-radius: 10px 10px 0 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Прелоадер */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f0f1f;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .spinner-box {
+            position: relative;
+            width: 115px;
+            height: 115px;
+            margin: 0 auto;
+        }
+
+        .configure-border-1 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 115px;
+            height: 115px;
+            padding: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #6912cb;
+            transform-origin: center;
+            animation: rotate-clockwise 3s linear infinite;
+        }
+
+        .configure-border-2 {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 115px;
+            height: 115px;
+            padding: 3px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgb(38 116 252);
+            transform-origin: center;
+            animation: rotate-counter 3s linear infinite;
+        }
+
+        .configure-core {
+            width: 100%;
+            height: 100%;
+            background-color: #1d2630;
+        }
+
+        @keyframes rotate-clockwise {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes rotate-counter {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+
+        /* Новые стили для карточек */
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .player-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+        }
+
+        .player-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+        }
+
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .player-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .player-hours {
+            color: #666;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-online {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .modal-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+            margin-left: 15px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .stats-section {
+            margin-bottom: 25px;
+        }
+
+        .stats-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .characteristic {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #6a11cb;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .no-data {
+            color: #999;
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .players-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+
+            .header {
+                padding: 10px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Прелоадер -->
+    <div id="preloader">
+        <div class="spinner-box">
+            <div class="configure-border-1">  
+                <div class="configure-core"></div>
+            </div>  
+            <div class="configure-border-2">
+                <div class="configure-core"></div>
+            </div> 
+        </div>
+    </div>
+
     <header>
         <div class="header">
             <a href="index.html" class="logo-link">
-    <div class="logo">
-        RuneWorld
-        <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
-    </div>
-</a>
+                <div class="logo">
+                    RuneWorld
+                    <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
+                </div>
+            </a>
             <nav>
                 <a href="index.html">Главная</a>
             </nav>
@@ -35,228 +455,40 @@
     </header>
 
     <div class="main">
-        <h1 class="main-title">Список игроков</h1>
-        <!-- Players Grid -->
-    <div class="container mx-auto px-4 pb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="playersGrid">
-            <!-- Players will be generated here -->
+        <h1 class="main-title">🎮 Список игроков RuneWorld</h1>
+        
+        <div class="players-grid" id="playersGrid">
+            <!-- Карточки игроков будут добавлены через JavaScript -->
         </div>
     </div>
 
-    <!-- Modal -->
-    <div id="playerModal" class="fixed inset-0 z-50 hidden modal-backdrop">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full modal-enter" id="modalContent">
-                <!-- Modal content will be generated here -->
+    <!-- Модальное окно -->
+    <div class="modal" id="playerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center;">
+                    <div class="modal-avatar" id="modalAvatar"></div>
+                    <div class="modal-name" id="modalName"></div>
+                </div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
             </div>
-        </div>
-    </div>
 
-    <script>
-        const players = [
-            {
-                name: "Runecraft2287",
-                hours: "5760ч",
-                description: "создатель сервера, стример, ютубер, задрот выживания в майнкрафте, люблю копаться в шахте, строить фермы, помогать другим игрокам, добрый, очень люблю прятки и мини игры на The Hive",
-                role: "👑 Засновник",
-                avatar: "🎮"
-            },
-            {
-                name: "💾kristoferUA💻",
-                hours: "2647ч",
-                description: "☢️😈Я технический администратор сервера, разработчик и кодер сервера, олд (играю с первого сезона), средний билдер, креативный человек, коммуникабельный.😈☢️",
-                role: "⚡ Тех. Адмін",
-                avatar: "💻"
-            },
-            {
-                name: "Freskacraft6746",
-                hours: "802ч",
-                description: "Люблю выживание без грифа, строить фермы, играть в мини игры на The Hive, помогаю другим игрокам, честный и добрый, осуждаю мат.",
-                role: "🌱 Фермер",
-                avatar: "🌾"
-            },
-            {
-                name: "NickMoytash",
-                hours: "644ч",
-                description: "нет данных",
-                role: "🎯 Гравець",
-                avatar: "⚔️"
-            },
-            {
-                name: "Denis12096",
-                hours: "278ч",
-                description: "Я обычный игрок, который играет на RuneWorld начиная с первого сезона. Я занимаюсь строительством панельных домов и содержу Ишаков.",
-                role: "🏗️ Будівельник",
-                avatar: "🏠"
-            },
-            {
-                name: "MyxaaXD",
-                hours: "нет данных",
-                description: "нет данных",
-                role: "🎯 Гравець",
-                avatar: "❓"
-            },
-            {
-                name: "Sasha123490",
-                hours: "384ч",
-                description: "Я пупсик, живу в Беларуси, люблю играть на сервере The Hive, также играю на Rune World 3. Был в Москве. Не осуждаю читы, не люблю будилку и люблю долбить девочек в колготках)",
-                role: "🎮 Геймер",
-                avatar: "🐝"
-            },
-            {
-                name: "sokibtw",
-                hours: "2052ч",
-                description: "Радиант в валоранте, 10 левел фейсита, хорошо стреляю хедшоты",
-                role: "🎯 Снайпер",
-                avatar: "🔫"
-            },
-            {
-                name: "Vlad_merea",
-                hours: "1076ч",
-                description: "нет данных",
-                role: "🎯 Гравець",
-                avatar: "⚔️"
-            },
-            {
-                name: "Playcase1",
-                hours: "1442ч",
-                description: "я в прошлом основной билдер на политических серверах, креативний, достаточно коммуникабельний, доброй души человек который поможет чем сможет.",
-                role: "🏛️ Архітектор",
-                avatar: "🏰"
-            },
-            {
-                name: "WrongAura742120",
-                hours: "нет данных",
-                description: "нет данных",
-                role: "🎯 Гравець",
-                avatar: "👻"
-            },
-            {
-                name: "andrusha513",
-                hours: "нет данных",
-                description: "нет данных",
-                role: "🎯 Гравець",
-                avatar: "⚔️"
-            },
-            {
-                name: "Radion6774",
-                hours: "1920ч",
-                description: "Я радиатор, радиоприёмник, радио, Радик, рапик, билдер, который играет с 3 сезона, и депаю людей в казике ^^",
-                role: "📻 Радіо",
-                avatar: "📻"
-            }
-        ];
-
-        function generatePlayerCard(player, index) {
-            const hasData = player.hours !== "нет данных" && player.description !== "нет данных";
-            
-            return `
-                <div class="bg-white rounded-xl shadow-lg card-hover cursor-pointer overflow-hidden" onclick="openPlayerModal(${index})">
-                    <div class="gradient-bg p-4 text-white text-center">
-                        <div class="text-4xl mb-2">${player.avatar}</div>
-                        <div class="text-sm opacity-90">${player.role}</div>
-                    </div>
-                    <div class="p-4">
-                        <h3 class="font-bold text-lg text-gray-800 mb-2 minecraft-font truncate">${player.name}</h3>
-                        <div class="flex items-center justify-between text-sm text-gray-600">
-                            <span class="flex items-center">
-                                <span class="w-2 h-2 bg-green-400 rounded-full mr-2 online-pulse"></span>
-                                Активный
-                            </span>
-                            ${hasData ? `<span class="font-semibold">⏰ ${player.hours}</span>` : '<span class="text-gray-400">Нет данных</span>'}
-                        </div>
-                        <div class="mt-3 text-xs text-gray-500 line-clamp-2">
-                            ${hasData ? player.description.substring(0, 80) + '...' : 'Информация недоступна'}
-                        </div>
-                    </div>
+            <div class="stats-section">
+                <div class="stats-title">📊 Статистика</div>
+                <div class="stat-item">
+                    <span>⏰ Время в игре</span>
+                    <span id="modalHours"></span>
                 </div>
-            `;
-        }
-
-        function generateModal(player) {
-            const hasData = player.hours !== "нет данных" && player.description !== "нет данных";
-            
-            return `
-                <div class="gradient-bg text-white p-6 text-center rounded-t-2xl">
-                    <div class="text-6xl mb-3">${player.avatar}</div>
-                    <h2 class="text-2xl font-bold minecraft-font mb-2">${player.name}</h2>
-                    <div class="text-lg opacity-90">${player.role}</div>
+                <div class="stat-item">
+                    <span>🏆 Статус</span>
+                    <span id="modalStatus">Активный игрок</span>
                 </div>
-                <div class="p-6">
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-2xl font-bold gradient-bg bg-clip-text text-transparent">${hasData ? player.hours : '???'}</div>
-                            <div class="text-sm text-gray-600">Время в игре</div>
-                        </div>
-                        <div class="text-center p-3 bg-gray-50 rounded-lg">
-                            <div class="text-2xl font-bold text-green-500">●</div>
-                            <div class="text-sm text-gray-600">Статус</div>
-                            <div class="text-xs text-green-600 font-semibold">Активный</div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <h3 class="font-bold text-gray-800 mb-3 flex items-center">
-                            <span class="w-4 h-4 gradient-bg rounded mr-2"></span>
-                            Характеристика
-                        </h3>
-                        <div class="bg-gray-50 rounded-lg p-4 text-gray-700 text-sm leading-relaxed">
-                            ${hasData ? player.description : 'К сожалению, информация об этом игроке пока недоступна. Возможно, он новичок на сервере или просто не поделился своей историей.'}
-                        </div>
-                    </div>
-                    
-                    <button onclick="closePlayerModal()" class="w-full gradient-bg text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
-                        Закрыть
-                    </button>
-                </div>
-            `;
-        }
+            </div>
 
-        function openPlayerModal(index) {
-            const modal = document.getElementById('playerModal');
-            const modalContent = document.getElementById('modalContent');
-            
-            modalContent.innerHTML = generateModal(players[index]);
-            modal.classList.remove('hidden');
-            
-            // Prevent body scroll
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closePlayerModal() {
-            const modal = document.getElementById('playerModal');
-            modal.classList.add('hidden');
-            
-            // Restore body scroll
-            document.body.style.overflow = 'auto';
-        }
-
-        // Close modal when clicking outside
-        document.getElementById('playerModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closePlayerModal();
-            }
-        });
-
-        // Close modal with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePlayerModal();
-            }
-        });
-
-        // Generate player cards
-        function initializePlayers() {
-            const grid = document.getElementById('playersGrid');
-            grid.innerHTML = players.map((player, index) => generatePlayerCard(player, index)).join('');
-        }
-
-        // Initialize the page
-        initializePlayers();
-    </script>
-        <div id="player-menu" class="mobile-menu" style="display: none;">
-            <h2 id="player-name"></h2>
-            <p id="player-stats"></p>
+            <div class="stats-section">
+                <div class="stats-title">👤 Характеристика</div>
+                <div class="characteristic" id="modalCharacteristic"></div>
+            </div>
         </div>
     </div>
 
@@ -265,66 +497,179 @@
             <p>&copy; 2025 RUNEWORLD</p>
         </div>
     </footer>
-</body>
-</html>
- <!-- 🔹 Скрипт для прелоадера -->
+
+    <!-- Скрипт для прелоадера -->
     <script>
-      window.addEventListener("load", () => {
-        const preloader = document.getElementById("preloader");
-        preloader.style.opacity = "1";
-        setTimeout(() => {
-          preloader.style.transition = "opacity 0.5s ease";
-          preloader.style.opacity = "0";
-          setTimeout(() => preloader.style.display = "none", 500);
-        }, 300); // маленькая задержка перед исчезновением
-      });
+        window.addEventListener("load", () => {
+            const preloader = document.getElementById("preloader");
+            preloader.style.opacity = "1";
+            setTimeout(() => {
+                preloader.style.transition = "opacity 0.5s ease";
+                preloader.style.opacity = "0";
+                setTimeout(() => preloader.style.display = "none", 500);
+            }, 300);
+        });
     </script>
 
-<style>
-    .gradient-bg {
-            background: linear-gradient(135deg, #6a11cb, #2575fc);
-        }
-        
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(106, 17, 203, 0.3);
-        }
-        
-        .modal-backdrop {
-            backdrop-filter: blur(10px);
-            background: rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-enter {
-            animation: modalEnter 0.3s ease-out;
-        }
-        
-        @keyframes modalEnter {
-            from {
-                opacity: 0;
-                transform: scale(0.9) translateY(-20px);
+    <script>
+        const players = [
+            {
+                name: "Runecraft2287",
+                hours: "5760ч",
+                characteristic: "создатель сервера, стример, ютубер, задрот выживания в майнкрафте, люблю копаться в шахте, строить фермы, помогать другим игрокам, добрый, очень люблю прятки и мини игры на The Hive",
+                status: "Создатель сервера"
+            },
+            {
+                name: "💾kristoferUA💻",
+                hours: "2647ч",
+                characteristic: "☢️😈Я технический администратор сервера, разработчик и кодер сервера, олд (играю с первого сезона), средний билдер, креативный человек, коммуникабельный.😈☢️",
+                status: "Администратор"
+            },
+            {
+                name: "Freskacraft6746",
+                hours: "802ч",
+                characteristic: "Люблю выживание без грифа, строить фермы, играть в мини игры на The Hive, помогаю другим игрокам, честный и добрый, осуждаю мат.",
+                status: "Активный игрок"
+            },
+            {
+                name: "NickMoytash",
+                hours: "644ч",
+                characteristic: "нет данных",
+                status: "Игрок"
+            },
+            {
+                name: "Denis12096",
+                hours: "278ч",
+                characteristic: "Я обычный игрок, который играет на RuneWorld начиная с первого сезона. Я занимаюсь строительством панельных домов и содержу Ишаков.",
+                status: "Строитель"
+            },
+            {
+                name: "MyxaaXD",
+                hours: "нет данных",
+                characteristic: "нет данных",
+                status: "Новичок"
+            },
+            {
+                name: "Sasha123490",
+                hours: "384ч",
+                characteristic: "Я пупсик, живу в Беларуси, люблю играть на сервере The Hive, также играю на Rune World 3. Был в Москве. Не осуждаю читы, не люблю будилду и люблю долбить девочек в колготках)",
+                status: "Игрок"
+            },
+            {
+                name: "sokibtw",
+                hours: "2052ч",
+                characteristic: "Радиант в валоранте, 10 левел фейсита, хорошо стреляю хедшоты",
+                status: "Про-игрок"
+            },
+            {
+                name: "Vlad_merea",
+                hours: "1076ч",
+                characteristic: "нет данных",
+                status: "Игрок"
+            },
+            {
+                name: "Playcase1",
+                hours: "1442ч",
+                characteristic: "я в прошлом основной билдер на политических серверах, креативний, достаточно коммуникабельний, доброй души человек который поможет чем сможет.",
+                status: "Билдер"
+            },
+            {
+                name: "WrongAura742120",
+                hours: "нет данных",
+                characteristic: "нет данных",
+                status: "Новичок"
+            },
+            {
+                name: "andrusha513",
+                hours: "нет данных",
+                characteristic: "нет данных",
+                status: "Новичок"
+            },
+            {
+                name: "Radion6774",
+                hours: "1920ч",
+                characteristic: "Я радиатор, радиоприёмник, радио, Радик, рапик, билдер, который играет с 3 сезона, и депаю людей в казике ^^",
+                status: "Билдер"
             }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
+        ];
+
+        function getPlayerEmoji(name) {
+            const emojiMap = {
+                "Runecraft2287": "👑",
+                "💾kristoferUA💻": "⚡",
+                "Freskacraft6746": "🌱",
+                "NickMoytash": "🎯",
+                "Denis12096": "🏗️",
+                "MyxaaXD": "🎮",
+                "Sasha123490": "🐻",
+                "sokibtw": "🎯",
+                "Vlad_merea": "⚔️",
+                "Playcase1": "🏛️",
+                "WrongAura742120": "🌟",
+                "andrusha513": "🎲",
+                "Radion6774": "📻"
+            };
+            return emojiMap[name] || "🎮";
+        }
+
+        function createPlayerCard(player) {
+            const card = document.createElement('div');
+            card.className = 'player-card';
+            card.onclick = () => openModal(player);
+
+            card.innerHTML = `
+                <div class="player-avatar">${getPlayerEmoji(player.name)}</div>
+                <div class="player-name">${player.name}</div>
+                <div class="player-hours">
+                    <div class="status-online"></div>
+                    ${player.hours}
+                </div>
+            `;
+
+            return card;
+        }
+
+        function openModal(player) {
+            document.getElementById('modalAvatar').textContent = getPlayerEmoji(player.name);
+            document.getElementById('modalName').textContent = player.name;
+            document.getElementById('modalHours').textContent = player.hours;
+            document.getElementById('modalStatus').textContent = player.status;
+            
+            const characteristicElement = document.getElementById('modalCharacteristic');
+            if (player.characteristic === 'нет данных') {
+                characteristicElement.innerHTML = '<div class="no-data">Информация о игроке пока недоступна</div>';
+            } else {
+                characteristicElement.textContent = player.characteristic;
             }
+            
+            document.getElementById('playerModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
-        
-        .online-pulse {
-            animation: pulse 2s infinite;
+
+        function closeModal() {
+            document.getElementById('playerModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        
-        .minecraft-font {
-            font-family: 'Courier New', monospace;
-            font-weight: bold;
-        }
-    </style>
+
+        // Закрытие модального окна при клике вне его
+        document.getElementById('playerModal').onclick = function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        };
+
+        // Закрытие модального окна при нажатии Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // Создание карточек игроков
+        const playersGrid = document.getElementById('playersGrid');
+        players.forEach(player => {
+            playersGrid.appendChild(createPlayerCard(player));
+        });
+    </script>
+</body>
+</html>
