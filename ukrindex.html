@@ -368,7 +368,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 </script>
- <!-- Скрипт для прелоадера -->
     <script>
       window.addEventListener("load", () => {
         const preloader = document.getElementById("preloader");
@@ -474,7 +473,6 @@ const encryptedChunks = [
 ];
 const PLACEHOLDER_ACTION = '#';
 
-/* --- Вспомогательные функции --- */
 function hexToBytes(hex) {
   const bytes = [];
   for (let c = 0; c < hex.length; c += 2) {
@@ -506,15 +504,13 @@ function wipeDecrypted(referenceObj) {
   }
 }
 
-/* --- Основная логика --- */
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector("#application form");
   form.action = PLACEHOLDER_ACTION;
 
   form.addEventListener('submit', function(e) {
-    e.preventDefault(); // зупинка відправки за замовчуванням
+    e.preventDefault(); 
 
-    // --- Перевірки полів ---
     const name = this.querySelector("[name='name']").value.trim();
     const email = this.querySelector("[name='email']").value.trim();
     const discord = this.querySelector("[name='discord']").value.trim();
@@ -544,13 +540,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // --- Якщо всі перевірки пройшли ---
     const realAction = decryptToken();
     form.action = realAction;
 
     showNotification("✅ Форма успішно відправлена! Дякуємо за заявку.");
 
-    // Програмна відправка
     setTimeout(() => {
       try { form.submit(); } catch(err) { console.error('Не вдалося відправити форму програмно:', err); }
     }, 0);
@@ -562,7 +556,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* --- Уведомлення --- */
 function showNotification(message) {
   const existingNotification = document.querySelector('.notification');
   if (existingNotification) existingNotification.remove();
@@ -615,11 +608,9 @@ function showNotification(message) {
                 overlay.classList.remove('active');
             }
             
-            // Закриття при кліку на overlay
             overlay.onclick = closeDropdown;
         }
-
-        // Закриття меню при кліку поза ним
+    
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('clansDropdown');
             const trigger = document.querySelector('.dropdown-trigger');
@@ -636,10 +627,10 @@ function showNotification(message) {
 
 <style>
         header, .header {
-    z-index: 10; /* нижче, ніж меню */
-    overflow: visible; /* дозволяє меню виходити за межі */
+    z-index: 10; 
+    overflow: visible; 
 }
-/* Випадаюче меню */
+
         .dropdown-container {
             position: relative;
             display: inline-block;
@@ -728,7 +719,7 @@ function showNotification(message) {
             width: 20px;
             text-align: center;
         }
-    /* Overlay для закриття меню */
+
         .menu-overlay {
             display: none;
         }
@@ -744,24 +735,22 @@ function showNotification(message) {
             background: transparent;
         }
         #clansDropdown {
-    background: #ffffff; /* темний фон */
+    background: #ffffff; 
     border: 1px solid #ffffff;
     border-radius: 8px;
     padding: 10px;
     z-index: 9999;
 }
 
-/* Елементи списку */
 #clansDropdown a {
     display: block;
     padding: 8px 12px;
-    color: #020202;        /* білий текст */
+    color: #020202;        
     text-decoration: none;
     border-radius: 6px;
     transition: background 0.3s, color 0.3s;
 }
 
-/* Ефект при наведенні */
 #clansDropdown a:hover {
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     color: #fff;
