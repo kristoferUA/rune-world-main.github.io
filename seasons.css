@@ -79,6 +79,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-right: 10px;
+    min-width: 100px;
 }
 
 .seasons-buttons button:hover {
