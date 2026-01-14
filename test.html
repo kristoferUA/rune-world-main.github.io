@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuneWorld</title>
+    <link rel="stylesheet" href="style-new.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    
+    <meta property="og:title" content="RuneWorld - Сервер із теплою атмосферою Minecraft">
+    <meta property="og:description" content="RuneWorld - ванільний сервер Minecraft із доброю атмосферою, низьким пінгом та дружнім ком'юніті. Приєднуйтесь до нас!">
+    <meta property="og:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg1.png">
+    <meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/index.html?v=1">
+    <meta property="og:type" content="website">
+</head>
+<body>
+    <div id="preloader">
+        <div class="spinner-box">
+            <div class="configure-border-1">  
+                <div class="configure-core"></div>
+            </div>  
+            <div class="configure-border-2">
+                <div class="configure-core"></div>
+            </div> 
+        </div>
+    </div>
+
+    <header>
+        <div class="header">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    RuneWorld
+                    <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
+                </div>
+            </a>
+            <button class="menu-button" id="menu-button">Меню</button>
+            <nav class="desktop-menu">
+                <a href="#application">Подати заявку</a>
+                <a href="#reviews">Відгуки</a>
+                <a href="#about">Античит</a>
+                <a href="ukrseasons.html">Мапи сезонів</a>
+                <a href="PlayerListMenuUkr.html">Список гравців</a>
+                <div class="dropdown-container">
+                    <a href="#" class="dropdown-trigger" onclick="toggleDropdown(event)">
+                        Клани
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu" id="clansDropdown">
+                        <a href="ukrMonolithPage.html" class="dropdown-item">
+                            <span class="dropdown-icon">⚔️</span>
+                            Моноліт
+                        </a>
+                        <a href="ukrmoytash.html" class="dropdown-item">
+                            <span class="dropdown-icon">🗡️</span>
+                            Мойташбуд
+                        </a>
+                    </div>
+                </div>
+                <a href="ukrEvents.html">Івенти</a>
+                <a href="index.html">Російська версія</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay">
+        <div class="mobile-menu" id="mobile-menu">
+            <button class="close-menu" id="close-menu">×</button>
+            <a href="#application">Подати заявку</a>
+            <a href="#reviews">Відгуки</a>
+            <a href="#about">Античит</a>
+            <a href="ukrseasons.html">Мапи сезонів</a>
+            <a href="PlayerListMenuUkr.html">Список гравців</a>
+            <a href="ukrMonolithPage.html">Моноліт</a>
+            <a href="ukrmoytash.html">Мойташбуд</a>
+            <a href="ukrEvents.html">Івенти</a>
+            <a href="index.html">Російська версія</a>
+        </div>
+    </div>
+
+    <main class="main-container">
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="minecraft-title">Про сервер RuneWorld</h1>
+                    <p>Сервер RuneWorld - це ванільний Minecraft-сервер із теплою атмосферою, гарним хостингом, дружніми гравцями та добрими адміністраторами. Наш сервер працює на хостингу Minecraft Realms, завдяки чому всі гравці мають безперебійний доступ до сервера з будь-якої країни. На нашому сервері завжди низький пінг у будь-якій точці світу, адже сервер розташований на хостингу від Microsoft. У нас панує тепла атмосфера, проводяться івенти, будуються мега-проєкти та розвивається інфраструктура. Основою сервера є система сезонів, які починаються та завершуються кожного року. Актуальний сезон - 3 сезон. Приєднуйтесь до нас і станьте частиною нашого дружнього ком'юніті!</p>
+                </div>
+                <div class="hero-image">
+                    <img src="creeper-block.png" alt="Creeper on Block" class="creeper-img">
+                </div>
+            </div>
+        </section>
+
+        <section id="about" class="about-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Античит</h2>
+                <p>Для забезпечення чесної гри та підтримання справедливості на сервері RuneWorld впроваджено передову античит-систему. Ми використовуємо найсучасніші алгоритми для виявлення та блокування нечесних гравців, які намагаються отримати перевагу за допомогою заборонених модифікацій та читів. Наша античит-система регулярно оновлюється, щоб ефективно протистояти новим загрозам і методам злому. Ми прагнемо створити умови, за яких кожен гравець може насолоджуватися грою в рівних умовах, без загрози шахрайства чи нечесних методів. Приєднуйтесь до RuneWorld і насолоджуйтесь грою, знаючи, що ваша чесність захищена!</p>
+            </div>
+        </section>
+
+        <section class="youtube-section">
+            <div class="section-container">
+                <div class="youtube-content">
+                    <div class="youtube-logo">
+                        <span class="minecraft-title">RuneWorld</span>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="#FF0000">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <h2 class="minecraft-title">YouTube канал сервера RuneWorld</h2>
+                    <a href="https://www.youtube.com/@rune_craft2287?si=9OCK7hWKA1nPm93C" target="_blank" class="youtube-button">Відвідати канал</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="reviews" class="reviews-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Відгуки</h2>
+                <div class="reviews-wrapper">
+                    <div class="reviews-cards">
+                        <div class="review-card">
+                            <p>Rune_craft2287: "Граю на RuneWorld вже понад рік і можу сказати, що це дійсно особливе місце. Сезони надають грі динамічності, а мега-проєкти завжди надихають на створення чогось нового. Безпека та античит-система на висоті, грайте спокійно!"</p>
+                        </div>
+                        <div class="review-card">
+                            <p>sokibtw: "Сервер RuneWorld став для мене справжнім домом у світі Minecraft. Тут завжди можна знайти нових друзів і отримати масу задоволення від гри. Особлива подяка адмінам за їхню працю та турботу про безпеку сервера. Найкращий вибір для всіх майнкрафтерів!"</p>
+                        </div>
+                        <div class="review-card">
+                            <p>Kristofer UA: "RuneWorld - це найкращий сервер, на якому я коли-небудь грав! Тут завжди доброзичлива атмосфера, низький пінг і чудові івенти. Адміни дійсно дбають про комфорт гравців, і це відчувається на кожному кроці. Усім рекомендую!"</p>
+                        </div>
+                    </div>
+                    <div class="characters-image">
+                        <img src="minecraft-characters.png" alt="Minecraft Characters" class="characters-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="application" class="application-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Подати заявку</h2>
+                <p class="form-subtitle">Заповніть форму, і ми зв'яжемося з Вами</p>
+                <form id="appl-form" action="#" method="POST">
+                    <input type="text" name="name" placeholder="Ваш нік" required>
+                    <input type="email" name="email" placeholder="Ваш email" required>
+                    <input type="text" name="discord" placeholder="Ваш нік у Discord" required>
+                    <input type="text" name="telegram" placeholder="Ваш юзернейм у Telegram" required>
+                    <button class="submit-button" id="but-appl" type="submit">Відправити</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="discord-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Discord канал сервера</h2>
+                <div class="discord-widget">
+                    <iframe src="https://discord.com/widget?id=1062052663002398790&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                </div>
+                <div class="runeworld-logo">
+                    <img src="runeworld.png" alt="RuneWorld Logo" class="rw-logo">
+                </div>
+            </div>
+        </section>
+
+        <section class="contacts-section" id="contacts">
+            <div class="section-container">
+                <h2 class="minecraft-title">Контакти</h2>
+                <div class="contacts-info">
+                    <p><strong>Телефон:</strong> +375 29 394 3461 | +380 97 214 22 17</p>
+                    <p><strong>Email:</strong> <a href="mailto:admruneworld@gmail.com">admruneworld@gmail.com</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button class="contact-button" onclick="toggleContactPopup()" aria-label="Зв'язатися з нами">
+        <svg class="message-icon" viewBox="0 0 24 24">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+        </svg>
+    </button>
+
+    <div class="contact-popup" id="contactPopup">
+        <div class="popup-header">
+            <h3 class="popup-title">Якщо виникли питання, зв'яжіться з нами!</h3>
+        </div>
+        <div class="popup-content">
+            <div class="contact-item" onclick="copyToClipboard('admruneworld@gmail.com', 'Email скопійовано!')">
+                <svg class="contact-icon" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <div class="contact-text">
+                    <div class="contact-label">Email</div>
+                    <div class="contact-value">admruneworld@gmail.com</div>
+                </div>
+            </div>
+            <div class="contact-item" onclick="copyToClipboard('@kr1stoferUA', 'Telegram скопійовано!')">
+                <svg class="contact-icon" viewBox="0 0 24 24">
+                    <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/>
+                </svg>
+                <div class="contact-text">
+                    <div class="contact-label">Telegram</div>
+                    <div class="contact-value">@kr1stoferUA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer">
+            <p>&copy; 2025 RUNEWORLD</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
