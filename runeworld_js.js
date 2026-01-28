@@ -274,3 +274,364 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+
+// ======================= //
+//  SCROLL ANIMATIONS      //
+// ======================= //
+
+// Класс для управления анимациями при прокрутке
+class ScrollAnimations {
+    constructor() {
+        this.elements = [];
+        this.init();
+    }
+
+    init() {
+        // Добавляем базовые стили для анимаций
+        this.injectStyles();
+        
+        // Находим все элементы для анимации
+        this.findElements();
+        
+        // Запускаем наблюдение
+        this.observeElements();
+        
+        // Проверяем элементы при загрузке
+        this.checkElements();
+    }
+
+    injectStyles() {
+        const style = document.createElement('style');
+        style.textContent = `
+            /* Базовые стили для анимаций */
+            .scroll-animate {
+                opacity: 0;
+                transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .scroll-animate.animated {
+                opacity: 1;
+            }
+
+            /* Анимация появления снизу */
+            .animate-fade-up {
+                transform: translateY(60px);
+            }
+
+            .animate-fade-up.animated {
+                transform: translateY(0);
+            }
+
+            /* Анимация появления слева */
+            .animate-fade-left {
+                transform: translateX(-60px);
+            }
+
+            .animate-fade-left.animated {
+                transform: translateX(0);
+            }
+
+            /* Анимация появления справа */
+            .animate-fade-right {
+                transform: translateX(60px);
+            }
+
+            .animate-fade-right.animated {
+                transform: translateX(0);
+            }
+
+            /* Анимация масштабирования */
+            .animate-scale {
+                transform: scale(0.8);
+            }
+
+            .animate-scale.animated {
+                transform: scale(1);
+            }
+
+            /* Анимация поворота */
+            .animate-rotate {
+                transform: rotate(-5deg) scale(0.9);
+            }
+
+            .animate-rotate.animated {
+                transform: rotate(0deg) scale(1);
+            }
+
+            /* Анимация появления с задержкой для карточек */
+            .stagger-1 {
+                transition-delay: 0.1s;
+            }
+
+            .stagger-2 {
+                transition-delay: 0.2s;
+            }
+
+            .stagger-3 {
+                transition-delay: 0.3s;
+            }
+
+            .stagger-4 {
+                transition-delay: 0.4s;
+            }
+
+            /* Анимация для заголовков */
+            .animate-title {
+                opacity: 0;
+                transform: translateY(40px);
+                transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .animate-title.animated {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Анимация для изображений */
+            .animate-image {
+                opacity: 0;
+                transform: scale(0.85) rotate(-3deg);
+                transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+
+            .animate-image.animated {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+
+            /* Анимация волны для текста */
+            .animate-wave {
+                display: inline-block;
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            .animate-wave.animated {
+                animation: wave 0.6s ease forwards;
+            }
+
+            @keyframes wave {
+                0% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                100% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Анимация пульсации */
+            .animate-pulse {
+                animation: pulse 2s infinite;
+            }
+
+            @keyframes pulse {
+                0%, 100% {
+                    transform: scale(1);
+                }
+                50% {
+                    transform: scale(1.05);
+                }
+            }
+
+            /* Анимация появления с эффектом blur */
+            .animate-blur {
+                opacity: 0;
+                filter: blur(10px);
+                transform: translateY(30px);
+                transition: all 0.8s ease;
+            }
+
+            .animate-blur.animated {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0);
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    findElements() {
+        // Hero section элементы
+        const heroText = document.querySelector('.hero-text');
+        const heroImage = document.querySelector('.hero-image');
+        
+        if (heroText) {
+            heroText.classList.add('scroll-animate', 'animate-fade-left');
+            this.elements.push(heroText);
+        }
+        
+        if (heroImage) {
+            heroImage.classList.add('scroll-animate', 'animate-fade-right', 'animate-image');
+            this.elements.push(heroImage);
+        }
+
+        // Все заголовки секций
+        document.querySelectorAll('.minecraft-title').forEach(title => {
+            title.classList.add('scroll-animate', 'animate-title');
+            this.elements.push(title);
+        });
+
+        // About section
+        const aboutSection = document.querySelector('.about-section p');
+        if (aboutSection) {
+            aboutSection.classList.add('scroll-animate', 'animate-fade-up');
+            this.elements.push(aboutSection);
+        }
+
+        // YouTube section
+        const youtubeContent = document.querySelector('.youtube-content');
+        if (youtubeContent) {
+            youtubeContent.classList.add('scroll-animate', 'animate-scale');
+            this.elements.push(youtubeContent);
+        }
+
+        // Review cards с задержкой
+        document.querySelectorAll('.review-card').forEach((card, index) => {
+            card.classList.add('scroll-animate', 'animate-fade-up', `stagger-${index + 1}`);
+            this.elements.push(card);
+        });
+
+        // Characters image
+        const charactersImage = document.querySelector('.characters-image');
+        if (charactersImage) {
+            charactersImage.classList.add('scroll-animate', 'animate-fade-right', 'animate-image');
+            this.elements.push(charactersImage);
+        }
+
+        // Form
+        const form = document.querySelector('#appl-form');
+        if (form) {
+            form.classList.add('scroll-animate', 'animate-fade-up');
+            this.elements.push(form);
+        }
+
+        // Discord widget
+        const discordWidget = document.querySelector('.discord-widget');
+        if (discordWidget) {
+            discordWidget.classList.add('scroll-animate', 'animate-scale');
+            this.elements.push(discordWidget);
+        }
+
+        // RuneWorld logo
+        const rwLogo = document.querySelector('.runeworld-logo');
+        if (rwLogo) {
+            rwLogo.classList.add('scroll-animate', 'animate-fade-up', 'animate-image');
+            this.elements.push(rwLogo);
+        }
+
+        // Contacts
+        const contactsInfo = document.querySelector('.contacts-info');
+        if (contactsInfo) {
+            contactsInfo.classList.add('scroll-animate', 'animate-blur');
+            this.elements.push(contactsInfo);
+        }
+
+        // Input fields с задержкой
+        document.querySelectorAll('form input').forEach((input, index) => {
+            input.classList.add('scroll-animate', 'animate-fade-left', `stagger-${(index % 4) + 1}`);
+            this.elements.push(input);
+        });
+
+        // Submit button
+        const submitBtn = document.querySelector('.submit-button');
+        if (submitBtn) {
+            submitBtn.classList.add('scroll-animate', 'animate-scale');
+            this.elements.push(submitBtn);
+        }
+    }
+
+    observeElements() {
+        const options = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15 // Элемент должен быть виден на 15%
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Добавляем класс animated когда элемент в зоне видимости
+                    entry.target.classList.add('animated');
+                    
+                    // Опционально: можно отключить наблюдение после анимации
+                    // observer.unobserve(entry.target);
+                }
+            });
+        }, options);
+
+        this.elements.forEach(el => {
+            observer.observe(el);
+        });
+    }
+
+    checkElements() {
+        // Проверяем элементы при загрузке страницы
+        this.elements.forEach(el => {
+            const rect = el.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight && rect.bottom >= 0;
+            
+            if (isVisible) {
+                el.classList.add('animated');
+            }
+        });
+    }
+}
+
+// Инициализация анимаций при загрузке DOM
+document.addEventListener('DOMContentLoaded', () => {
+    // Небольшая задержка для корректной работы
+    setTimeout(() => {
+        new ScrollAnimations();
+    }, 100);
+});
+
+// Дополнительные эффекты при наведении
+document.addEventListener('DOMContentLoaded', () => {
+    // Анимация для review cards при наведении
+    document.querySelectorAll('.review-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-10px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Плавная анимация для кнопок
+    document.querySelectorAll('.youtube-button, .submit-button').forEach(btn => {
+        btn.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.05)';
+        });
+        
+        btn.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Parallax эффект для изображений при скролле
+    let lastScrollY = window.scrollY;
+    
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY;
+        const scrollDelta = scrollY - lastScrollY;
+        
+        // Parallax для hero image
+        const heroImage = document.querySelector('.hero-image img');
+        if (heroImage) {
+            const translateY = scrollY * 0.3;
+            heroImage.style.transform = `translateY(${translateY}px)`;
+        }
+        
+        // Parallax для characters image
+        const charactersImg = document.querySelector('.characters-image img');
+        if (charactersImg) {
+            const translateY = scrollY * 0.2;
+            charactersImg.style.transform = `translateY(${translateY}px)`;
+        }
+        
+        lastScrollY = scrollY;
+    });
+});
