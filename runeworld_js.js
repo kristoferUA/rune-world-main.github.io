@@ -612,26 +612,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Parallax эффект для изображений при скролле
-    let lastScrollY = window.scrollY;
-    
     window.addEventListener('scroll', () => {
         const scrollY = window.scrollY;
-        const scrollDelta = scrollY - lastScrollY;
         
         // Parallax для hero image
         const heroImage = document.querySelector('.hero-image img');
         if (heroImage) {
-            const translateY = scrollY * 0.3;
-            heroImage.style.transform = `translateY(${translateY}px)`;
+            const heroImageParent = document.querySelector('.hero-image');
+            const rect = heroImageParent.getBoundingClientRect();
+            
+            // Применяем parallax только когда элемент в зоне видимости
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                const relativeScroll = (window.innerHeight - rect.top) * 0.15;
+                heroImage.style.transform = `translateY(${relativeScroll}px)`;
+            }
         }
         
         // Parallax для characters image
         const charactersImg = document.querySelector('.characters-image img');
         if (charactersImg) {
-            const translateY = scrollY * 0.2;
-            charactersImg.style.transform = `translateY(${translateY}px)`;
+            const charactersParent = document.querySelector('.characters-image');
+            const rect = charactersParent.getBoundingClientRect();
+            
+            // Применяем parallax только когда элемент в зоне видимости
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                const relativeScroll = (window.innerHeight - rect.top) * 0.1;
+                charactersImg.style.transform = `translateY(${relativeScroll}px)`;
+            }
         }
-        
-        lastScrollY = scrollY;
     });
 });
