@@ -308,10 +308,7 @@ body {
     height: auto;
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
 }
-@media (max-width: 768px) {
-    .creeper-img {
-        display:none
-    }
+
 @media (max-width: 768px) {
     .hero-content {
         grid-template-columns: 1fr;
@@ -320,6 +317,9 @@ body {
     
     .hero-text h1 {
         text-align: center;
+    }
+    .creeper-img {
+        display:none
     }
 }
 
