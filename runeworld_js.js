@@ -621,7 +621,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Применяем parallax только когда элемент в зоне видимости
             if (rect.top < window.innerHeight && rect.bottom > 0) {
-                const relativeScroll = (window.innerHeight - rect.top) * 0.15;
+                // Вычисляем центральную точку элемента относительно экрана
+                const elementCenter = rect.top + rect.height / 2;
+                const screenCenter = window.innerHeight / 2;
+                
+                // Смещение от центра (может быть положительным и отрицательным)
+                const distanceFromCenter = screenCenter - elementCenter;
+                const relativeScroll = distanceFromCenter * 0.15;
+                
                 heroImage.style.transform = `translateY(${relativeScroll}px)`;
             }
         }
@@ -634,7 +641,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Применяем parallax только когда элемент в зоне видимости
             if (rect.top < window.innerHeight && rect.bottom > 0) {
-                const relativeScroll = (window.innerHeight - rect.top) * 0.1;
+                // Вычисляем центральную точку элемента относительно экрана
+                const elementCenter = rect.top + rect.height / 2;
+                const screenCenter = window.innerHeight / 2;
+                
+                // Смещение от центра (может быть положительным и отрицательным)
+                const distanceFromCenter = screenCenter - elementCenter;
+                const relativeScroll = distanceFromCenter * 0.1;
+                
                 charactersImg.style.transform = `translateY(${relativeScroll}px)`;
             }
         }
