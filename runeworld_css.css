@@ -131,7 +131,10 @@ body {
     background: linear-gradient(135deg, rgba(71, 184, 255, 0.1), rgba(58, 125, 233, 0.1));
     color: #2563eb;
 }
-
+a.dropdown-item {
+    color:back
+}
+    
 .menu-overlay {
     display: none;
     position: fixed;
