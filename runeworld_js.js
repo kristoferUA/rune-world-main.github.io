@@ -37,47 +37,27 @@ window.addEventListener("load", () => {
         if (!menuButton || !closeMenuButton || !mobileMenu || !mobileMenuOverlay) return;
 
         const menuLinks = mobileMenu.querySelectorAll("a");
-        const menuWidth = mobileMenu.offsetWidth || 300;
 
-        // Полностью убираем CSS анимации и позиционирование
-        mobileMenu.style.cssText += `
-            position: fixed !important;
-            top: 0 !important;
-            right: auto !important;
-            left: ${menuWidth}px !important;
-            width: ${menuWidth}px !important;
-            height: 100% !important;
-            transition: none !important;
-            z-index: 1200 !important;
-        `;
-
-        mobileMenuOverlay.style.cssText += `
-            display: none !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            background: rgba(0,0,0,0.7) !important;
-            z-index: 1100 !important;
-            opacity: 0 !important;
-            transition: none !important;
-        `;
-
+        // Начальное состояние: оверлей скрыт целиком
+        gsap.set(mobileMenuOverlay, { display: 'none', autoAlpha: 0 });
+        // Меню сдвинуто вправо за экран внутри оверлея
+        gsap.set(mobileMenu, { x: '100%' });
         gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
 
         let tl = gsap.timeline({
             paused: true,
             defaults: { ease: "menuEase", duration: 0.5 },
             onReverseComplete: () => {
-                mobileMenu.style.left = menuWidth + 'px';
-                mobileMenuOverlay.style.display = 'none';
+                // После завершения закрытия прячем оверлей целиком
+                gsap.set(mobileMenuOverlay, { display: 'none' });
+                gsap.set(mobileMenu, { x: '100%' });
                 gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
             }
         });
 
-        tl.to(mobileMenuOverlay, { display: 'block', opacity: 1, duration: 0.3 }, 0)
-          .to(mobileMenu, { left: 0, duration: 0.5 }, 0)
+        tl.set(mobileMenuOverlay, { display: 'block' })
+          .to(mobileMenuOverlay, { autoAlpha: 1, duration: 0.3 }, 0)
+          .to(mobileMenu, { x: '0%', duration: 0.5 }, 0)
           .to(menuLinks, {
               y: 0,
               autoAlpha: 1,
@@ -96,7 +76,10 @@ window.addEventListener("load", () => {
         };
 
         closeMenuButton.addEventListener('click', closeMenu);
-        mobileMenuOverlay.addEventListener('click', closeMenu);
+        // Клик на оверлей (но не на само меню)
+        mobileMenuOverlay.addEventListener('click', (e) => {
+            if (e.target === mobileMenuOverlay) closeMenu();
+        });
 
         menuLinks.forEach(link => {
             link.addEventListener('click', () => {
