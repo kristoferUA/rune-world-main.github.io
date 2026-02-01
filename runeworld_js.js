@@ -3,14 +3,14 @@
 // ======================= //
 
 window.addEventListener("load", () => {
-    const preloader = document.getElementById("preloader");
-    preloader.style.opacity = "1";
-    setTimeout(() => {
-        preloader.style.transition = "opacity 0.5s ease";
-        preloader.style.opacity = "0";
-        setTimeout(() => preloader.style.display = "none", 500);
-    }, 300);
-});
+        const preloader = document.getElementById("preloader");
+        preloader.style.opacity = "1";
+        setTimeout(() => {
+          preloader.style.transition = "opacity 0.5s ease";
+          preloader.style.opacity = "0";
+          setTimeout(() => preloader.style.display = "none", 500);
+        }, 300); // маленькая задержка перед исчезновением
+      });
 
 // ======================= //
 //    MOBILE MENU          //
