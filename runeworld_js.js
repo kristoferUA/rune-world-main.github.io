@@ -3,46 +3,104 @@
 // ======================= //
 
 window.addEventListener("load", () => {
-        const preloader = document.getElementById("preloader");
-        preloader.style.opacity = "1";
-        setTimeout(() => {
-          preloader.style.transition = "opacity 0.5s ease";
-          preloader.style.opacity = "0";
-          setTimeout(() => preloader.style.display = "none", 500);
-        }, 300); // маленькая задержка перед исчезновением
-      });
+    const preloader = document.getElementById("preloader");
+    preloader.style.opacity = "1";
+    setTimeout(() => {
+        preloader.style.transition = "opacity 0.5s ease";
+        preloader.style.opacity = "0";
+        setTimeout(() => preloader.style.display = "none", 500);
+    }, 300);
+});
 
 // ======================= //
-//    MOBILE MENU          //
+//    MOBILE MENU (GSAP)   //
 // ======================= //
+
+// Загрузка GSAP
+(function() {
+    const gsapScript = document.createElement('script');
+    gsapScript.src = 'https://unpkg.com/gsap@3/dist/gsap.min.js';
+    gsapScript.onload = function() {
+        const customEaseScript = document.createElement('script');
+        customEaseScript.src = 'https://unpkg.com/gsap@3/dist/CustomEase.min.js';
+        customEaseScript.onload = initGsapMenu;
+        document.head.appendChild(customEaseScript);
+    };
+    document.head.appendChild(gsapScript);
+})();
+
+function initGsapMenu() {
+    gsap.registerPlugin(CustomEase);
+    CustomEase.create("menuEase", "0.65, 0.01, 0.05, 0.99");
 
     document.addEventListener('DOMContentLoaded', () => {
-    const menuButton = document.getElementById('menu-button');
-    const closeMenuButton = document.getElementById('close-menu');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+        const menuButton = document.getElementById('menu-button');
+        const closeMenuButton = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
-    if (menuButton) {
+        if (!menuButton || !closeMenuButton || !mobileMenu || !mobileMenuOverlay) return;
+
+        const menuLinks = mobileMenu.querySelectorAll("a");
+
+        gsap.set(mobileMenu, { xPercent: 100 });
+        gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+        gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
+
+        let tl = gsap.timeline({
+            paused: true,
+            defaults: { ease: "menuEase", duration: 0.5 },
+            onReverseComplete: resetMenuState
+        });
+
+        function resetMenuState() {
+            gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
+            gsap.set(mobileMenu, { xPercent: 100 });
+            gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+        }
+
+        tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
+          .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
+          .to(mobileMenu, { xPercent: 0 }, 0)
+          .to(menuLinks, {
+              y: 0,
+              autoAlpha: 1,
+              stagger: 0.1,
+              duration: 0.25
+          }, "<+=0.2");
+
         menuButton.addEventListener('click', () => {
-            mobileMenu.classList.add('open');
-            mobileMenuOverlay.classList.add('open');
+            if (tl.reversed()) {
+                tl.progress(0);
+            }
+            tl.timeScale(1);
+            tl.play();
         });
-    }
 
-    if (closeMenuButton) {
-        closeMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            mobileMenuOverlay.classList.remove('open');
-        });
-    }
+        const closeMenu = () => {
+            if (tl.isActive()) {
+                tl.progress(1);
+            }
+            tl.timeScale(4);
+            tl.reverse();
+        };
 
-    if (mobileMenuOverlay) {
-        mobileMenuOverlay.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            mobileMenuOverlay.classList.remove('open');
+        closeMenuButton.addEventListener('click', closeMenu);
+        mobileMenuOverlay.addEventListener('click', closeMenu);
+
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                closeMenu();
+                const targetId = link.getAttribute('href');
+                if (targetId && targetId.startsWith('#')) {
+                    setTimeout(() => {
+                        document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                }
+            });
         });
-    }
-});
+    });
+}
 
 // ======================= //
 //    DROPDOWN MENU        //
