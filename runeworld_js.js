@@ -38,7 +38,12 @@ window.addEventListener("load", () => {
 
         const menuLinks = mobileMenu.querySelectorAll("a");
 
-        gsap.set(mobileMenu, { xPercent: 100 });
+        // Убираем CSS right/transition чтобы не конфликтовало с GSAP
+        mobileMenu.style.right = 'auto';
+        mobileMenu.style.transition = 'none';
+        mobileMenu.style.left = '100%';
+
+        gsap.set(mobileMenu, { x: 0 });
         gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
         gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
 
