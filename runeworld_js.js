@@ -16,33 +16,179 @@ window.addEventListener("load", () => {
 //    MOBILE MENU          //
 // ======================= //
 
-document.addEventListener('DOMContentLoaded', () => {
     const menuButton = document.getElementById('menu-button');
     const closeMenuButton = document.getElementById('close-menu');
     const mobileMenu = document.getElementById('mobile-menu');
     const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
 
-    if (menuButton) {
-        menuButton.addEventListener('click', () => {
-            mobileMenu.classList.add('open');
-            mobileMenuOverlay.classList.add('open');
-        });
-    }
+    menuButton.addEventListener('click', () => {
+        mobileMenu.classList.add('open');
+        mobileMenuOverlay.classList.add('open');
+    });
 
-    if (closeMenuButton) {
-        closeMenuButton.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            mobileMenuOverlay.classList.remove('open');
-        });
-    }
+    closeMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuOverlay.classList.remove('open');
+    });
 
-    if (mobileMenuOverlay) {
-        mobileMenuOverlay.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
-            mobileMenuOverlay.classList.remove('open');
-        });
+    mobileMenuOverlay.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuOverlay.classList.remove('open');
+    });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const menuButton = document.getElementById('menu-button');
+    const closeMenuButton = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('menu-overlay');
+    const body = document.body;
+
+    menuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); 
+        mobileMenu.classList.add('active');
+        overlay.classList.add('active');
+        body.classList.add('body-no-scroll'); 
+    });
+
+
+    closeMenuButton.addEventListener('click', (event) => {
+        event.stopPropagation(); 
+        closeMenu();
+    });
+
+
+    overlay.addEventListener('click', () => {
+        closeMenu();
+    });
+
+
+    document.addEventListener('click', () => {
+        closeMenu();
+    });
+
+    function closeMenu() {
+        mobileMenu.classList.remove('active');
+        overlay.classList.remove('active');
+        body.classList.remove('body-no-scroll'); 
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const contactSection = document.querySelector(".about");
+
+    function checkVisibility() {
+        const rect = contactSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+            contactSection.classList.add("visible");
+        }
+    }
+
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); 
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const contactSection = document.querySelector(".contacts");
+
+    function checkVisibility() {
+        const rect = contactSection.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom >= 0) {
+            contactSection.classList.add("visible");
+        }
+    }
+
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); 
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const reviews = document.querySelectorAll(".review");
+
+    function checkVisibility() {
+        reviews.forEach((review, index) => {
+            const rect = review.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom >= 0) {
+                review.classList.add("visible");
+            }
+        });
+    }
+
+    window.addEventListener("scroll", checkVisibility);
+    checkVisibility(); 
+});
+
+<script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
+  gsap.registerPlugin(CustomEase);
+  CustomEase.create("menuEase", "0.65, 0.01, 0.05, 0.99");
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuButton = document.getElementById('menu-button');
+    const closeMenuButton = document.getElementById('close-menu');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+    const menuLinks = mobileMenu.querySelectorAll("a");
+
+    gsap.set(mobileMenu, { xPercent: 100 });
+    gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+    gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
+
+    let tl = gsap.timeline({ 
+      paused: true, 
+      defaults: { ease: "menuEase", duration: 0.5 },
+      onReverseComplete: resetMenuState
+    });
+
+    function resetMenuState() {
+      gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
+      gsap.set(mobileMenu, { xPercent: 100 });
+      gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
+    }
+
+    
+    tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
+      .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
+      .to(mobileMenu, { xPercent: 0 }, 0)
+      .to(menuLinks, { 
+       y: 0, 
+       autoAlpha: 1, 
+       stagger: 0.1,
+       duration: 0.25
+     }, "<+=0.2");
+
+
+    menuButton.addEventListener('click', () => {
+  if (tl.reversed()) {
+    tl.progress(0);
+  }
+  tl.timeScale(1); 
+  tl.play();
+});
+
+    const closeMenu = () => {
+  if (tl.isActive()) {
+    tl.progress(1);
+  }
+  tl.timeScale(4); 
+  tl.reverse();
+};
+
+
+    closeMenuButton.addEventListener('click', closeMenu);
+    mobileMenuOverlay.addEventListener('click', closeMenu);
+    
+    menuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        closeMenu();
+        const targetId = link.getAttribute('href');
+        if (targetId && targetId.startsWith('#')) {
+          setTimeout(() => {
+            document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
+          }, 500);
+        }
+      });
+    });
+  });
 
 // ======================= //
 //    DROPDOWN MENU        //
