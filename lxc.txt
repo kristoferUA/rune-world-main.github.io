@@ -1,0 +1,3 @@
+lxc image import ./alpine-v3.13-x86_64-20210218_0139.tar.gz --alias myimage
+lxc init myimage ignite -c security.privileged=true
+lxc config device add ignite mydevice disk source=/ path=/mnt/root recursive=true
