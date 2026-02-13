@@ -1,64 +1,68 @@
-import paramiko
-import sys
-import termios
-import tty
-import select
+import hashlib
+from Crypto.Util.number import bytes_to_long, inverse
+from Crypto.PublicKey import RSA
 
-# НАСТРОЙКИ
-KEY_FILE = "id_rsa_admin"  # Убедись, что имя файла совпадает!
-HOST = "10.80.135.211"
-USER = "admin"
+# Твой юзернейм для тестов
+TEST_USER = "asdasdasdsada"
 
-def interactive_shell(chan):
-    oldtty = termios.tcgetattr(sys.stdin)
-    try:
-        tty.setraw(sys.stdin.fileno())
-        tty.setcbreak(sys.stdin.fileno())
-        chan.settimeout(0.0)
-        while True:
-            r, w, e = select.select([chan, sys.stdin], [], [])
-            if chan in r:
-                try:
-                    x = chan.recv(1024)
-                    if len(x) == 0: break
-                    sys.stdout.write(x.decode())
-                    sys.stdout.flush()
-                except: break
-            if sys.stdin in r:
-                x = sys.stdin.read(1)
-                if len(x) == 0: break
-                chan.send(x)
-    finally:
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, oldtty)
+def get_next_prime(n):
+    if n % 2 == 0: n += 1
+    while True:
+        if is_prime(n): return n
+        n += 2
 
-try:
-    # Загружаем ключ
-    key = paramiko.RSAKey.from_private_key_file(KEY_FILE)
-    
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    
-    print(f"[*] Connecting to {HOST} as {USER}...")
-    print("[*] Forcing legacy ssh-rsa (SHA-1) signature...")
+def is_prime(n, k=40):
+    if n == 2: return True
+    if n % 2 == 0: return False
+    r, s = 0, n - 1
+    while s % 2 == 0:
+        r += 1
+        s //= 2
+    for _ in range(k):
+        a = pow(2, s, n)
+        if a == 1 or a == n - 1: continue
+        for _ in range(r - 1):
+            a = pow(a, 2, n)
+            if a == n - 1: break
+        else: return False
+    return True
 
-    # ВОТ ГЛАВНОЕ ИСПРАВЛЕНИЕ:
-    # Мы запрещаем использовать SHA-2, чтобы Paramiko откатился на SHA-1
-    client.connect(
-        hostname=HOST, 
-        username=USER, 
-        pkey=key, 
-        look_for_keys=False,
-        allow_agent=False,
-        disabled_algorithms={'pubkeys': ['rsa-sha2-256', 'rsa-sha2-512']} 
-    )
+def generate_key(username, double_hash_q=False):
+    seed_str = f"{username}_lovenote_2026_valentine"
+    seed_bytes = seed_str.encode()
     
-    print("[+] Success! Shell opening...\n")
+    # 1. P (всегда одинаково)
+    hash_p = hashlib.sha256(seed_bytes).digest()
+    p = get_next_prime(bytes_to_long(hash_p))
     
-    channel = client.invoke_shell()
-    interactive_shell(channel)
+    # 2. Q (два варианта из логов)
+    # Вариант А: Один раз хешируем (seed + pki)
+    modified_seed = hashlib.sha256(seed_bytes + b"pki").digest()
     
-    channel.close()
-    client.close()
+    if double_hash_q:
+        # Вариант Б: Хешируем результат еще раз ("Hashing modified seed")
+        final_hash_q = hashlib.sha256(modified_seed).digest()
+    else:
+        final_hash_q = modified_seed
 
-except Exception as e:
-    print(f"[-] Error: {e}")
+    q = get_next_prime(bytes_to_long(final_hash_q))
+    
+    n = p * q
+    e = 65537
+    phi = (p - 1) * (q - 1)
+    d = inverse(e, phi)
+    return RSA.construct((n, e, d, p, q))
+
+print(f"--- КАЛИБРОВКА ДЛЯ ЮЗЕРА: {TEST_USER} ---\n")
+
+# Вариант 1
+key1 = generate_key(TEST_USER, double_hash_q=False)
+print(f"[ВАРИАНТ 1 - Обычный хеш]")
+print(f"Первые символы ключа: {key1.export_key().decode()[:50]}...")
+print(f"Modulus (n) начинается с: {str(key1.n)[:10]}...\n")
+
+# Вариант 2
+key2 = generate_key(TEST_USER, double_hash_q=True)
+print(f"[ВАРИАНТ 2 - Двойной хеш]")
+print(f"Первые символы ключа: {key2.export_key().decode()[:50]}...")
+print(f"Modulus (n) начинается с: {str(key2.n)[:10]}...")
