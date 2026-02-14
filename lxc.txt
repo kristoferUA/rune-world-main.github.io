@@ -1,40 +1,28 @@
 import hashlib
-import base64
-from cryptography.hazmat.primitives import serialization
+import random
 
-# --- 1. ТВОИ ИЗВЕСТНЫЕ ДАННЫЕ ---
+# --- 1. ПАРАМЕТРЫ, КОТОРЫЕ МЫ НАШЛИ ---
 USERNAME = "mgkrgegk"
-# Твой публичный ключ со скриншота (я переписал его точно)
-REAL_PUB_KEY = b"""-----BEGIN PUBLIC KEY-----
-MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAICyTyHQxpUuXHaI13bsS3hhMlAH7Oom
-fthYPpBmb898d4FtfJCwx7XQWW9pL4Fw5DUFuD5EBcgMGiOIigdP3m8CAwEAAQ==
------END PUBLIC KEY-----"""
+MESSAGE = "1234"
+# Алгоритм, подтвержденный скрином:
+ENDIAN = 'big' 
+Q_MODE = 'SingleHash' 
 
-# Извлекаем "настоящий" модуль N из ключа для сверки
-try:
-    pub_obj = serialization.load_pem_public_key(REAL_PUB_KEY)
-    REAL_N = pub_obj.public_numbers().n
-    print(f"[*] Целевой модуль N (из ключа): {hex(REAL_N)[:30]}...")
-except Exception as e:
-    print(f"[!] Ошибка чтения ключа: {e}")
-    exit()
+# --- 2. ГЕНЕРАЦИЯ КЛЮЧЕЙ (Восстанавливаем твой Private Key) ---
+seed_str = f"{USERNAME}_lovenote_2026_valentine"
+seed_bytes = seed_str.encode()
 
-# --- 2. ЭМУЛЯЦИЯ ЛОГИКИ СЕРВЕРА ---
-SEED_STRING = f"{USERNAME}_lovenote_2026_valentine"
-
-# Вспомогательные функции математики
-def is_prime(n):
-    if n < 2: return False
-    if n == 2 or n == 3: return True
+def is_prime(n, k=40):
+    if n <= 1: return False
+    if n <= 3: return True
     if n % 2 == 0: return False
-    d, s = n - 1, 0
-    while d % 2 == 0:
-        d //= 2
-        s += 1
-    for a in [2, 3, 5, 7, 11, 13, 17, 19, 23]:
+    r, d = 0, n - 1
+    while d % 2 == 0: r += 1; d //= 2
+    for _ in range(k):
+        a = random.randint(2, n - 2)
         x = pow(a, d, n)
         if x == 1 or x == n - 1: continue
-        for _ in range(s - 1):
+        for _ in range(r - 1):
             x = pow(x, 2, n)
             if x == n - 1: break
         else: return False
@@ -45,71 +33,51 @@ def find_next_prime(n):
     while not is_prime(n): n += 2
     return n
 
-print(f"[*] Проверяем генерацию для сида: '{SEED_STRING}'")
+print(f"[*] Восстанавливаем ключи для {USERNAME}...")
 
-# --- 3. ПЕРЕБОР ВАРИАНТОВ ГЕНЕРАЦИИ ---
-# Нам нужно найти комбинацию, которая даст тот же N
-found = False
+# P = SHA256(seed)
+h_p = hashlib.sha256(seed_bytes).digest()
+p = find_next_prime(int.from_bytes(h_p, ENDIAN))
 
-# Варианты интерпретации байтов (Big Endian - стандарт, Little - редкость, но бывает)
-byte_orders = ['big', 'little']
+# Q = SHA256(seed + "pki")  <-- SingleHash Mode
+h_q = hashlib.sha256(seed_bytes + b"pki").digest()
+q = find_next_prime(int.from_bytes(h_q, ENDIAN))
 
-# Варианты логики Q (как трактовать логи)
-# Log 1: Modifying seed with PKI-related constant (SHA256(seed + b"pki"))
-# Log 2: Hashing modified seed with SHA256
-q_modes = [
-    "DoubleHash", # Сначала хэш (seed+pki), потом ХЭШ от этого результата
-    "SingleHash", # Просто хэш (seed+pki), игнорируя вторую строку лога
-    "ConcatHash"  # Хэш от (seed + hash(seed+pki))
-]
+n = p * q
+phi = (p - 1) * (q - 1)
+e = 65537
+d = pow(e, -1, phi)
 
-for order in byte_orders:
-    for mode in q_modes:
-        print(f"   Проверка [Endian: {order}, Mode: {mode}]...", end="")
-        
-        # Генерация P (она везде одинакова - SHA256(seed))
-        h_p = hashlib.sha256(SEED_STRING.encode()).digest()
-        p_cand = find_next_prime(int.from_bytes(h_p, order))
-        
-        # Генерация Q
-        q_cand = 0
-        if mode == "DoubleHash":
-            # SHA256( SHA256(seed + "pki") )
-            step1 = hashlib.sha256(SEED_STRING.encode() + b"pki").digest()
-            step2 = hashlib.sha256(step1).digest()
-            q_cand = find_next_prime(int.from_bytes(step2, order))
-            
-        elif mode == "SingleHash":
-            # SHA256( seed + "pki" )
-            step1 = hashlib.sha256(SEED_STRING.encode() + b"pki").digest()
-            q_cand = find_next_prime(int.from_bytes(step1, order))
-            
-        elif mode == "ConcatHash":
-            # SHA256( seed + SHA256(seed+"pki") )
-            mod = hashlib.sha256(SEED_STRING.encode() + b"pki").digest()
-            step2 = hashlib.sha256(SEED_STRING.encode() + mod).digest()
-            q_cand = find_next_prime(int.from_bytes(step2, order))
+print(f"[*] Ключи восстановлены!")
 
-        # Сверка
-        calc_n = p_cand * q_cand
-        
-        if calc_n == REAL_N:
-            print(" ЕСТЬ КОНТАКТ! ✅")
-            print(f"\n[!] АЛГОРИТМ НАЙДЕН:")
-            print(f"    Byte Order: {order}")
-            print(f"    Q Generation: {mode}")
-            found = True
-            break
-        else:
-            print(" мимо.")
-            
-    if found: break
+# --- 3. ГЕНЕРАЦИЯ ПОДПИСЕЙ ---
 
-if not found:
-    print("\n[X] Ни один вариант не совпал с твоим публичным ключом.")
-    print("Возможные причины:")
-    print("1. В сиде используется не просто юзернейм (например, mgkrgegk_lovenote... а может mgkrgegk@lovenote.com?)")
-    print("2. Странная кодировка (не UTF-8).")
+def sign_pkcs1_v1_5(msg, d, n):
+    # Стандартная упаковка (Padding)
+    h = hashlib.sha256(msg.encode()).digest()
+    prefix = b'\x30\x31\x30\x0d\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x05\x00\x04\x20'
+    pad_len = 64 - 3 - len(prefix) - len(h)
+    padding = b'\x00\x01' + (b'\xff' * pad_len) + b'\x00'
+    block = padding + prefix + h
+    m_int = int.from_bytes(block, 'big')
+    s = pow(m_int, d, n)
+    return format(s, '0128x')
+
+def sign_raw(msg, d, n):
+    # Просто математика
+    h = hashlib.sha256(msg.encode()).digest()
+    m_int = int.from_bytes(h, 'big')
+    s = pow(m_int, d, n)
+    return format(s, '0128x')
+
+print(f"\n--- ТЕСТОВЫЕ ПОДПИСИ (Message: {MESSAGE}) ---")
+print("Попробуй вставить их в форму Verify для своего пользователя.")
+
+print(f"\n[Вариант 1] PKCS#1 v1.5 (Стандарт):")
+print(sign_pkcs1_v1_5(MESSAGE, d, n))
+
+print(f"\n[Вариант 2] Raw RSA:")
+print(sign_raw(MESSAGE, d, n))
 
 -----BEGIN PRIVATE KEY-----
 MIIBUQIBADANBgkqhkiG9w0BAQEFAASCATswggE3AgEAAkA4wvUChmqa9BWA/s99
