@@ -1,21 +1,27 @@
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
-from Crypto.Hash import SHA256
+from Crypto.Hash import SHA256, SHA1, MD5
 import base64
 
-# 1. Текст сообщения, который мы "якобы" получили от админа
-message = b"give_me_flag"
+# Сообщение должно быть в точности как в поле ввода на сайте
+msg_text = "give_me_flag"
+message = msg_text.encode('utf-8')
 
-# 2. Загружаем ключ админа (тот самый, из admin%00)
+# КЛЮЧ ИЗ ДАШБОРДА admin%00
 key_text = """-----BEGIN PRIVATE KEY-----
-... (ВСТАВЬ СВОЙ КЛЮЧ ИЗ ДАШБОРДА ТУТ) ...
+... (ВСТАВЬ СВОЙ КЛЮЧ ТУТ) ...
 -----END PRIVATE KEY-----"""
 
-key = RSA.importKey(key_text)
-h = SHA256.new(message)
+key = RSA.import_key(key_text)
 
-# 3. Создаем подпись
-signature = pkcs1_15.new(key).sign(h)
+print(f"[*] Генерируем подписи для сообщения: '{msg_text}'")
+print(f"[*] Размер ключа: {key.size_in_bits()} бит (RSA-512)")
 
-print(f"\n[+] Сообщение: {message.decode()}")
-print(f"[+] Подпись (Base64): {base64.b64encode(signature).decode()}")
+for hash_class in [SHA1, SHA256, MD5]:
+    h = hash_class.new(message)
+    signer = pkcs1_15.new(key)
+    signature = signer.sign(h)
+    
+    sig_b64 = base64.b64encode(signature).decode()
+    print(f"\n[+] Алгоритм: {hash_class.__name__}")
+    print(f"    ПОДПИСЬ: {sig_b64}")
