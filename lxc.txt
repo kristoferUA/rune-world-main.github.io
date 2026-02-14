@@ -1,46 +1,60 @@
 import hashlib
-import base64
 from Crypto.Util.number import isPrime, inverse
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 
 def get_next_prime(n):
-    # Лог говорит "checking consecutive integers"
+    # В логах: "Checking consecutive integers"
+    # Начинаем проверку с самого числа n
     while not isPrime(n):
         n += 1
     return n
 
-def solve(variant_q):
+def get_signature(q_val):
+    # Настройки из логов
     username = "admin"
-    seed = f"{username}_lovenote_2026_valentine".encode()
-
-    # Находим p (всегда одинаково)
+    seed_str = f"{username}_lovenote_2026_valentine"
+    seed = seed_str.encode()
+    
+    # p всегда вычисляется одинаково
     p_hash = hashlib.sha256(seed).digest()
     p = get_next_prime(int.from_bytes(p_hash, 'big'))
-
-    # Находим q (варианты интерпретации лога)
-    if variant_q == 1:
-        # Вариант 1: H(H(seed + "pki")) - бинарно
-        mid = hashlib.sha256(seed + b"pki").digest()
-        q_hash = hashlib.sha256(mid).digest()
-    else:
-        # Вариант 2: H(Hex(H(seed + "pki"))) - через строку
-        mid_hex = hashlib.sha256(seed + b"pki").hexdigest().encode()
-        q_hash = hashlib.sha256(mid_hex).digest()
-
-    q = get_next_prime(int.from_bytes(q_hash, 'big'))
-
-    # Сборка ключа
-    n = p * q
+    
+    # Сборка RSA-512 (256 + 256 бит)
+    n = p * q_val
     e = 65537
     d = inverse(e, (p - 1) * (q - 1))
-    key = RSA.construct((n, e, d, p, q))
-
-    # Подпись
-    msg = "give_me_flag" #
+    key = RSA.construct((n, e, d, p, q_val))
+    
+    # Подпись сообщения
+    msg = "give_me_flag"
     h = SHA256.new(msg.encode())
     return pkcs1_15.new(key).sign(h).hex()
 
-print(f"ПОДПИСЬ (Вариант 1): {solve(1)}")
-print(f"ПОДПИСЬ (Вариант 2): {solve(2)}")
+# --- ВАРИАНТЫ ГЕНЕРАЦИИ Q ---
+username = "admin"
+seed = f"{username}_lovenote_2026_valentine".encode()
+const_bin = hashlib.sha256(seed + b"pki").digest()
+const_hex = hashlib.sha256(seed + b"pki").hexdigest().encode()
+
+# 1. Double Hash Binary: H(H(seed + "pki"))
+q1_hash = hashlib.sha256(const_bin).digest()
+q1 = get_next_prime(int.from_bytes(q1_hash, 'big'))
+
+# 2. Concat Binary: H(seed + H(seed + "pki"))
+q2_hash = hashlib.sha256(seed + const_bin).digest()
+q2 = get_next_prime(int.from_bytes(q2_hash, 'big'))
+
+# 3. Concat Hex: H(seed + Hex(H(seed + "pki")))
+q3_hash = hashlib.sha256(seed + const_hex).digest()
+q3 = get_next_prime(int.from_bytes(q3_hash, 'big'))
+
+# 4. Double Hash Hex: H(Hex(H(seed + "pki")))
+q4_hash = hashlib.sha256(const_hex).digest()
+q4 = get_next_prime(int.from_bytes(q4_hash, 'big'))
+
+print(f"Вариант 1 (Double Binary): {get_signature(q1)}")
+print(f"Вариант 2 (Concat Binary): {get_signature(q2)}")
+print(f"Вариант 3 (Concat Hex):    {get_signature(q3)}")
+print(f"Вариант 4 (Double Hex):    {get_signature(q4)}")
