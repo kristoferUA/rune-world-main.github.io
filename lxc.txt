@@ -4,3 +4,4 @@ Content-Type: application/json
 Content-Length: 28
 
 {"user": {"$ne": "demo"}}
+http://10.81.186.177:5000/messages?user=%7B%22%24ne%22%3A%22demo%22%7D
