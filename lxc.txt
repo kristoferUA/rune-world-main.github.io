@@ -1,61 +1,95 @@
 import hashlib
+import base64
 from cryptography.hazmat.primitives import serialization
 
-# Твой ключ (из переписки)
-pem_key = b"""-----BEGIN PRIVATE KEY-----
-MIIBUQIBADANBgkqhkiG9w0BAQEFAASCATswggE3AgEAAkA4wvUChmqa9BWA/s99
-q2z0OMxVEuDZ8esFuQGJgzfhFrdnmTTJ6APRg2v8xBlxLIghPFZIwEx/VXcqk2Xf
-A9FDAgMBAAECQBzoniR1FSJqIfGa1U5p2onfy6Gghcg6f7pgaToCDJmkkPJrnTFg
-yEX9TJnQDmoGtC94hXLXWhQWIOHhipl7vNECIEqMnfiP56WFh0qdmAmCBJX4gjww
-LPd68EY+WeUi6divAiEAwureZmrzJf7BCc1GC6djuN1rkoAMnTGNkor8EJCcja0C
-IEHQwUqHqagtKdNLLMYAHpJUko4WrixTQjuRooWz/CYLAiA39vnOTEzuDtxcNR00
-gWZHkQOu96cnhy/P8Kn5E5xvrQIgHo+Vz5gwKn3Mq0SIY7vAZ3bSBuwcF3Mx4KwS
-vsRnhZE=
------END PRIVATE KEY-----"""
+# 1. Твой ПУБЛИЧНЫЙ КЛЮЧ (Эталон)
+pub_key_pem = b"""-----BEGIN PUBLIC KEY-----
+MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAICyTyHQxpUuXHaI13bsS3hhMlAH7Oom
+fthYPpBmb898d4FtfJCwx7XQWW9pL4Fw5DUFuD5EBcgMGiOIigdP3m8CAwEAAQ==
+-----END PUBLIC KEY-----"""
 
-# Загружаем параметры ключа
-private_key = serialization.load_pem_private_key(pem_key, password=None)
-pn = private_key.private_numbers()
-d = pn.d
-n = pn.public_numbers.n
+# Загружаем эталонный модуль (n) из публичного ключа
+public_key_obj = serialization.load_pem_public_key(pub_key_pem)
+target_n = public_key_obj.public_numbers().n
 
-message = b"1234"
-msg_hash = hashlib.sha256(message).digest()
+print(f"[*] Целевой модуль (из Public Key): {hex(target_n)[:20]}...")
 
-print(f"[*] Message: {message.decode()}")
-print(f"[*] Hash (SHA256): {msg_hash.hex()[:10]}...")
+# 2. Логика генерации (Brute-force параметров)
+username = "admin"
+seed_base = f"{username}_lovenote_2026_valentine".encode()
 
-# --- Вариант 1: Стандартный (Big Endian) ---
-# Мы это уже пробовали, но пусть будет для контроля.
-m_int_be = int.from_bytes(msg_hash, 'big')
-sig_int_be = pow(m_int_be, d, n)
-sig_hex_be = format(sig_int_be, '0128x')
+def is_prime(num):
+    if num < 2: return False
+    for i in range(2, int(num ** 0.5) + 1):
+        if num % i == 0: return False
+    return True
 
-# --- Вариант 2: Little Endian Input (Перевернутый хэш) ---
-# Сервер читает байты хэша задом наперед перед возведением в степень.
-m_int_le = int.from_bytes(msg_hash, 'little')
-sig_int_le = pow(m_int_le, d, n)
-# Результат выводим как обычно (Big Endian Hex)
-sig_hex_le_in = format(sig_int_le, '0128x')
+def find_next_prime(n):
+    if n % 2 == 0: n += 1
+    while not is_prime(n): n += 2
+    return n
 
-# --- Вариант 3: Little Endian Output (Перевернутая подпись) ---
-# Математика стандартная, но результат (число) конвертируется в байты задом наперед.
-sig_bytes_le = sig_int_be.to_bytes(64, 'little')
-sig_hex_le_out = sig_bytes_le.hex()
+print("[*] Подбираем параметры генерации...")
 
-print("\n--- ПОПРОБУЙ ЭТИ ВАРИАНТЫ ПО ОЧЕРЕДИ ---")
+# Перебираем варианты хэширования (Big Endian vs Little Endian)
+found_p, found_q = None, None
 
-print(f"\n[Вариант 1] Raw RSA (Big Endian - Стандарт):")
-print(sig_hex_be)
+# Варианты интерпретации байтов хэша
+endian_opts = ['big', 'little']
 
-print(f"\n[Вариант 2] Raw RSA (Little Endian INPUT - Вероятно!):")
-# Если сервер написан на C/C++ и кастует байты в int
-print(sig_hex_le_in)
+for endian in endian_opts:
+    # Генерируем P
+    h_p = hashlib.sha256(seed_base).digest()
+    p_cand = find_next_prime(int.from_bytes(h_p, endian))
+    
+    # Генерируем Q (пробуем разные методы из логов)
+    # Method A: SHA256(seed + "pki")
+    h_q_a = hashlib.sha256(seed_base + b"pki").digest()
+    q_cand_a = find_next_prime(int.from_bytes(h_q_a, endian))
+    
+    # Method B: Double Hash SHA256(SHA256(seed + "pki"))
+    h_q_b = hashlib.sha256(h_q_a).digest()
+    q_cand_b = find_next_prime(int.from_bytes(h_q_b, endian))
 
-print(f"\n[Вариант 3] Raw RSA (Little Endian OUTPUT):")
-# Если сервер пишет результат в память задом наперед
-print(sig_hex_le_out)
+    if p_cand * q_cand_a == target_n:
+        print(f"[!] УСПЕХ! Нашли совпадение (Endian: {endian}, Q-Method: Single Hash)")
+        found_p, found_q = p_cand, q_cand_a
+        break
+    elif p_cand * q_cand_b == target_n:
+        print(f"[!] УСПЕХ! Нашли совпадение (Endian: {endian}, Q-Method: Double Hash)")
+        found_p, found_q = p_cand, q_cand_b
+        break
 
+if found_p:
+    # 3. Восстанавливаем ПРИВАТНЫЙ ключ (d)
+    e = 65537
+    phi = (found_p - 1) * (found_q - 1)
+    d = pow(e, -1, phi)
+    
+    # 4. Генерируем подпись
+    message = "1234"
+    print(f"[*] Подписываем сообщение: '{message}'")
+    
+    # Вариант PKCS#1 v1.5 (Создаем вручную для точности)
+    # Hashed Message
+    m_hash = hashlib.sha256(message.encode()).digest()
+    # Prefix for SHA256
+    prefix = b'\x30\x31\x30\x0d\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x05\x00\x04\x20'
+    # Padding: 00 01 FF..FF 00 Prefix Hash
+    k = 64 # 512 bits
+    pad_len = k - 3 - len(prefix) - len(m_hash)
+    block = b'\x00\x01' + (b'\xff' * pad_len) + b'\x00' + prefix + m_hash
+    
+    m_int = int.from_bytes(block, 'big')
+    signature = pow(m_int, d, target_n)
+    
+    print("-" * 20)
+    print(f"ПРАВИЛЬНАЯ ПОДПИСЬ (Hex):\n{format(signature, '0128x')}")
+    print("-" * 20)
+else:
+    print("[X] Не удалось восстановить ключ из сида. Возможно, сид отличается (например, 'admin%00')?")
+    # Если не нашли, выводим модуль для дебага
+    print(f"Target N: {target_n}")
 
 
 -----BEGIN PRIVATE KEY-----
