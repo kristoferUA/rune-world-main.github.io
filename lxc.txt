@@ -1,45 +1,46 @@
 import hashlib
+import base64
 from Crypto.Util.number import isPrime, inverse
 from Crypto.PublicKey import RSA
 from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 
 def get_next_prime(n):
-    # Лог говорит: "Checking consecutive integers..." 
-    # Это значит n, n+1, n+2...
+    # Лог говорит "checking consecutive integers"
     while not isPrime(n):
         n += 1
     return n
 
-# 1. ПАРАМЕТРЫ ИЗ ЛОГОВ
-username = "admin"
-seed = f"{username}_lovenote_2026_valentine".encode() #
+def solve(variant_q):
+    username = "admin"
+    seed = f"{username}_lovenote_2026_valentine".encode()
 
-# Вычисляем p
-p_hash = hashlib.sha256(seed).digest()
-p = get_next_prime(int.from_bytes(p_hash, 'big'))
+    # Находим p (всегда одинаково)
+    p_hash = hashlib.sha256(seed).digest()
+    p = get_next_prime(int.from_bytes(p_hash, 'big'))
 
-# Вычисляем q (двойное хэширование согласно логу)
-#
-modified_seed = hashlib.sha256(seed + b"pki").digest()
-q_hash = hashlib.sha256(modified_seed).digest()
-q = get_next_prime(int.from_bytes(q_hash, 'big'))
+    # Находим q (варианты интерпретации лога)
+    if variant_q == 1:
+        # Вариант 1: H(H(seed + "pki")) - бинарно
+        mid = hashlib.sha256(seed + b"pki").digest()
+        q_hash = hashlib.sha256(mid).digest()
+    else:
+        # Вариант 2: H(Hex(H(seed + "pki"))) - через строку
+        mid_hex = hashlib.sha256(seed + b"pki").hexdigest().encode()
+        q_hash = hashlib.sha256(mid_hex).digest()
 
-# Собираем RSA (он получится 512-битным, что и есть "ложь" про 2048)
-n = p * q
-e = 65537
-phi = (p - 1) * (q - 1)
-d = inverse(e, phi)
-key = RSA.construct((n, e, d, p, q))
+    q = get_next_prime(int.from_bytes(q_hash, 'big'))
 
-# 2. ПОДПИСЬ ПРАВИЛЬНОГО СООБЩЕНИЯ
-# Важно: используй именно то сообщение, которое требует форма!
-msg_text = "give_me_flag" 
-h = SHA256.new(msg_text.encode())
-signature = pkcs1_15.new(key).sign(h)
+    # Сборка ключа
+    n = p * q
+    e = 65537
+    d = inverse(e, (p - 1) * (q - 1))
+    key = RSA.construct((n, e, d, p, q))
 
-print(f"\n[*] Ключ RSA-{key.size_in_bits()} сгенерирован.")
-print(f"[*] Сообщение: {msg_text}")
-print("-" * 50)
-print(f"HEX ПОДПИСЬ ДЛЯ ВСТАВКИ:\n{signature.hex()}")
-print("-" * 50)
+    # Подпись
+    msg = "give_me_flag" #
+    h = SHA256.new(msg.encode())
+    return pkcs1_15.new(key).sign(h).hex()
+
+print(f"ПОДПИСЬ (Вариант 1): {solve(1)}")
+print(f"ПОДПИСЬ (Вариант 2): {solve(2)}")
