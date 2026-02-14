@@ -5,43 +5,52 @@ from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 
 def get_next_prime(n):
-    # В логах: "Checking consecutive integers until a valid prime is reached"
-    # Это значит, начинаем проверку прямо с числа n
+    # Лог: "Checking consecutive integers until a valid prime is reached"
     while not isPrime(n):
         n += 1
     return n
 
-def get_signature():
+def get_signature(q_val):
     username = "admin"
-    seed = f"{username}_lovenote_2026_valentine".encode() #
-
-    # 1. Находим p (SHA256 от seed)
+    seed = f"{username}_lovenote_2026_valentine".encode()
+    
+    # p всегда вычисляется одинаково
     p_hash = hashlib.sha256(seed).digest()
     p = get_next_prime(int.from_bytes(p_hash, 'big'))
-
-    # 2. Находим q (Двойной хэш согласно логу)
-    # "Modifying seed... (SHA256(seed + b'pki')). Hashing modified seed with SHA256"
-    modified_seed = hashlib.sha256(seed + b"pki").digest()
-    q_hash = hashlib.sha256(modified_seed).digest()
-    q = get_next_prime(int.from_bytes(q_hash, 'big'))
-
-    # 3. Собираем RSA-512 (т.к. p и q по 256 бит)
-    n = p * q
+    
+    # Сборка ключа (p и q по 256 бит дают n = 512 бит)
+    n = p * q_val
     e = 65537
-    phi = (p - 1) * (q - 1)
-    d = inverse(e, phi)
-    key = RSA.construct((n, e, d, p, q))
+    d = inverse(e, (p - 1) * (q - 1))
+    key = RSA.construct((n, e, d, p, q_val))
+    
+    # Подпись правильного сообщения
+    msg = "give_me_flag"
+    h = SHA256.new(msg.encode())
+    return pkcs1_15.new(key).sign(h).hex()
 
-    # 4. Подписываем сообщение "give_me_flag"
-    msg_text = "give_me_flag" #
-    h = SHA256.new(msg_text.encode())
-    signature = pkcs1_15.new(key).sign(h)
+# --- ПОДГОТОВКА КОМБИНАЦИЙ Q ИЗ ЛОГОВ ---
+username = "admin"
+seed = f"{username}_lovenote_2026_valentine".encode()
+h1_bin = hashlib.sha256(seed + b"pki").digest()
+h1_hex = hashlib.sha256(seed + b"pki").hexdigest().encode()
 
-    print(f"\n[*] Ключ RSA-{key.size_in_bits()} (админская 'ложь' раскрыта)")
-    print(f"[*] Сообщение: {msg_text}")
-    print("-" * 50)
-    print(f"HEX ПОДПИСЬ:\n{signature.hex()}")
-    print("-" * 50)
+# 1. Двойной бинарный хэш: H(H(seed + "pki"))
+q1 = get_next_prime(int.from_bytes(hashlib.sha256(h1_bin).digest(), 'big'))
 
-if __name__ == "__main__":
-    get_signature()
+# 2. Склеивание с бинарным хэшем: H(seed + H(seed + "pki"))
+q2 = get_next_prime(int.from_bytes(hashlib.sha256(seed + h1_bin).digest(), 'big'))
+
+# 3. Хэш от Hex-строки: H(Hex(H(seed + "pki")))
+q3 = get_next_prime(int.from_bytes(hashlib.sha256(h1_hex).digest(), 'big'))
+
+# 4. Склеивание с Hex-строкой: H(seed + Hex(H(seed + "pki")))
+q4 = get_next_prime(int.from_bytes(hashlib.sha256(seed + h1_hex).digest(), 'big'))
+
+print(f"\n[*] Сообщение: give_me_flag")
+print("-" * 60)
+print(f"Вариант 1 (Double Binary): {get_signature(q1)}")
+print(f"Вариант 2 (Concat Binary): {get_signature(q2)}")
+print(f"Вариант 3 (Double Hex):    {get_signature(q3)}")
+print(f"Вариант 4 (Concat Hex):    {get_signature(q4)}")
+print("-" * 60)
