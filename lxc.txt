@@ -5,12 +5,13 @@ from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA256
 
 def get_next_prime(n):
-    if n % 2 == 0: n += 1
+    # Лог говорит: "Checking consecutive integers..." 
+    # Это значит n, n+1, n+2...
     while not isPrime(n):
-        n += 2
+        n += 1
     return n
 
-# 1. ВОССОЗДАЕМ КЛЮЧ АДМИНА
+# 1. ПАРАМЕТРЫ ИЗ ЛОГОВ
 username = "admin"
 seed = f"{username}_lovenote_2026_valentine".encode() #
 
@@ -18,25 +19,27 @@ seed = f"{username}_lovenote_2026_valentine".encode() #
 p_hash = hashlib.sha256(seed).digest()
 p = get_next_prime(int.from_bytes(p_hash, 'big'))
 
-# Вычисляем q (согласно логу: модификация -> хэширование)
-# "Modifying seed... (SHA256(seed + b'pki')). Hashing modified seed..."
+# Вычисляем q (двойное хэширование согласно логу)
+#
 modified_seed = hashlib.sha256(seed + b"pki").digest()
 q_hash = hashlib.sha256(modified_seed).digest()
 q = get_next_prime(int.from_bytes(q_hash, 'big'))
 
-# Собираем RSA-2048
+# Собираем RSA (он получится 512-битным, что и есть "ложь" про 2048)
 n = p * q
 e = 65537
 phi = (p - 1) * (q - 1)
 d = inverse(e, phi)
 key = RSA.construct((n, e, d, p, q))
 
-# 2. ПОДПИСЫВАЕМ СООБЩЕНИЕ
-message_text = "give_me_flag" #
-h = SHA256.new(message_text.encode())
+# 2. ПОДПИСЬ ПРАВИЛЬНОГО СООБЩЕНИЯ
+# Важно: используй именно то сообщение, которое требует форма!
+msg_text = "give_me_flag" 
+h = SHA256.new(msg_text.encode())
 signature = pkcs1_15.new(key).sign(h)
 
-print(f"\n[!] Подпись для сообщения '{message_text}' от имени {username}:")
+print(f"\n[*] Ключ RSA-{key.size_in_bits()} сгенерирован.")
+print(f"[*] Сообщение: {msg_text}")
 print("-" * 50)
-print(signature.hex()) # ВЫВОД В HEX
+print(f"HEX ПОДПИСЬ ДЛЯ ВСТАВКИ:\n{signature.hex()}")
 print("-" * 50)
