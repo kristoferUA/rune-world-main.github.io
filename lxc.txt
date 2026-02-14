@@ -58,3 +58,16 @@ signature = pow(msg_hash, d, n)
 
 # Результат в HEX
 print(f"Digital Signature (Hex):\n{hex(signature)[2:]}")
+
+
+
+-----BEGIN PRIVATE KEY-----
+MIIBUQIBADANBgkqhkiG9w0BAQEFAASCATswggE3AgEAAkA4wvUChmqa9BWA/s99
+q2z0OMxVEuDZ8esFuQGJgzfhFrdnmTTJ6APRg2v8xBlxLIghPFZIwEx/VXcqk2Xf
+A9FDAgMBAAECQBzoniR1FSJqIfGa1U5p2onfy6Gghcg6f7pgaToCDJmkkPJrnTFg
+yEX9TJnQDmoGtC94hXLXWhQWIOHhipl7vNECIEqMnfiP56WFh0qdmAmCBJX4gjww
+LPd68EY+WeUi6divAiEAwureZmrzJf7BCc1GC6djuN1rkoAMnTGNkor8EJCcja0C
+IEHQwUqHqagtKdNLLMYAHpJUko4WrixTQjuRooWz/CYLAiA39vnOTEzuDtxcNR00
+gWZHkQOu96cnhy/P8Kn5E5xvrQIgHo+Vz5gwKn3Mq0SIY7vAZ3bSBuwcF3Mx4KwS
+vsRnhZE=
+-----END PRIVATE KEY-----
