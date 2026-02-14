@@ -1,16 +1,16 @@
 import hashlib
 import random
-from cryptography.hazmat.primitives import serialization, hashes
-from cryptography.hazmat.primitives.asymmetric import padding, utils
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+from cryptography.hazmat.backends import default_backend
 
-# --- 1. ПАРАМЕТРЫ (КОТОРЫЕ МЫ ВЗЛОМАЛИ) ---
-USERNAME = "mgkrgegk"
-MESSAGE = "1234"      # Попробуй также "1234\n" если не сработает
-ENDIAN = 'big'        # Подтверждено
-Q_MODE = 'SingleHash' # Подтверждено
+# --- НАСТРОЙКИ (ПОДТВЕРЖДЕННЫЕ) ---
+TARGET_USER = "admin"
+MESSAGE = "1234"
+ENDIAN = 'big'
 
-# --- 2. ВОССТАНОВЛЕНИЕ КЛЮЧА ---
-seed_str = f"{USERNAME}_lovenote_2026_valentine"
+# --- 1. ГЕНЕРАЦИЯ КЛЮЧЕЙ ДЛЯ ADMIN ---
+seed_str = f"{TARGET_USER}_lovenote_2026_valentine"
 seed_bytes = seed_str.encode()
 
 def is_prime(n, k=40):
@@ -34,76 +34,47 @@ def find_next_prime(n):
     while not is_prime(n): n += 2
     return n
 
-# Генерация P
+print(f"[*] Генерируем приватный ключ для {TARGET_USER}...")
+
+# P = SHA256(seed)
 h_p = hashlib.sha256(seed_bytes).digest()
 p = find_next_prime(int.from_bytes(h_p, ENDIAN))
 
-# Генерация Q (SingleHash)
+# Q = SHA256(seed + "pki") (SingleHash Mode)
 h_q = hashlib.sha256(seed_bytes + b"pki").digest()
 q = find_next_prime(int.from_bytes(h_q, ENDIAN))
 
+# Вычисляем параметры RSA
 n = p * q
 phi = (p - 1) * (q - 1)
 e = 65537
 d = pow(e, -1, phi)
 
-print(f"[*] Ключ восстановлен. Генерируем варианты для: '{MESSAGE}'")
-
-# --- 3. ВАРИАНТЫ ПОДПИСИ ---
-
-def to_hex(val):
-    return format(val, '0128x')
-
-# Вариант A: PKCS#1 v1.5 (Стандарт)
-# S = PKCS1_Pad(Hash(m))^d mod n
-h_msg = hashlib.sha256(MESSAGE.encode()).digest()
-prefix = b'\x30\x31\x30\x0d\x06\x09\x60\x86\x48\x01\x65\x03\x04\x02\x01\x05\x00\x04\x20'
-pad_len = 64 - 3 - len(prefix) - len(h_msg)
-block = b'\x00\x01' + (b'\xff' * pad_len) + b'\x00' + prefix + h_msg
-sig_pkcs = pow(int.from_bytes(block, 'big'), d, n)
-
-# Вариант B: Raw RSA (Big Endian)
-# S = Hash(m)^d mod n
-m_int = int.from_bytes(h_msg, 'big')
-sig_raw_be = pow(m_int, d, n)
-
-# Вариант C: Raw RSA (Little Endian Output)
-# Бывает в C++ реализациях: байты результата развернуты
-sig_bytes = sig_raw_be.to_bytes(64, 'big')
-sig_raw_le = int.from_bytes(sig_bytes, 'little')
-
-# Вариант D: RSA-PSS (Более современный стандарт)
-# Используем библиотеку для PSS, так как вручную сложно
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import rsa
-# Создаем объект ключа для библиотеки
+# Создаем объект ключа для библиотеки cryptography
 private_key = rsa.RSAPrivateNumbers(
-    p=p, q=q, d=d, dmp1=d%(p-1), dmq1=d%(q-1), iqmp=pow(q,-1,p),
+    p=p, q=q, d=d,
+    dmp1=d % (p - 1),
+    dmq1=d % (q - 1),
+    iqmp=pow(q, -1, p),
     public_numbers=rsa.RSAPublicNumbers(e, n)
 ).private_key(default_backend())
 
-try:
-    sig_pss_bytes = private_key.sign(
-        MESSAGE.encode(),
-        padding.PSS(mgf=padding.MGF1(hashes.SHA256()), salt_length=padding.PSS.MAX_LENGTH),
-        hashes.SHA256()
-    )
-    sig_pss = sig_pss_bytes.hex()
-except:
-    sig_pss = "Ошибка генерации PSS"
+print("[*] Ключ готов!")
 
-# Вариант E: Textbook RSA (Без хэша)
-# S = int(message_bytes)^d mod n
-m_textbook = int.from_bytes(MESSAGE.encode(), 'big')
-sig_textbook = pow(m_textbook, d, n)
+# --- 2. ПОДПИСЬ (RSA-PSS) ---
+# PSS использует случайную "соль", поэтому подпись каждый раз разная,
+# но все они будут валидными.
+signature = private_key.sign(
+    MESSAGE.encode(),
+    padding.PSS(
+        mgf=padding.MGF1(hashes.SHA256()),
+        salt_length=padding.PSS.MAX_LENGTH
+    ),
+    hashes.SHA256()
+)
 
-
-print("\n=== ПОПРОБУЙ ЭТИ ВАРИАНТЫ ПО ОЧЕРЕДИ ===")
-print(f"1. PKCS#1 v1.5 (Самый частый стандарт):\n{to_hex(sig_pkcs)}")
-print(f"\n2. Raw RSA (Просто хэш в степень):\n{to_hex(sig_raw_be)}")
-print(f"\n3. RSA-PSS (Современный стандарт):\n{sig_pss}")
-print(f"\n4. Raw RSA Little-Endian (Перевернутые байты):\n{format(sig_raw_le, '0128x')}")
-print(f"\n5. Textbook RSA (Без хэширования, просто текст):\n{to_hex(sig_textbook)}")
+print(f"\n--- ВАЛИДНАЯ ПОДПИСЬ ДЛЯ ADMIN ---")
+print(signature.hex())
 
 -----BEGIN PRIVATE KEY-----
 MIIBUQIBADANBgkqhkiG9w0BAQEFAASCATswggE3AgEAAkA4wvUChmqa9BWA/s99
