@@ -1,68 +1,50 @@
 import hashlib
 
 def is_prime(n):
-    """Быстрая проверка на простоту (тест Миллера — Рабина)."""
+    """Проверка числа на простоту."""
     if n < 2: return False
-    if n % 2 == 0: return n == 2
-    d = n - 1
-    s = 0
-    while d % 2 == 0:
-        d //= 2
-        s += 1
-    # Достаточно нескольких раундов для 256-битных чисел
-    for a in [2, 3, 5, 7, 11, 13, 17, 19, 23]:
-        if n <= a: break
-        x = pow(a, d, n)
-        if x == 1 or x == n - 1:
-            continue
-        for _ in range(s - 1):
-            x = pow(x, 2, n)
-            if x == n - 1:
-                break
-        else:
-            return False
+    if n == 2 or n == 3: return True
+    if n % 2 == 0: return False
+    for i in range(3, int(n**0.5) + 1, 2):
+        if n % i == 0: return False
     return True
 
 def find_next_prime(n):
-    """Ищет ближайшее простое число, начиная с n (как в логах)."""
-    if n % 2 == 0: n += 1
+    """Ищет первое простое число, начиная с n (как в логах)."""
     while not is_prime(n):
-        n += 2
+        n += 1
     return n
 
-# Данные из запроса
+# Данные для генерации
 username = "admin"
 message = "1234"
 seed_pattern = f"{username}_lovenote_2026_valentine"
-seed_bytes = seed_pattern.encode()
 
-# 1. Извлекаем P (Prime derivation step 1)
-hash_p = hashlib.sha256(seed_bytes).digest()
-start_p = int.from_bytes(hash_p, 'big')
-p = find_next_prime(start_p)
+# 1. Генерация P (Prime derivation step 1)
+hash_p = hashlib.sha256(seed_pattern.encode()).digest()
+p = find_next_prime(int.from_bytes(hash_p, 'big'))
 
-# 2. Извлекаем Q (Prime derivation step 2)
-# Согласно логам: SHA256(seed + b"pki")
-hash_q = hashlib.sha256(seed_bytes + b"pki").digest()
-start_q = int.from_bytes(hash_q, 'big')
-q = find_next_prime(start_q)
+# 2. Генерация Q (Prime derivation step 2)
+# В логах: SHA256(seed + b"pki")
+hash_q = hashlib.sha256(seed_pattern.encode() + b"pki").digest()
+q = find_next_prime(int.from_bytes(hash_q, 'big'))
 
-# 3. Генерация RSA ключей
+# 3. RSA параметры
 n = p * q
 phi = (p - 1) * (q - 1)
 e = 65537
-d = pow(e, -1, phi) # Приватная экспонента
+d = pow(e, -1, phi) # Приватный ключ
 
-# 4. Подпись сообщения (Message Signing)
-# Хэшируем само сообщение "1234"
+# 4. Создание подписи
+# Хэшируем сообщение "1234" (SHA-256)
 msg_hash = hashlib.sha256(message.encode()).digest()
 msg_int = int.from_bytes(msg_hash, 'big')
 
-# Вычисляем подпись: S = Hash^d mod n
+# Подписываем: S = H^d mod n
 signature_int = pow(msg_int, d, n)
 
-# Вывод результата в HEX (как требуется для формы)
-signature_hex = hex(signature_int)[2:] # Убираем '0x'
-print(f"Username: {username}")
-print(f"Message: {message}")
-print(f"Digital Signature (Hex):\n{signature_hex}")
+# Переводим в HEX для формы
+signature_hex = hex(signature_int)[2:]
+print(f"--- Результаты для {username} ---")
+print(f"Сообщение: {message}")
+print(f"Сигнатура (HEX):\n{signature_hex}")
