@@ -2,7 +2,7 @@ import hashlib
 import random
 
 def is_prime(n, k=40):
-    """Быстрая проверка на простоту Миллера — Рабина для больших чисел."""
+    """Быстрая проверка на простоту Миллера — Рабина."""
     if n <= 1: return False
     if n <= 3: return True
     if n % 2 == 0: return False
@@ -24,40 +24,37 @@ def is_prime(n, k=40):
     return True
 
 def find_next_prime(n):
-    """Ищет следующее простое число (как указано в логах)."""
+    """Ищет следующее простое число (как в логах)."""
     if n % 2 == 0: n += 1
     while not is_prime(n):
         n += 2
     return n
 
-# Данные из системы
+# Данные для генерации
 username = "admin"
 message = "1234"
-seed_str = f"{username}_lovenote_2026_valentine"
+seed_pattern = f"{username}_lovenote_2026_valentine".encode()
 
-print(f"[*] Генерируем ключи для сида: {seed_str}")
-
-# 1. Находим p (Prime derivation step 1)
-h_p = hashlib.sha256(seed_str.encode()).digest()
+# Шаг 1: Находим p
+h_p = hashlib.sha256(seed_pattern).digest()
 p = find_next_prime(int.from_bytes(h_p, 'big'))
 
-# 2. Находим q (Prime derivation step 2)
-h_q = hashlib.sha256(seed_str.encode() + b"pki").digest()
+# Шаг 2: Находим q (Seed + b"pki")
+# Лог: Modifying seed with PKI-related constant (SHA256(seed + b"pki"))
+# Затем: Hashing modified seed with SHA256
+pki_const = hashlib.sha256(seed_pattern + b"pki").digest()
+h_q = hashlib.sha256(pki_const).digest() 
 q = find_next_prime(int.from_bytes(h_q, 'big'))
 
-# 3. RSA математика
+# Шаг 3: RSA параметры
 n = p * q
 phi = (p - 1) * (q - 1)
 e = 65537
 d = pow(e, -1, phi)
 
-# 4. Подпись сообщения (Message Signing)
-msg_hash_bytes = hashlib.sha256(message.encode()).digest()
-msg_hash_int = int.from_bytes(msg_hash_bytes, 'big')
+# Шаг 4: Подпись сообщения "1234"
+msg_hash = int.from_bytes(hashlib.sha256(message.encode()).digest(), 'big')
+signature = pow(msg_hash, d, n)
 
-# Вычисляем: Signature = Hash^d mod n
-signature_int = pow(msg_hash_int, d, n)
-
-# Вывод в HEX
-sig_hex = hex(signature_int)[2:]
-print(f"\n[+] Готовая сигнатура для вставки (HEX):\n{sig_hex}")
+# Результат в HEX
+print(f"Digital Signature (Hex):\n{hex(signature)[2:]}")
