@@ -1,6 +1,9 @@
 import hashlib
-from Crypto.Util.number import isPrime, inverse, getPrime
+import base64
+from Crypto.Util.number import isPrime, inverse
 from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
 
 def get_next_prime(n):
     if n % 2 == 0: n += 1
@@ -8,27 +11,32 @@ def get_next_prime(n):
         n += 2
     return n
 
-# 1. Формируем зерно на основе имени админа
+# 1. ВОССОЗДАЕМ КЛЮЧ АДМИНА (из дебаг-логов)
 username = "admin"
 seed_pattern = f"{username}_lovenote_2026_valentine" #
 
-# 2. Находим p
+# Находим p
 seed1_hash = hashlib.sha256(seed_pattern.encode()).digest()
-start_p = int.from_bytes(seed1_hash, 'big')
-p = get_next_prime(start_p)
+p = get_next_prime(int.from_bytes(seed1_hash, 'big'))
 
-# 3. Находим q
+# Находим q
 seed2_input = seed_pattern.encode() + b"pki" #
 seed2_hash = hashlib.sha256(seed2_input).digest()
-start_q = int.from_bytes(seed2_hash, 'big')
-q = get_next_prime(start_q)
+q = get_next_prime(int.from_bytes(seed2_hash, 'big'))
 
-# 4. Собираем RSA ключ
+# Собираем RSA-2048
 n = p * q
 e = 65537
-phi = (p - 1) * (q - 1)
-d = inverse(e, phi)
-
-# Создаем объект ключа и выводим его в формате PEM
+d = inverse(e, (p - 1) * (q - 1))
 key = RSA.construct((n, e, d, p, q))
-print(key.export_key().decode())
+
+# 2. ПОДПИСЫВАЕМ СООБЩЕНИЕ
+message_text = "give_me_flag" # Текст из твоей формы Verify
+h = SHA256.new(message_text.encode())
+signature = pkcs1_15.new(key).sign(h)
+
+print(f"\n[!] Ключ для '{username}' успешно воссоздан.")
+print(f"[!] Сообщение: {message_text}")
+print("-" * 50)
+print(f"ТВОЯ ПОДПИСЬ (Base64):\n{base64.b64encode(signature).decode()}")
+print("-" * 50)
