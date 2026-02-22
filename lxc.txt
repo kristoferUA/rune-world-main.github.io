@@ -17,7 +17,7 @@ var
 
   # Change this
   v1 = "192.168.138.88"
-  v2 = "4444"
+  v2 = "80"
 
   s4 = "Exiting.."
   s5 = "cd"
