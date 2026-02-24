@@ -1,1 +1,27 @@
-curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -v http://delivery.cupidsarrow.thm/ПУТЬ_ИЗ_ПИСЬМА
+import base64
+import re
+
+# 1. Читаем исходный JS файл
+with open('valentine-animations.js', 'r') as f:
+    data = f.read()
+
+# 2. Вытаскиваем куски base64 (игнорируем короткие слова типа 'deb', 'ugg', 'er')
+chunks = re.findall(r"'([A-Za-z0-9+/=]{10,})'", data)
+payload_b64 = "".join(chunks)
+
+# 3. Декодируем base64 в сырые байты
+raw_bytes = base64.b64decode(payload_b64)
+
+# 4. Ключ дешифровки от хакера
+key = b"VALENTINE"
+
+# 5. Применяем XOR (как делает функция _xd)
+decrypted = bytearray()
+for i in range(len(raw_bytes)):
+    decrypted.append(raw_bytes[i] ^ key[i % len(key)])
+
+# 6. Сохраняем боевой payload
+with open("LOVE_LETTER.pdf.iso", "wb") as f:
+    f.write(decrypted)
+
+print(f"Готово! Извлечен файл LOVE_LETTER.pdf.iso (Размер: {len(decrypted)} байт)")
