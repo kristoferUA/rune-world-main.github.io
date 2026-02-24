@@ -1,4 +1,4 @@
-curl -H "User-Agent:" -H "Authorization: Basic Y3VwaWRfYWdlbnQ6UjBzM00cjNSM2QhVjEwbDN0czRyM0JsdTMjMjAyNA==" http://api.valentinesforever.thm:8080/exfil
+dd if=/dev/zero of=zeros.bin bs=1 count=3000
 import base64
 
 # Читаем скачанную "картинку" как сырые байты
