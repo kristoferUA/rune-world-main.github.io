@@ -11,7 +11,7 @@ if idx != -1:
     # Берем зашифрованные данные после маркера и убираем лишние переносы строк
     raw_payload = data[idx + len(marker):].strip()
 
-    # Применяем XOR с ключом ROSES
+    # ИСПРАВЛЕННЫЙ КЛЮЧ: ROSE
     key = b"ROSES"
     xor_result = bytearray()
     for i in range(len(raw_payload)):
@@ -26,4 +26,4 @@ if idx != -1:
         f.write(final_vbs)
     print("Успех! VBScript извлечен в файл valentine.vbs")
 else:
-    print("Маркер не найден. Видимо, это просто обычные розы...")
+    print("Маркер не найден.")
