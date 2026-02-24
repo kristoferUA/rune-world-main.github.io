@@ -1,4 +1,7 @@
-dd if=/dev/zero of=zeros.bin bs=1 count=3000
+curl -s -X POST -H "Authorization: Basic Y3VwaWRfYWdlbnQ6UjBzM00cjNSM2QhVjEwbDN0czRyM0JsdTMjMjAyNA==" \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @zeros.bin \
+  http://api.valentinesforever.thm:8080/exfil -o keystream.bin
 import base64
 
 # Читаем скачанную "картинку" как сырые байты
