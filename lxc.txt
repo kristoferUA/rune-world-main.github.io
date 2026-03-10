@@ -4,7 +4,7 @@ https://naurok.com.ua/test/complete/7b009424-f956-4762-a0e0-c018fae24907
 for i in {000..999}; do
   q_id="42669${i}"
   echo "[+] Отправка question_id: $q_id"
-  curl -s -o /dev/null -w "Статус: %{http_code}\n" -X PUT "http://127.0.0.1:8080/api2/test/responses/answer" \
+  curl -s -o /dev/null -w "Статус: %{http_code}\n" -X PUT "https://naurok.com.ua/test/testing/d84296eb-5427-4773-a320-3f4cd667fd5a" \
     -H "Content-Type: application/json;charset=utf-8" \
     -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0" \
     -d '{
