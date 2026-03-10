@@ -6,16 +6,16 @@ for i in {000..999}; do
   echo "[+] Отправка question_id: $q_id"
   
   # --http2 заставляет curl использовать протокол HTTP/2, как на скрине
-  curl -s -o /dev/null -w "Статус: %{http_code}\n" --http2 -X PUT "http://127.0.0.1:8080/api2/test/responses/answer" \
-    -H "Host: ВАШ_ХОСТ" \
+  curl -s -o /dev/null -w "Статус: %{http_code}\n" --http2 -X PUT "/api2/test/responses/answer HTTP/2" \
+    -H "Host: naurok.com.ua" \
     -H "Cookie: _csrf=1bfabf4f5ce229cb66942d1be5acb9c6957b721734e89edbd4f5286aa8bc4b3ca%3A2%3A%7Bi%3A0%3Bs%3A5%3A%22_csrf%22%3Bi%3A1%3Bs%3A32%3A%22QallozMZwNpM4WU4mU2qHV5wNlimN3-o%22%3B%7D; PHPSESSID=q88vje8vqicrgdi9oq2g0g48sh; test_promo_text_grade_11=1" \
     -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0" \
     -H "Accept: application/json, text/plain, */*" \
     -H "Accept-Language: en-US,en;q=0.5" \
     -H "Accept-Encoding: gzip, deflate, br" \
     -H "Content-Type: application/json;charset=utf-8" \
-    -H "Referer: ВАШ_РЕФЕРЕР" \
-    -H "Origin: ВАШ_ОРИДЖИН" \
+    -H "Referer: https://naurok.com.ua/test/testing/d84296eb-5427-4773-a320-3f4cd667fd5a" \
+    -H "Origin: https://naurok.com.ua" \
     -H "Sec-Fetch-Dest: empty" \
     -H "Sec-Fetch-Mode: cors" \
     -H "Sec-Fetch-Site: same-origin" \
