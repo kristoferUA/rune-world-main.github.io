@@ -1,3 +1,6 @@
 https://moodle.viti.edu.ua/mod/quiz/attempt.php?attempt=5201886&cmid=16&page=4
 https://naurok.com.ua/test/join?gamecode=2515424&authuser=0
 https://naurok.com.ua/test/complete/7b009424-f956-4762-a0e0-c018fae24907
+with open("numbers.txt", "w") as file:
+    for i in range(1, 10001):
+        file.write(f"{i}\n")
