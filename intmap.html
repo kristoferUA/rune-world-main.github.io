@@ -13,7 +13,31 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 <!DOCTYPE html>
 <html lang="ru">
-    <!-- 🔹 Прелоадер -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта сервера - RuneWorld</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="seasons.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        /* 🔹 Стили для контейнера карты */
+        .map-container {
+            width: 100%;
+            height: 75vh; /* Карта занимает 75% высоты экрана */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
     <div id="preloader">
       <div class="spinner-box">
         <div class="configure-border-1">  
@@ -24,23 +48,15 @@ limitations under the License. -->
         </div> 
       </div>
     </div>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список игроков - RuneWorld</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="seasons.css">
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-</head>
-<body>
+
     <header>
         <div class="header">
             <a href="index.html" class="logo-link">
-    <div class="logo">
-        RuneWorld
-        <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
-    </div>
-</a>
+                <div class="logo">
+                    RuneWorld
+                    <img src="iconrw.png" alt="RuneWorld Logo" class="logo-image">
+                </div>
+            </a>
             <nav>
                 <a href="index.html">Главная</a>
             </nav>
@@ -48,27 +64,10 @@ limitations under the License. -->
     </header>
 
     <div class="main">
-        <h1 class="main-title">Список игроков</h1>
-        <div class="player-list">
-            <ul>
-                <li><button onclick="showPlayerMenu('runecraft2287')">Runecraft2287</button></li>
-                <li><button onclick="showPlayerMenu('💾kristoferUA💻')">kristofer UA</button></li>
-                <li><button onclick="showPlayerMenu('freskacraft6746')">Freskacraft6746</button></li>
-                <li><button onclick="showPlayerMenu('nickmoytash')">NickMoytash</button></li>
-                <li><button onclick="showPlayerMenu('denis12096')">Denis12096</button></li>
-                <li><button onclick="showPlayerMenu('myxaaxd')">MyxaaXD</button></li>
-                <li><button onclick="showPlayerMenu('sasha123490')">Sasha123490</button></li>
-                <li><button onclick="showPlayerMenu('sokibtw')">sokibtw</button></li>
-                <li><button onclick="showPlayerMenu('vlad_merea')">Vlad_merea</button></li>
-                <li><button onclick="showPlayerMenu('playcase1')">Playcase1</button></li>
-                <li><button onclick="showPlayerMenu('wrongaura742120')">WrongAura742120</button></li>
-                <li><button onclick="showPlayerMenu('andrusha513')">andrusha513</button></li>
-                <li><button onclick="showPlayerMenu('radion6774')">Radion6774</button></li>
-            </ul>
-        </div>
-        <div id="player-menu" class="mobile-menu" style="display: none;">
-            <h2 id="player-name"></h2>
-            <p id="player-stats"></p>
+        <h1 class="main-title">Интерактивная карта</h1>
+        
+        <div class="map-container">
+            <iframe src="http://runeworld.dynmap.xyz" title="RuneWorld Map"></iframe>
         </div>
     </div>
 
@@ -78,43 +77,6 @@ limitations under the License. -->
         </div>
     </footer>
 
-    <script>
-        const playerData = {
-            'runecraft2287': { stats: 'Время в игре: 5760ч |', description: 'Характеристика: создатель сервера, стример, ютубер, задрот выживания в майнкрафте, люблю копаться в шахте, строить фермы, помогать другим игрокам, добрый, очень люблю прятки и мини игры на The Hive' },
-            '💾kristoferUA💻': {
-                stats: 'Время в игре: 2647ч |',
-                description: 'Характеристика: ☢️😈Я технический администратор сервера, разработчик и кодер сервера, олд (играю с первого сезона), средний билдер, креативный человек, коммуникабельный.😈☢️'
-            },
-            'freskacraft6746': { stats: 'Время в игре: 802ч |', description: 'Характеристика: Люблю выживание без грифа, строить фермы, играть в мини игры на The Hive, помогаю другим игрокам, честный и добрый, осуждаю мат.' },
-            'nickmoytash': { stats: 'Время в игре: 644ч |', description: 'Характеристика: нет данных' },
-            'denis12096': { stats: 'Время в игре: 278ч |', description: 'Характеристика: Я обычный игрок, который играет на RuneWorld начиная с первого сезона. Я занимаюсь строительством панельных домов и содержу Ишаков.' },
-            'ggvplv1189': { stats: 'Время в игре: 17ч |', description: 'Характеристика: Пьяный мастер без пива.' },
-            'myxaaxd': { stats: 'Время в игре: нет данных |', description: 'Характеристика: нет данных' },
-            'sasha123490': { stats: 'Время в игре: 384ч |', description: 'Характеристика: Я пупсик, живу в Беларуси, люблю играть на сервере The Hive, также играю на Rune World 3. Был в Москве. Осуждаю читы, не люблю будилду и люблю долбить девочек в колготках)' },
-            'sokibtw': { stats: 'Время в игре: 2052ч |', description: 'Характеристика: Радиант в валоранте, 10 левел фейсита, хорошо стреляю камшоты' },
-            'vlad_merea': { stats: 'Время в игре: 1076ч |', description: 'Характеристика: нет данных' },
-            'playcase1': { stats: 'Время в игре: 1442ч |', description: 'Характеристика: я в прошлом основной билдер на политических серверах, креативний, достаточно коммуникабельний, доброй души человек который поможет чем сможет.' },
-            'wrongaura742120': { stats: 'Время в игре: нет данных |', description: 'Характеристика: нет данных' },
-            'andrusha513': { stats: 'Время в игре: нет данных |', description: 'Характеристика: нет данных' },
-            'radion6774': { stats: 'Время в игре: 1920ч |', description: 'Характеристика: Я радиатор, радиоприёмник, радио, Радик, рапик, билдер, который играет с 3 сезона, и депаю людей в казике ^^' },
-        };
-
-        function showPlayerMenu(playerId) {
-            const menu = document.getElementById('player-menu');
-            const nameElem = document.getElementById('player-name');
-            const statsElem = document.getElementById('player-stats');
-
-            const player = playerData[playerId];
-
-            nameElem.textContent = playerId.replace(/_/g, ' ');
-            statsElem.textContent = `${player.stats}\n${player.description}`;
-
-            menu.style.display = 'block';
-        }
-    </script>
-</body>
-</html>
- <!-- 🔹 Скрипт для прелоадера -->
     <script>
       window.addEventListener("load", () => {
         const preloader = document.getElementById("preloader");
@@ -126,3 +88,5 @@ limitations under the License. -->
         }, 300); // маленькая задержка перед исчезновением
       });
     </script>
+</body>
+</html>
