@@ -5,43 +5,39 @@ https://national-icoa2026.ctf.in.ua/
 with open('story.txt', 'rb') as f:
     data = f.read()
 
-print("1 Поиск скрытых нулевых байтов (\\x00):")
-null_parts = data.split(b'\x00')
-if len(null_parts) > 1:
-    print(f"Найдено {len(null_parts) - 1} нулей!")
-    for part in null_parts:
-        if part and len(part) < 50: 
-            print(part)
-
-print("\n2 Поиск невидимых символов (Zero-Width Steganography):")
-zero_width_bytes = b''
+# Вытаскиваем все не-ASCII байты
+hidden_bytes = b''
 for byte in data:
-    # Английский текст и базовые символы всегда меньше 128
-    if byte > 127: 
-        zero_width_bytes += bytes([byte])
+    if byte > 127:
+        hidden_bytes += bytes([byte])
 
-if zero_width_bytes:
-    print(f"Найдено {len(zero_width_bytes)} скрытых байт!")
-    print("Hex-дамп:", zero_width_bytes.hex())
+# Разбиваем на 3-байтовые последовательности (стандартный размер таких юникод-символов)
+chars = [hidden_bytes[i:i+3].hex() for i in range(0, len(hidden_bytes), 3) if len(hidden_bytes[i:i+3]) == 3]
+
+# Находим уникальные символы
+unique_chars = list(set(chars))
+print(f"Найдено уникальных невидимых символов: {len(unique_chars)}")
+print(f"Алфавит: {unique_chars}")
+
+if len(unique_chars) == 2:
+    print("\nПробуем два варианта бинарной расшифровки...\n")
+    char0, char1 = unique_chars[0], unique_chars[1]
     
-    # Очень часто в CTF невидимые символы кодируют бинарный код
-    # \u200b (e2808b) = 0, \u200c (e2808c) = 1
-    binary_str = zero_width_bytes.hex().replace('e2808b', '0').replace('e2808c', '1').replace('e2808d', '0').replace('efbbbf', '1')
-    
-    # Очищаем от возможного мусора
-    binary_clean = ''.join([c for c in binary_str if c in '01'])
-    
-    if len(binary_clean) >= 8:
-        print(f"\nСкрытый бинарный код: {binary_clean}")
+    # Вариант 1 (первый символ - 0, второй - 1)
+    bin1 = "".join(['0' if c == char0 else '1' for c in chars])
+    # Вариант 2 (наоборот)
+    bin2 = "".join(['1' if c == char0 else '0' for c in chars])
+
+    for i, b_str in enumerate([bin1, bin2]):
         try:
-            # Переводим биты обратно в текст
-            chars = [chr(int(binary_clean[i:i+8], 2)) for i in range(0, len(binary_clean), 8)]
-            print("Расшифровка:", ''.join(chars))
+            # Переводим биты в текст
+            res = "".join([chr(int(b_str[j:j+8], 2)) for j in range(0, len(b_str), 8)])
+            print(f"--- Вариант {i+1} ---")
+            print(res)
         except Exception:
             pass
-
-print("\n3 Проверка скрытых пробелов в конце строк (SNOW stego):")
-with open('story.txt', 'r', encoding='utf-8', errors='ignore') as f:
-    for i, line in enumerate(f):
-        if line.endswith(' \n') or line.endswith('\t\n'):
-            print(f"Строка {i+1} имеет скрытые пробелы!")
+elif len(unique_chars) > 2:
+    print("\nСимволов больше двух! Вероятно, используется сложная кодировка.")
+    print("В этом случае лучше всего скопировать текст из story.txt и вставить его:")
+    print("1. На сайт CyberChef в рецепт 'Zero Width Steg Extract'")
+    print("2. На сайты вроде 'zwsp-steg' или 'Unicode Steganography with Zero-Width Characters'")
