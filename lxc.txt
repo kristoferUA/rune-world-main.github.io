@@ -10,7 +10,7 @@ strings reflected_file | grep -v "KPbw"
 foremost -i /home/kali/Downloads/kapy.zip -o result_capy
 dd if=reflected_file bs=1 skip=18 of=clean_zip.bin
 strings tail_data | grep -v "coa" | grep -v "KPbw" | grep -v "taaa" | grep -v "zzza" | grep -v "PK"
-
+python3 -c "open('xor_fixed','wb').write(bytes([b^97 for b in open('tail_data','rb').read()]))"
 
 
 import sys
