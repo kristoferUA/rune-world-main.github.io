@@ -7,47 +7,40 @@ import itertools
 with open('story.txt', 'rb') as f:
     data = f.read()
 
-# Извлекаем все байты больше 127
 hidden_bytes = b''
 for byte in data:
     if byte > 127:
         hidden_bytes += bytes([byte])
 
-# Разбиваем на блоки по 3 байта
 chars = [hidden_bytes[i:i+3].hex() for i in range(0, len(hidden_bytes), 3) if len(hidden_bytes[i:i+3]) == 3]
-
-# Отсекаем обычное тире, оставляем только наши 3 невидимых символа
 zw_chars = [c for c in chars if c in ['e2808b', 'e2808c', 'e2808d']]
 unique_zw = list(set(zw_chars))
 
 if len(unique_zw) == 3:
-    print("Найдено ровно 3 невидимых символа! Перебираем 6 комбинаций...\n")
+    print("Найдено 3 символа. Выводим сырые результаты...\n")
     
-    # itertools.permutations создаст все возможные расстановки ролей
     for i, perm in enumerate(itertools.permutations(unique_zw)):
         char_0, char_1, char_sep = perm
         
-        # Переводим символы в биты и пробелы
         mapped = []
         for c in zw_chars:
             if c == char_0: mapped.append('0')
             elif c == char_1: mapped.append('1')
             elif c == char_sep: mapped.append(' ')
             
-        # Разбиваем по разделителю на отдельные буквы
         bin_blocks = "".join(mapped).split(' ')
         
-        try:
-            text = ""
-            for block in bin_blocks:
-                if block: # Игнорируем пустые блоки
+        text = ""
+        for block in bin_blocks:
+            if block: 
+                try:
                     text += chr(int(block, 2))
-            
-            # Проверяем, состоит ли результат только из стандартных букв и цифр
-            if all(32 <= ord(c) <= 126 for c in text) and len(text) > 5:
-                print(f"[УСПЕХ] Комбинация {i+1} дала читаемый текст:")
-                print(f"Флаг: {text}\n")
-        except:
-            pass
+                except:
+                    text += "?" # Если блок битый, ставим знак вопроса
+        
+        print(f"--- Комбинация {i+1} ---")
+        # Выведем первые 5 бинарных блоков, чтобы понять структуру
+        print(f"Биты (начало): {bin_blocks[:5]}")
+        print(f"Результат: {text}\n")
 else:
-    print("Что-то пошло не так, символов не 3.")
+    print("Символов не 3.")
