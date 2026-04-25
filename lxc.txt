@@ -2,56 +2,77 @@
 https://national-icoa2026.ctf.in.ua/
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
-import itertools
+import sys
+from Crypto.Util.number import long_to_bytes
 
-with open('story.txt', 'rb') as f:
-    data = f.read()
+# Читаем переменные прямо из файла
+with open('leak.txt', 'r') as f:
+    exec(f.read())
 
-# Точные байты наших невидимых символов
-zwc_bytes = [b'\xe2\x80\x8b', b'\xe2\x80\x8c', b'\xe2\x80\x8d']
-zw_chars = []
+def solve():
+    # k_p и k_q строго меньше e, перебираем их
+    for kp in range(1, e):
+        for kq in range(1, e):
+            
+            # Стек для DFS: храним (текущий_бит, p_val, q_val)
+            # Простые числа всегда нечетные, поэтому 0-й бит равен 1
+            stack = [(1, 1, 1)] 
+            
+            while stack:
+                i, p_val, q_val = stack.pop()
+                
+                # Если собрали все 512 бит
+                if i == 512:
+                    if p_val * q_val == n:
+                        return p_val, q_val
+                    continue
+                    
+                target_mod = 1 << (i + 1)
+                
+                # Инверсия e по модулю 2^(i+1)
+                inv_e = pow(e, -1, target_mod)
+                
+                # Пробуем угадать следующий бит для p и q
+                for p_i in (0, 1):
+                    for q_i in (0, 1):
+                        p_next = p_val | (p_i << i)
+                        q_next = q_val | (q_i << i)
+                        
+                        # Базовая проверка: p*q должно совпадать с n с конца
+                        if (p_next * q_next) % target_mod != n % target_mod:
+                            continue
+                            
+                        # Вычисляем, какими ДОЛЖНЫ быть dp и dq при таких p и q
+                        dp_next = (inv_e * (kp * (p_next - 1) + 1)) % target_mod
+                        dq_next = (inv_e * (kq * (q_next - 1) + 1)) % target_mod
+                        
+                        ok = True
+                        # Сверяем с утечками, если мы сейчас на парном бите
+                        if i in dp_leaks:
+                            if ((dp_next >> i) & 1) != dp_leaks[i]:
+                                ok = False
+                        if i in dq_leaks:
+                            if ((dq_next >> i) & 1) != dq_leaks[i]:
+                                ok = False
+                                
+                        # Если все сходится - идем глубже
+                        if ok:
+                            stack.append((i + 1, p_next, q_next))
+    return None, None
 
-# Безопасный поиск без сдвигов выравнивания
-i = 0
-while i < len(data) - 2:
-    if data[i:i+3] in zwc_bytes:
-        zw_chars.append(data[i:i+3].hex())
-        i += 3
-    else:
-        i += 1
+print("Запускаем восстановление ключа...")
+p, q = solve()
 
-unique_zw = list(set(zw_chars))
-
-print(f"Успешно извлечено {len(zw_chars)} скрытых символов.")
-print("Запускаем метод разделителя...\n")
-
-for i, perm in enumerate(itertools.permutations(unique_zw)):
-    char_0, char_1, char_sep = perm
+if p and q:
+    print("\n[УСПЕХ] Найдены p и q!")
+    phi = (p - 1) * (q - 1)
+    d = pow(e, -1, phi)
     
-    # Распределяем роли: нули, единицы и пробел-разделитель
-    mapped = []
-    for c in zw_chars:
-        if c == char_0: mapped.append('0')
-        elif c == char_1: mapped.append('1')
-        elif c == char_sep: mapped.append(' ')
-        
-    # Разделитель позволяет нам не зависеть от жесткой длины в 8 бит
-    bin_blocks = "".join(mapped).split(' ')
-    
-    text = ""
-    for block in bin_blocks:
-        if block: 
-            try:
-                text += chr(int(block, 2))
-            except:
-                text += "?" 
-    
-    print(f"Вариант {i+1}")
-    print(f"0={char_0[-2:]} | 1={char_1[-2:]} | Sep={char_sep[-2:]}")
-    
-    # Убираем возможные скрытые переносы строк для компактного вывода
-    clean_text = text.replace(chr(10), '').replace(chr(13), '')
-    print(f"Результат: {clean_text[:150]}\n")
-
-
-Hi, this is a text file, but with hidden content. I need you to find this hidden content. Ideally, there should be a flag. A cursory analysis showed that it's zero-width text.
+    # Расшифровываем флаг
+    m = pow(c, d, n)
+    flag = long_to_bytes(m).decode(errors='ignore')
+    print("-" * 40)
+    print(f"Флаг: {flag}")
+    print("-" * 40)
+else:
+    print("Не удалось найти p и q.")
