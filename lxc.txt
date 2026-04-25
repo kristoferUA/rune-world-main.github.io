@@ -138,67 +138,73 @@ else:
 
 
 
-from Crypto.Cipher import ChaCha20
+import base64
 import hashlib
+from Crypto.Cipher import ChaCha20
 
 target_pos = 13991507
-target = b'KPI'
 
-# Базові варіанти слова (зміна регістру, додавання переносів)
-bases = [
-    b'sikorsky', b'Sikorsky', b'SIKORSKY', 
-    b'key sikorsky', b'sikorsky\n', b'Sikorsky\n'
-]
-
+# Базовые варианты ключа
+bases = [b'sikorsky', b'Sikorsky', b'SIKORSKY']
 keys = {}
 for b in bases:
-    str_b = b.decode(errors='ignore').strip()
-    
-    # Класичні відступи
-    keys[f"Null padded '{str_b}'"] = b.ljust(32, b'\x00')
-    keys[f"Left Null padded '{str_b}'"] = b.rjust(32, b'\x00')
-    keys[f"Space padded '{str_b}'"] = b.ljust(32, b' ')
-    keys[f"Repeated '{str_b}'"] = (b * 32)[:32]
-    
-    # Строгий PKCS7
-    pad_len = 32 - (len(b) % 32)
-    keys[f"PKCS7 '{str_b}'"] = b + bytes([pad_len] * pad_len)
-    
-    # Хеші
-    keys[f"SHA-256 '{str_b}'"] = hashlib.sha256(b).digest()
-    keys[f"SHA-256 HexTrunc '{str_b}'"] = hashlib.sha256(b).hexdigest().encode()[:32]
-    keys[f"MD5 Hex '{str_b}'"] = hashlib.md5(b).hexdigest().encode()
-    keys[f"MD5 Hex UPPER '{str_b}'"] = hashlib.md5(b).hexdigest().upper().encode()
-    keys[f"SHA-512 Trunc '{str_b}'"] = hashlib.sha512(b).digest()[:32]
-    
-    # KDF (Key Derivation Functions)
-    keys[f"PBKDF2 (1 iter) '{str_b}'"] = hashlib.pbkdf2_hmac('sha256', b, b'', 1, 32)
+    str_b = b.decode()
+    keys[f"Нулевые байты '{str_b}'"] = b.ljust(32, b'\x00')
+    keys[f"Символы '0' '{str_b}'"] = b.ljust(32, b'0')
+    keys[f"Пробелы '{str_b}'"] = b.ljust(32, b' ')
+    keys[f"Повторение '{str_b}'"] = (b * 32)[:32]
+    keys[f"MD5 '{str_b}'"] = hashlib.md5(b).hexdigest().encode()
+    keys[f"SHA256 '{str_b}'"] = hashlib.sha256(b).digest()
 
-# Варіанти вектора ініціалізації
+# Варианты nonce
 nonces = {
-    "8 zero bytes (\\x00)": b'\x00' * 8,
-    "12 zero bytes (\\x00)": b'\x00' * 12,
-    "8 ASCII zeros ('0')": b'0' * 8,
-    "12 ASCII zeros ('0')": b'0' * 12,
+    "8 байт (\\x00)": b'\x00' * 8,
+    "12 байт (\\x00)": b'\x00' * 12,
+    "8 символов '0'": b'0' * 8,
 }
 
-print("Починаємо блискавичний пошук через cipher.seek()...")
+print("Начинаем умный поиск (Base64, Hex, Кириллица)...")
 
 found = False
 for key_name, k in keys.items():
     for nonce_name, n in nonces.items():
         try:
             cipher = ChaCha20.new(key=k, nonce=n)
-            cipher.seek(target_pos) # Миттєвий стрибок на потрібну позицію
             
-            # Перевіряємо лише 3 байти
-            if cipher.encrypt(b'\x00' * 3) == target:
-                print(f"\n[УСПІХ!] Еталон 13991507 знайдено!")
-                print(f"Формат ключа: {key_name}")
-                print(f"Формат Nonce: {nonce_name}")
+            # 1. Поиск в сырых байтах (KPI, kpi, КПІ)
+            cipher.seek(target_pos)
+            chunk_raw = cipher.encrypt(b'\x00' * 6)
+            if chunk_raw.startswith(b'KPI') or chunk_raw.startswith(b'kpi'):
+                print(f"\n[НАЙДЕНО] Формат: Сырые байты (Raw KPI)")
+                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
                 found = True
+            elif chunk_raw == 'КПІ'.encode():
+                print(f"\n[НАЙДЕНО] Формат: Кириллица (КПІ)")
+                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
+                found = True
+                
+            # 2. Поиск в Hex-строке (ищем '4b5049')
+            byte_pos_hex = target_pos // 2
+            cipher.seek(byte_pos_hex)
+            chunk_hex = cipher.encrypt(b'\x00' * 4).hex()
+            offset_hex = target_pos % 2
+            if chunk_hex[offset_hex:offset_hex+6].lower() == '4b5049':
+                print(f"\n[НАЙДЕНО] Формат: Hex-строка")
+                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
+                found = True
+
+            # 3. Поиск в Base64-строке (ищем 'KPI')
+            byte_pos_b64 = (target_pos // 4) * 3
+            cipher.seek(byte_pos_b64)
+            chunk_b64 = base64.b64encode(cipher.encrypt(b'\x00' * 6)).decode('ascii')
+            offset_b64 = target_pos % 4
+            if chunk_b64[offset_b64:offset_b64+3] == 'KPI':
+                print(f"\n[НАЙДЕНО] Формат: Base64")
+                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
+                found = True
+
         except Exception as e:
             pass
 
 if not found:
-    print("\nНа жаль, словникові варіанти не підійшли.")
+    print("\nСнова мимо. Возможно, автор использовал нестандартную библиотеку.")
