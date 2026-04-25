@@ -2,6 +2,13 @@
 https://national-icoa2026.ctf.in.ua/
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
+
+
+python3 -c "open('fixed.zip','wb').write(open('kapy.zip','rb').read()[::-1])"
+
+
+
+
 import sys
 from Crypto.Util.number import long_to_bytes
 
