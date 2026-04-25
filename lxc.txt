@@ -150,12 +150,11 @@ OUTPUT_FILE = "out.kdbx"
 KEY = b"sikorsky"
 NONCE = b"\x00" * 12
 
-# сколько цифр π нам нужно (с запасом)
-PI_PRECISION = 100_000_000
+PI_PRECISION = 100_000_000  # 100 млн цифр
 
 
 # =====================
-# LOAD ENCRYPTED FILE
+# LOAD FILE
 # =====================
 with open(INPUT_FILE, "rb") as f:
     data = f.read()
@@ -166,19 +165,18 @@ print(f"[+] Loaded encrypted file: {len(data)} bytes")
 # =====================
 # GENERATE PI
 # =====================
-print("[*] Generating pi digits... (this may take time)")
+print("[*] Generating pi digits...")
 
-mp.dps = PI_PRECISION + 10  # точность
-pi_str = str(mp.pi)[2:]     # убираем "3."
+mp.dps = PI_PRECISION + 10
+pi_str = str(mp.pi)[2:]  # убираем "3."
 
 print(f"[+] Generated {len(pi_str)} digits of pi")
 
 
 # =====================
-# PREPARE CHACHA20
+# CHACHA20
 # =====================
 key = KEY.ljust(32, b"\x00")
-
 cipher = ChaCha20.new(key=key, nonce=NONCE)
 
 needed_bytes = len(data) * 4
@@ -188,7 +186,7 @@ print("[*] Generated ChaCha20 stream")
 
 
 # =====================
-# GENERATE POSITIONS
+# POSITIONS
 # =====================
 positions = []
 
@@ -197,7 +195,7 @@ for i in range(0, len(keystream), 4):
     if len(chunk) < 4:
         break
 
-    val = struct.unpack("<I", chunk)[0]
+    val = struct.unpack("<I", chunk)[0] % 100_000_000
     positions.append(val)
 
 print("[*] First 3 generated positions:")
@@ -213,9 +211,6 @@ print("[*] Building pi-based keystream...")
 pi_stream = []
 
 for pos in positions[:len(data)]:
-    if pos >= len(pi_str):
-        raise Exception("Not enough pi digits!")
-
     digit = int(pi_str[pos])
     pi_stream.append(digit)
 
@@ -223,7 +218,7 @@ keystream_bytes = bytes(pi_stream)
 
 
 # =====================
-# XOR DECRYPT
+# XOR
 # =====================
 print("[*] Decrypting...")
 
@@ -232,4 +227,4 @@ decrypted = bytes([a ^ b for a, b in zip(data, keystream_bytes)])
 with open(OUTPUT_FILE, "wb") as f:
     f.write(decrypted)
 
-print(f"[+] Done! Output saved to {OUTPUT_FILE}")
+print(f"[+] Done! Saved to {OUTPUT_FILE}")
