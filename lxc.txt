@@ -139,37 +139,72 @@ else:
 
 
 from Crypto.Cipher import ChaCha20
+import hashlib
 
-# Пробуємо доповнити ключ нулями до 32 байт
-key = b'sikorsky'.ljust(32, b'\x00')
-# Nonce 0, зазвичай 8 байт у pycryptodome
-nonce = b'\x00' * 8 
+base_key = b'sikorsky'
 
-cipher = ChaCha20.new(key=key, nonce=nonce)
+# Собираем все адекватные варианты формирования ключа
+keys = [
+    (base_key.ljust(32, b'\x00'), "Дополнение нулями (ljust)"),
+    (base_key * 4, "Дублирование 4 раза"),
+    (hashlib.sha256(base_key).digest(), "SHA256 хеш"),
+    (hashlib.md5(base_key).digest() * 2, "MD5 хеш дважды")
+]
 
-chunk_size = 1024 * 1024  # 1 Мегабайт
-target = b'KPI'
-offset = 0
-overlap = b''
+# И два разных стандарта длины Nonce
+nonces = [
+    (b'\x00' * 8, "8 байт (стандарт DJB)"),
+    (b'\x00' * 12, "12 байт (стандарт IETF / RFC 7539)")
+]
 
-print("Шукаємо збіги...")
+target_pos = 13991507
+correct_k = None
+correct_n = None
 
-# Шукаємо перші 5 збігів
-found_count = 0
-while found_count < 5:
-    # Шифрування нулів дає чистий keystream
-    chunk = cipher.encrypt(b'\x00' * chunk_size)
-    data = overlap + chunk
+print("[*] Начинаем моментальный перебор параметров через seek()...")
+
+for k_val, k_name in keys:
+    for n_val, n_name in nonces:
+        try:
+            cipher = ChaCha20.new(key=k_val, nonce=n_val)
+            # Магия: моментально прыгаем на нужный байт
+            cipher.seek(target_pos)
+            if cipher.encrypt(b'\x00\x00\x00') == b'KPI':
+                print(f"[+] БИНГО! Найдена правильная конфигурация:")
+                print(f"    Ключ: {k_name}")
+                print(f"    Nonce: {n_name}")
+                correct_k, correct_n = k_val, n_val
+                break
+        except Exception:
+            continue
+    if correct_k:
+        break
+
+if correct_k:
+    print("\n[*] Запускаем полный поиск (выводим первые 5 совпадений)...")
+    # Пересоздаем шифр с нуля с правильными параметрами
+    cipher = ChaCha20.new(key=correct_k, nonce=correct_n)
+    chunk_size = 1024 * 1024
+    offset = 0
+    overlap = b''
+    found_count = 0
     
-    pos = data.find(target)
-    while pos != -1:
-        # Враховуємо зсув (overlap) від попереднього шматка
-        global_pos = offset - len(overlap) + pos
-        print(f"Знайдено 'KPI' на позиції: {global_pos}")
-        found_count += 1
+    while found_count < 5:
+        chunk = cipher.encrypt(b'\x00' * chunk_size)
+        data = overlap + chunk
         
-        pos = data.find(target, pos + 1)
-        
-    # Зберігаємо хвостик для перекриття на стику шматків
-    overlap = chunk[-(len(target)-1):]
-    offset += chunk_size
+        pos = data.find(b'KPI')
+        while pos != -1:
+            global_pos = offset - len(overlap) + pos
+            print(f"[{found_count+1}] Позиция: {global_pos}")
+            found_count += 1
+            if found_count == 4:
+                print(f"\n[!!!] ТВОЙ ПАРОЛЬ ОТ secret.kdbx: {global_pos}\n")
+            if found_count >= 5:
+                break
+            pos = data.find(b'KPI', pos + 1)
+            
+        overlap = chunk[-2:]
+        offset += chunk_size
+else:
+    print("[-] Стандартные комбинации не подошли. Возможно, используется специфичный KDF.")
