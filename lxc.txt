@@ -139,26 +139,19 @@ else:
 
 from Crypto.Cipher import ChaCha20
 import struct
+from mpmath import mp
 
 # =====================
 # CONFIG
 # =====================
-PI_FILE = "pi.txt"          # файл с цифрами π (строка без пробелов)
 INPUT_FILE = "secret.kdbx"
 OUTPUT_FILE = "out.kdbx"
 
 KEY = b"sikorsky"
 NONCE = b"\x00" * 12
 
-
-# =====================
-# LOAD PI
-# =====================
-print("[*] Loading pi digits...")
-with open(PI_FILE, "r") as f:
-    pi_digits = f.read().strip()
-
-print(f"[+] Loaded {len(pi_digits)} digits of pi")
+# сколько цифр π нам нужно (с запасом)
+PI_PRECISION = 100_000_000
 
 
 # =====================
@@ -171,13 +164,23 @@ print(f"[+] Loaded encrypted file: {len(data)} bytes")
 
 
 # =====================
+# GENERATE PI
+# =====================
+print("[*] Generating pi digits... (this may take time)")
+
+mp.dps = PI_PRECISION + 10  # точность
+pi_str = str(mp.pi)[2:]     # убираем "3."
+
+print(f"[+] Generated {len(pi_str)} digits of pi")
+
+
+# =====================
 # PREPARE CHACHA20
 # =====================
-key = KEY.ljust(32, b"\x00")  # pad to 32 bytes
+key = KEY.ljust(32, b"\x00")
 
 cipher = ChaCha20.new(key=key, nonce=NONCE)
 
-# генерируем достаточно байтов
 needed_bytes = len(data) * 4
 keystream = cipher.encrypt(b"\x00" * needed_bytes)
 
@@ -197,10 +200,8 @@ for i in range(0, len(keystream), 4):
     val = struct.unpack("<I", chunk)[0]
     positions.append(val)
 
-# Проверка первых 3 позиций
 print("[*] First 3 generated positions:")
 print(positions[:3])
-
 print("[!] Expected: [13991507, 15887797, 66894714]")
 
 
@@ -212,10 +213,10 @@ print("[*] Building pi-based keystream...")
 pi_stream = []
 
 for pos in positions[:len(data)]:
-    if pos >= len(pi_digits):
+    if pos >= len(pi_str):
         raise Exception("Not enough pi digits!")
 
-    digit = int(pi_digits[pos])
+    digit = int(pi_str[pos])
     pi_stream.append(digit)
 
 keystream_bytes = bytes(pi_stream)
