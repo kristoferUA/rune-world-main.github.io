@@ -141,47 +141,64 @@ else:
 from Crypto.Cipher import ChaCha20
 import hashlib
 
-base = b'sikorsky'
-
-# Розширений набір можливих ключів
-keys = {
-    "MD5 hex string": hashlib.md5(base).hexdigest().encode(),
-    "Space padded": base.ljust(32, b' '),
-    "Zero left padded": base.rjust(32, b'\x00'),
-    "MD5 hex UPPER": hashlib.md5(base).hexdigest().upper().encode(),
-    "SHA256 hex trunc": hashlib.sha256(base).hexdigest().encode()[:32],
-    "Newline + zeroes": (base + b'\n').ljust(32, b'\x00'),
-    "Zero padded (16 bytes repeated)": base.ljust(16, b'\x00') * 2
-}
-
-nonces = {
-    "8 bytes": b'\x00' * 8,
-    "12 bytes": b'\x00' * 12
-}
-
-target = b'KPI'
 target_pos = 13991507
-chunk_size = 15000000 
+target = b'KPI'
 
-print("Шукаємо далі...")
+# Базові варіанти слова (зміна регістру, додавання переносів)
+bases = [
+    b'sikorsky', b'Sikorsky', b'SIKORSKY', 
+    b'key sikorsky', b'sikorsky\n', b'Sikorsky\n'
+]
 
-for key_name, key in keys.items():
-    for nonce_name, nonce in nonces.items():
+keys = {}
+for b in bases:
+    str_b = b.decode(errors='ignore').strip()
+    
+    # Класичні відступи
+    keys[f"Null padded '{str_b}'"] = b.ljust(32, b'\x00')
+    keys[f"Left Null padded '{str_b}'"] = b.rjust(32, b'\x00')
+    keys[f"Space padded '{str_b}'"] = b.ljust(32, b' ')
+    keys[f"Repeated '{str_b}'"] = (b * 32)[:32]
+    
+    # Строгий PKCS7
+    pad_len = 32 - (len(b) % 32)
+    keys[f"PKCS7 '{str_b}'"] = b + bytes([pad_len] * pad_len)
+    
+    # Хеші
+    keys[f"SHA-256 '{str_b}'"] = hashlib.sha256(b).digest()
+    keys[f"SHA-256 HexTrunc '{str_b}'"] = hashlib.sha256(b).hexdigest().encode()[:32]
+    keys[f"MD5 Hex '{str_b}'"] = hashlib.md5(b).hexdigest().encode()
+    keys[f"MD5 Hex UPPER '{str_b}'"] = hashlib.md5(b).hexdigest().upper().encode()
+    keys[f"SHA-512 Trunc '{str_b}'"] = hashlib.sha512(b).digest()[:32]
+    
+    # KDF (Key Derivation Functions)
+    keys[f"PBKDF2 (1 iter) '{str_b}'"] = hashlib.pbkdf2_hmac('sha256', b, b'', 1, 32)
+
+# Варіанти вектора ініціалізації
+nonces = {
+    "8 zero bytes (\\x00)": b'\x00' * 8,
+    "12 zero bytes (\\x00)": b'\x00' * 12,
+    "8 ASCII zeros ('0')": b'0' * 8,
+    "12 ASCII zeros ('0')": b'0' * 12,
+}
+
+print("Починаємо блискавичний пошук через cipher.seek()...")
+
+found = False
+for key_name, k in keys.items():
+    for nonce_name, n in nonces.items():
         try:
-            cipher = ChaCha20.new(key=key, nonce=nonce)
-            keystream = cipher.encrypt(b'\x00' * chunk_size)
+            cipher = ChaCha20.new(key=k, nonce=n)
+            cipher.seek(target_pos) # Миттєвий стрибок на потрібну позицію
             
-            pos = keystream.find(target)
-            
-            if pos == target_pos:
-                print(f"\nЗНАЙДЕНО! Правильна конфігурація:")
-                print(f"Ключ: {key_name}")
-                print(f"Nonce: {nonce_name}")
-                exit()
-            elif pos != -1:
-                print(f"[{key_name}] + [{nonce_name}] -> знайдено на {pos}")
-                
+            # Перевіряємо лише 3 байти
+            if cipher.encrypt(b'\x00' * 3) == target:
+                print(f"\n[УСПІХ!] Еталон 13991507 знайдено!")
+                print(f"Формат ключа: {key_name}")
+                print(f"Формат Nonce: {nonce_name}")
+                found = True
         except Exception as e:
             pass
 
-print("\nПеребір завершено.")
+if not found:
+    print("\nНа жаль, словникові варіанти не підійшли.")
