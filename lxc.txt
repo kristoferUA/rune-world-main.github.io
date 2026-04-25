@@ -2,169 +2,46 @@
 https://national-icoa2026.ctf.in.ua/
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
-IcQ/wua0l1HfHHaA3kYym3q4NhAGKz06YokVpBQo3UgWIfLC252QXohdZbR/U1hK
-0kLGwBwH5MT8X5tMjQGrwb1nqBvhE0bXA3m9ax5935qICiX+AgoK1Td6qIYiArqD
-ni1L81u7Erq7HSpA5+eJP+uPo7Y0EG62oCdfNtYdD8TuTbxxYlG6XiVXAZdA/3xR
-9Sl0sL04a4DLAoIBAQCw3e6U3JPWHlLN65ANR+yZwnjhIxEdaZa1v52MxUld8Dqz
-SYb91560R2nn9OlnMpROYDSuo4mtpPKQBAah468yQgqC0wQQiFQwwKP+0qDFURqP
-dew+tZixls5uT9Uq9Zwfp+cGPabVZVUTlkeRXQ6EdSQPTyDXrf6IyP8MDnNLe4gG
-3imVz+6KIcVqD0GwqN4H5zV7Ehmtj7e/+Hi9yZ7gWCOW3/f2V0+ldssMh4BLl9jb
-R96xQyfePn6rOeQLav2O8ZSWZwzMo69aWjyTEqYDBgAoYVaKLcRACxWCqwYdWb0k
-MmaqjZLp5PaIgtB6XPVE/jARBvtH/y+g0gvqXFM5AoIBAQCLH/Zv7ohm2CJbMvr3
-xEx3/rI9mtsFHXa51Ro8pTFQKaq0tUOXE01p+bJZlp5qcjC68E9p8C5cU1LrHLUM
-import base64
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_v1_5
-from Crypto.Util.number import inverse
+with open('story.txt', 'rb') as f:
+    data = f.read()
 
-# 1. Вставь сюда свой модуль N из public_key.pem
-# Пример: N = int("009954840c889fd99dfd...", 16)
-N = int("ВСТАВЬ_HEX_МОДУЛЯ_БЕЗ_ДВОЕТОЧИЙ", 16)
-e = 65537
+print("1 Поиск скрытых нулевых байтов (\\x00):")
+null_parts = data.split(b'\x00')
+if len(null_parts) > 1:
+    print(f"Найдено {len(null_parts) - 1} нулей!")
+    for part in null_parts:
+        if part and len(part) < 50: 
+            print(part)
 
-# 2. Твой переписанный кусок Base64
-b64_text = """
-IcQ/wuaOl1HfHHaA3kYym3q4NhAGKz06YokVpBQo3UgWIfLC252QXohdZbR/UlhK
-0kLGwBwH5MT8X5tMjQGrwb1nqBvhE0bXA3m9ax5935qICiX+AgoK1Td6qIYiArqD
-nilL81u7Erq7HSpA5+eJP+uPo7Y0EG62oCdfNtYdD8TuTbxxYlG6XiVXAZdA/3xR
-9Sl0sL04a4DLAoIBAQCw3e6U3JPWHlLN65ANR+yZwnjhIxEdaZa1v52MxUld8Dqz
-SYb9l560R2nn9OlnMpROYDSuo4mtpPKQBAah468yQgqC0wQQiFQwwKP+0qDFURqP
-dew+tZixls5uT9Uq9Zwfp+cGPabVZVUTlkeRXQ6EdSQPTyDXrf6IyP8MDnNLe4gG
-3imVz+6KIcVqD0GwqN4H5zV7Ehmtj7e/+Hi9yZ7gWCOW3/f2V0+ldssMh4BLl9jb
-R96xQyfePn6rOeQLav2O8ZSWZwzMo69aWjyTEqYDBgAoYVaKLcRACxWCqwYdWb0k
-MmaqjZLp5PaIgtB6XPVE/jARBvtH/y+g0gvqXFM5AoIBAQCLH/Zv7ohm2CJbMvr3
-xEx3/rI9mtsFHXa51Ro8pTFQKaq0tUOXE01p+bJZlp5qcjC68E9p8C5cU1LrHLUM
-"""
+print("\n2 Поиск невидимых символов (Zero-Width Steganography):")
+zero_width_bytes = b''
+for byte in data:
+    # Английский текст и базовые символы всегда меньше 128
+    if byte > 127: 
+        zero_width_bytes += bytes([byte])
 
-# Декодируем Base64
-data = base64.b64decode(b64_text.replace("\n", ""))
-
-# 3. Ищем все маркеры 0x02 0x82 0x01 0x01 0x00 (это AoIBAQ)
-# и извлекаем следующие за ними 256 байт (2048 бит)
-marker = b"\x02\x82\x01\x01\x00"
-primes = []
-idx = data.find(marker)
-
-while idx != -1:
-    raw_int = data[idx + len(marker) : idx + len(marker) + 256]
-    if len(raw_int) == 256:
-        primes.append(int.from_bytes(raw_int, 'big'))
-    idx = data.find(marker, idx + 1)
-
-# 4. Проверяем, какое из найденных чисел является делителем N
-p = None
-for val in primes:
-    if val > 1 and N % val == 0:
-        p = val
-        break
-
-if p:
-    print("[+] Найдено простое число p!")
-    q = N // p
-    phi = (p - 1) * (q - 1)
-    d = inverse(e, phi)
-
-    # 5. Собираем приватный ключ
-    key = RSA.construct((N, e, d, p, q))
-
-    # 6. Читаем зашифрованный флаг и расшифровываем
-    with open("flag.enc", "rb") as f:
-        enc_data = f.read()
-
-    # Шифровальщики чаще всего используют PKCS1_v1_5
-    cipher = PKCS1_v1_5.new(key)
-    flag = cipher.decrypt(enc_data, b"ERROR_DECRYPTING")
+if zero_width_bytes:
+    print(f"Найдено {len(zero_width_bytes)} скрытых байт!")
+    print("Hex-дамп:", zero_width_bytes.hex())
     
-    print("\n[!] Флаг:", flag.decode(errors='ignore'))
-else:
-    print("[-] Не удалось найти p. Проверь правильность переписанного Base64.")
-009954840c889fd99dfd2e499e9f86
-    956d6518cd3eb0963efb4d237372c9
-    1e5472591a9fdc21ccbecbb7a3b7af
-    7a3232b0374c34c35cc9598c51b029
-    9a82757ae3c2fbb1905177d2de72cb
-    f0f9f8eec859768c0b9202b9c3eb80
-    3208c26480e67f4568d2416f68559a
-    3792daace63c3f2718eb7ed1cd4a00
-    780b7f1415bf43bf2f568e61f4e89c
-    634befaf93ed96a9107083d613785a
-    240577dc7328a14fee5e03ec2ff5d7
-    123d8eec13a02100ad28205330f239
-    b3054a2e98ef5a366ff04b05f56a9f
-    fe5c103eb7c1cea45be5dc101e4d7b
-    1a94161e3d977c93e8d453d1617c13
-    f6b71357e9a5b44e23b73fbdc7ed95
-    e3eabb9624e5eccccf0da1005131a8
-    4e89abeae6525b2899bf5bc35b4dda
-    cd40567f5926a75901fc8b6d1a0a6a
-    7d378860b1043cfc605162e1fd1b43
-    20a784
-import math
-
-# Читаем файл с текстом
-with open('story.txt', 'r', encoding='utf-8') as f:
-    text = f.read()
-
-# Ищем все символы нулевой ширины (самые популярные в CTF)
-zwc = [c for c in text if c in ('\u200b', '\u200c', '\u200d', '\ufeff')]
-print(f"[+] Найдено скрытых символов: {len(zwc)}")
-
-unique = list(set(zwc))
-if len(unique) >= 2:
-    # Превращаем два типа символов в 0 и 1
-    # Если картинка будет инвертирована (негатив), просто поменяй '0' и '1' местами
-    bits = ''.join(['0' if c == unique[0] else '1' for c in zwc])
+    # Очень часто в CTF невидимые символы кодируют бинарный код
+    # \u200b (e2808b) = 0, \u200c (e2808c) = 1
+    binary_str = zero_width_bytes.hex().replace('e2808b', '0').replace('e2808c', '1').replace('e2808d', '0').replace('efbbbf', '1')
     
-    # Пытаемся угадать размеры "графика" (картинки)
-    # Чаще всего это квадрат (например, QR-код) или прямоугольник
-    width = int(math.isqrt(len(bits)))
+    # Очищаем от возможного мусора
+    binary_clean = ''.join([c for c in binary_str if c in '01'])
     
-    # Ищем точный делитель для ровного прямоугольника
-    if width * width != len(bits):
-        for i in range(width + 50, 0, -1):
-            if len(bits) % i == 0:
-                width = i
-                break
+    if len(binary_clean) >= 8:
+        print(f"\nСкрытый бинарный код: {binary_clean}")
+        try:
+            # Переводим биты обратно в текст
+            chars = [chr(int(binary_clean[i:i+8], 2)) for i in range(0, len(binary_clean), 8)]
+            print("Расшифровка:", ''.join(chars))
+        except Exception:
+            pass
 
-    print(f"[+] Отрисовка графика {width} x {len(bits)//width}:\n")
-    
-    # Рисуем биты в терминале, заменяя 1 на черный квадрат
-    for i in range(0, len(bits), width):
-        line = bits[i:i+width].replace('0', ' ').replace('1', '█')
-        print(line)
-else:
-    print("[-] Недостаточно разных невидимых символов для бинарного кода.")
-
-
-
-pub_key = [35503, 76468, 505235, 125231, 620315, 408002, 481981, 702393]
-ct = [1891308, 1904411, 2386392, 2794394, 1188915, 1891308, 2386392, 2029642, 
-      2511623, 1188915, 1814840, 989705, 1817329, 1766077, 2222842, 1332859, 
-      630466, 2092001, 2414390, 1766077, 1202018, 1038468, 2312413, 706934, 
-      1332859, 630466, 2092001, 2437644, 1102296]
-
-# Создаем словарь для быстрого поиска
-lookup_table = {}
-
-# Перебираем все 256 возможных значений байта
-for i in range(256):
-    # Превращаем число в 8-битную строку, как это делал автор
-    bin_str = bin(i)[2:].zfill(8)
-    
-    # Считаем сумму ключей для текущей комбинации бит
-    current_sum = 0
-    for pos, bit in enumerate(bin_str):
-        current_sum += pub_key[pos] * int(bit)
-        
-    # Сохраняем результат: сумма -> символ
-    lookup_table[current_sum] = chr(i)
-
-# Собираем флаг
-flag = ""
-for encrypted_char in ct:
-    if encrypted_char in lookup_table:
-        flag += lookup_table[encrypted_char]
-    else:
-        flag += "?" # На случай ошибки
-
-print("Флаг:", flag)
+print("\n3 Проверка скрытых пробелов в конце строк (SNOW stego):")
+with open('story.txt', 'r', encoding='utf-8', errors='ignore') as f:
+    for i, line in enumerate(f):
+        if line.endswith(' \n') or line.endswith('\t\n'):
+            print(f"Строка {i+1} имеет скрытые пробелы!")
