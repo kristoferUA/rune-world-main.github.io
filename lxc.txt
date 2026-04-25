@@ -16,31 +16,36 @@ chars = [hidden_bytes[i:i+3].hex() for i in range(0, len(hidden_bytes), 3) if le
 zw_chars = [c for c in chars if c in ['e2808b', 'e2808c', 'e2808d']]
 unique_zw = list(set(zw_chars))
 
-if len(unique_zw) == 3:
-    print("Найдено 3 символа. Выводим сырые результаты...\n")
-    
-    for i, perm in enumerate(itertools.permutations(unique_zw)):
-        char_0, char_1, char_sep = perm
-        
-        mapped = []
-        for c in zw_chars:
-            if c == char_0: mapped.append('0')
-            elif c == char_1: mapped.append('1')
-            elif c == char_sep: mapped.append(' ')
-            
-        bin_blocks = "".join(mapped).split(' ')
-        
-        text = ""
-        for block in bin_blocks:
-            if block: 
-                try:
-                    text += chr(int(block, 2))
-                except:
-                    text += "?" # Если блок битый, ставим знак вопроса
-        
-        print(f"--- Комбинация {i+1} ---")
-        # Выведем первые 5 бинарных блоков, чтобы понять структуру
-        print(f"Биты (начало): {bin_blocks[:5]}")
-        print(f"Результат: {text}\n")
-else:
-    print("Символов не 3.")
+print("Читаем сплошным потоком по 8 бит (один символ игнорируем)...\n")
+
+for i, perm in enumerate(itertools.permutations(unique_zw)):
+    char_0, char_1, char_ignore = perm
+
+    # Собираем сплошную строку нулей и единиц
+    bin_str = ""
+    for c in zw_chars:
+        if c == char_0: bin_str += '0'
+        elif c == char_1: bin_str += '1'
+
+    # Рубим на блоки по 8 бит
+    text = ""
+    for j in range(0, len(bin_str) - 7, 8):
+        byte_chunk = bin_str[j:j+8]
+        try:
+            char = chr(int(byte_chunk, 2))
+            # Печатные символы оставляем, мусор заменяем на точку
+            if 32 <= ord(char) <= 126:
+                text += char
+            else:
+                text += "."
+        except:
+            pass
+
+    # Выводим варианты, где есть хоть какой-то осмысленный текст
+    clean_text = text.replace(".", "")
+    if len(clean_text) > 10:
+         print(f"--- Вариант {i+1} ---")
+         print(f"0 = {char_0[-2:]} | 1 = {char_1[-2:]} | Игнор = {char_ignore[-2:]}")
+         # Выводим начало строки, чтобы найти формат флага
+         print(text[:150]) 
+         print("-" * 40)
