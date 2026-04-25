@@ -4,7 +4,8 @@ https://national-icoa2026.ctf.in.ua/
 Пароль: k*fklDd*PvzDsU@C
 
 
-python3 -c "open('fixed.zip','wb').write(open('kapy.zip','rb').read()[::-1])"
+dd if=kapy.zip bs=1 skip=7075974 of=tail_data
+python3 -c "open('reflected_file','wb').write(open('tail_data','rb').read()[::-1])"
 
 
 
