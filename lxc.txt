@@ -52,3 +52,6 @@ for i, perm in enumerate(itertools.permutations(unique_zw)):
     # Убираем возможные скрытые переносы строк для компактного вывода
     clean_text = text.replace(chr(10), '').replace(chr(13), '')
     print(f"Результат: {clean_text[:150]}\n")
+
+
+Hi, this is a text file, but with hidden content. I need you to find this hidden content. Ideally, there should be a flag. A cursory analysis showed that it's zero-width text.
