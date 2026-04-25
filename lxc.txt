@@ -141,15 +141,19 @@ else:
 from Crypto.Cipher import ChaCha20
 import hashlib
 
-# Можливі варіанти формування ключа
+base = b'sikorsky'
+
+# Розширений набір можливих ключів
 keys = {
-    "Null padded": b'sikorsky'.ljust(32, b'\x00'),
-    "SHA256 hash": hashlib.sha256(b'sikorsky').digest(),
-    "Repeated": (b'sikorsky' * 4)[:32],
-    "MD5 hash + nulls": hashlib.md5(b'sikorsky').digest().ljust(32, b'\x00')
+    "MD5 hex string": hashlib.md5(base).hexdigest().encode(),
+    "Space padded": base.ljust(32, b' '),
+    "Zero left padded": base.rjust(32, b'\x00'),
+    "MD5 hex UPPER": hashlib.md5(base).hexdigest().upper().encode(),
+    "SHA256 hex trunc": hashlib.sha256(base).hexdigest().encode()[:32],
+    "Newline + zeroes": (base + b'\n').ljust(32, b'\x00'),
+    "Zero padded (16 bytes repeated)": base.ljust(16, b'\x00') * 2
 }
 
-# Можливі варіанти nonce
 nonces = {
     "8 bytes": b'\x00' * 8,
     "12 bytes": b'\x00' * 12
@@ -157,9 +161,9 @@ nonces = {
 
 target = b'KPI'
 target_pos = 13991507
-chunk_size = 15000000  # 15 МБ вистачить, щоб захопити першу цільову позицію
+chunk_size = 15000000 
 
-print("Починаємо перебір конфігурацій...")
+print("Шукаємо далі...")
 
 for key_name, key in keys.items():
     for nonce_name, nonce in nonces.items():
@@ -169,14 +173,15 @@ for key_name, key in keys.items():
             
             pos = keystream.find(target)
             
-            if pos != -1:
-                print(f"[{key_name}] + [{nonce_name}] -> знайдено на позиції {pos}")
-                
             if pos == target_pos:
-                print(f"\nЗНАЙДЕНО! Правильна логіка: Ключ - {key_name}, Nonce - {nonce_name}")
+                print(f"\nЗНАЙДЕНО! Правильна конфігурація:")
+                print(f"Ключ: {key_name}")
+                print(f"Nonce: {nonce_name}")
                 exit()
+            elif pos != -1:
+                print(f"[{key_name}] + [{nonce_name}] -> знайдено на {pos}")
                 
         except Exception as e:
             pass
 
-print("\nЯкщо еталон не знайдено, можливо, використовується інша бібліотека або кодування.")
+print("\nПеребір завершено.")
