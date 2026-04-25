@@ -99,3 +99,38 @@ else:
     cd40567f5926a75901fc8b6d1a0a6a
     7d378860b1043cfc605162e1fd1b43
     20a784
+import math
+
+# Читаем файл с текстом
+with open('story.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
+
+# Ищем все символы нулевой ширины (самые популярные в CTF)
+zwc = [c for c in text if c in ('\u200b', '\u200c', '\u200d', '\ufeff')]
+print(f"[+] Найдено скрытых символов: {len(zwc)}")
+
+unique = list(set(zwc))
+if len(unique) >= 2:
+    # Превращаем два типа символов в 0 и 1
+    # Если картинка будет инвертирована (негатив), просто поменяй '0' и '1' местами
+    bits = ''.join(['0' if c == unique[0] else '1' for c in zwc])
+    
+    # Пытаемся угадать размеры "графика" (картинки)
+    # Чаще всего это квадрат (например, QR-код) или прямоугольник
+    width = int(math.isqrt(len(bits)))
+    
+    # Ищем точный делитель для ровного прямоугольника
+    if width * width != len(bits):
+        for i in range(width + 50, 0, -1):
+            if len(bits) % i == 0:
+                width = i
+                break
+
+    print(f"[+] Отрисовка графика {width} x {len(bits)//width}:\n")
+    
+    # Рисуем биты в терминале, заменяя 1 на черный квадрат
+    for i in range(0, len(bits), width):
+        line = bits[i:i+width].replace('0', ' ').replace('1', '█')
+        print(line)
+else:
+    print("[-] Недостаточно разных невидимых символов для бинарного кода.")
