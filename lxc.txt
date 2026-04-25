@@ -138,38 +138,45 @@ else:
 
 
 
-ffrom Crypto.Cipher import ChaCha20
+from Crypto.Cipher import ChaCha20
+import hashlib
 
-# Ключ sikorsky добивается нулями до 32 байт (256 бит)
-key = b'sikorsky'.ljust(32, b'\x00')
+# Можливі варіанти формування ключа
+keys = {
+    "Null padded": b'sikorsky'.ljust(32, b'\x00'),
+    "SHA256 hash": hashlib.sha256(b'sikorsky').digest(),
+    "Repeated": (b'sikorsky' * 4)[:32],
+    "MD5 hash + nulls": hashlib.md5(b'sikorsky').digest().ljust(32, b'\x00')
+}
 
-# Nonce (вектор инициализации) из нулей. Обычно в Python это 8 или 12 байт.
-nonce = b'\x00' * 8 
+# Можливі варіанти nonce
+nonces = {
+    "8 bytes": b'\x00' * 8,
+    "12 bytes": b'\x00' * 12
+}
 
-cipher = ChaCha20.new(key=key, nonce=nonce)
 target = b'KPI'
+target_pos = 13991507
+chunk_size = 15000000  # 15 МБ вистачить, щоб захопити першу цільову позицію
 
-# Читаем поток блоками по 10 МБ, чтобы не перегружать оперативную память
-chunk_size = 1024 * 1024 * 10 
-stream_index = 0
-tail = b''
+print("Починаємо перебір конфігурацій...")
 
-print("Начинаем поиск...")
+for key_name, key in keys.items():
+    for nonce_name, nonce in nonces.items():
+        try:
+            cipher = ChaCha20.new(key=key, nonce=nonce)
+            keystream = cipher.encrypt(b'\x00' * chunk_size)
+            
+            pos = keystream.find(target)
+            
+            if pos != -1:
+                print(f"[{key_name}] + [{nonce_name}] -> знайдено на позиції {pos}")
+                
+            if pos == target_pos:
+                print(f"\nЗНАЙДЕНО! Правильна логіка: Ключ - {key_name}, Nonce - {nonce_name}")
+                exit()
+                
+        except Exception as e:
+            pass
 
-while stream_index < 200000000: # Ограничим поиск первыми 200 МБ
-    # Генерируем keystream, шифруя нулевые байты
-    keystream = cipher.encrypt(b'\x00' * chunk_size)
-    
-    # Склеиваем конец прошлого блока с новым, чтобы не пропустить строку на стыке
-    search_block = tail + keystream
-    
-    local_pos = search_block.find(target)
-    while local_pos != -1:
-        # Вычисляем абсолютную позицию
-        absolute_pos = stream_index - len(tail) + local_pos
-        print(f"Найдена позиция: {absolute_pos}")
-        local_pos = search_block.find(target, local_pos + 1)
-        
-    stream_index += chunk_size
-    # Сохраняем последние байты для следующего цикла
-    tail = keystream[-(len(target)-1):]
+print("\nЯкщо еталон не знайдено, можливо, використовується інша бібліотека або кодування.")
