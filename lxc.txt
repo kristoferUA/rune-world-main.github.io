@@ -3,7 +3,24 @@ https://national-icoa2026.ctf.in.ua/
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
-
+Administrator:f23234234523b2a65428f6234324365c
+krbtgt:730a24523421e65492d2342a6b54234d
+backup:bd52354312348dd36524123426652234
+agazanov:957c9126f9e6bad3856b8c360ee555ca
+rnagavitsyn:0eaa3fefd75bec9f3bc3af28b6c014d8
+ilorkina:af8650c08dfefe8aeffc90ae95e59bd2
+abunov:ed235fda55d73e75b46bca4476663176
+dkrupoderov:e6760eaf2cac12712df55a0f10a380d4
+onosikov:b650cd51e8cbfd2a32ca3a0000c2dcca
+lpohmelkin:09f3ae5884b152b60c27a2fcca239355
+szhilkina:72c366e9d4e2c0972017d6d4aa212fe2
+gundrov:c04fd29eafe2fb460ece98816d3471bc
+kinahodova:70e13047e384f1852e3676a5bb26b4be
+reminev:8f4bbc34c12465ecece29f88671bfee4
+akavelenova:920edf983b8e25bb28171326ffd3fdaa
+rgatavskiy:cb8ee26278cf7b35c59995d2136ff8b5
+atubolova:37b994b236665c2353c5aacfbb712216
+lfayzulina:8b047c70089ad46f77783c84211a4ce0
 
 
 import sys
