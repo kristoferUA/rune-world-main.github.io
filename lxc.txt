@@ -12,3 +12,69 @@ dew+tZixls5uT9Uq9Zwfp+cGPabVZVUTlkeRXQ6EdSQPTyDXrf6IyP8MDnNLe4gG
 R96xQyfePn6rOeQLav2O8ZSWZwzMo69aWjyTEqYDBgAoYVaKLcRACxWCqwYdWb0k
 MmaqjZLp5PaIgtB6XPVE/jARBvtH/y+g0gvqXFM5AoIBAQCLH/Zv7ohm2CJbMvr3
 xEx3/rI9mtsFHXa51Ro8pTFQKaq0tUOXE01p+bJZlp5qcjC68E9p8C5cU1LrHLUM
+import base64
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+from Crypto.Util.number import inverse
+
+# 1. Вставь сюда свой модуль N из public_key.pem
+# Пример: N = int("009954840c889fd99dfd...", 16)
+N = int("ВСТАВЬ_HEX_МОДУЛЯ_БЕЗ_ДВОЕТОЧИЙ", 16)
+e = 65537
+
+# 2. Твой переписанный кусок Base64
+b64_text = """
+IcQ/wuaOl1HfHHaA3kYym3q4NhAGKz06YokVpBQo3UgWIfLC252QXohdZbR/UlhK
+0kLGwBwH5MT8X5tMjQGrwb1nqBvhE0bXA3m9ax5935qICiX+AgoK1Td6qIYiArqD
+nilL81u7Erq7HSpA5+eJP+uPo7Y0EG62oCdfNtYdD8TuTbxxYlG6XiVXAZdA/3xR
+9Sl0sL04a4DLAoIBAQCw3e6U3JPWHlLN65ANR+yZwnjhIxEdaZa1v52MxUld8Dqz
+SYb9l560R2nn9OlnMpROYDSuo4mtpPKQBAah468yQgqC0wQQiFQwwKP+0qDFURqP
+dew+tZixls5uT9Uq9Zwfp+cGPabVZVUTlkeRXQ6EdSQPTyDXrf6IyP8MDnNLe4gG
+3imVz+6KIcVqD0GwqN4H5zV7Ehmtj7e/+Hi9yZ7gWCOW3/f2V0+ldssMh4BLl9jb
+R96xQyfePn6rOeQLav2O8ZSWZwzMo69aWjyTEqYDBgAoYVaKLcRACxWCqwYdWb0k
+MmaqjZLp5PaIgtB6XPVE/jARBvtH/y+g0gvqXFM5AoIBAQCLH/Zv7ohm2CJbMvr3
+xEx3/rI9mtsFHXa51Ro8pTFQKaq0tUOXE01p+bJZlp5qcjC68E9p8C5cU1LrHLUM
+"""
+
+# Декодируем Base64
+data = base64.b64decode(b64_text.replace("\n", ""))
+
+# 3. Ищем все маркеры 0x02 0x82 0x01 0x01 0x00 (это AoIBAQ)
+# и извлекаем следующие за ними 256 байт (2048 бит)
+marker = b"\x02\x82\x01\x01\x00"
+primes = []
+idx = data.find(marker)
+
+while idx != -1:
+    raw_int = data[idx + len(marker) : idx + len(marker) + 256]
+    if len(raw_int) == 256:
+        primes.append(int.from_bytes(raw_int, 'big'))
+    idx = data.find(marker, idx + 1)
+
+# 4. Проверяем, какое из найденных чисел является делителем N
+p = None
+for val in primes:
+    if val > 1 and N % val == 0:
+        p = val
+        break
+
+if p:
+    print("[+] Найдено простое число p!")
+    q = N // p
+    phi = (p - 1) * (q - 1)
+    d = inverse(e, phi)
+
+    # 5. Собираем приватный ключ
+    key = RSA.construct((N, e, d, p, q))
+
+    # 6. Читаем зашифрованный флаг и расшифровываем
+    with open("flag.enc", "rb") as f:
+        enc_data = f.read()
+
+    # Шифровальщики чаще всего используют PKCS1_v1_5
+    cipher = PKCS1_v1_5.new(key)
+    flag = cipher.decrypt(enc_data, b"ERROR_DECRYPTING")
+    
+    print("\n[!] Флаг:", flag.decode(errors='ignore'))
+else:
+    print("[-] Не удалось найти p. Проверь правильность переписанного Base64.")
