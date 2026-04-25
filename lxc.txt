@@ -137,74 +137,98 @@ else:
 
 
 
-
-import base64
-import hashlib
 from Crypto.Cipher import ChaCha20
+import struct
 
-target_pos = 13991507
+# =====================
+# CONFIG
+# =====================
+PI_FILE = "pi.txt"          # файл с цифрами π (строка без пробелов)
+INPUT_FILE = "secret.kdbx"
+OUTPUT_FILE = "out.kdbx"
 
-# Базовые варианты ключа
-bases = [b'sikorsky', b'Sikorsky', b'SIKORSKY']
-keys = {}
-for b in bases:
-    str_b = b.decode()
-    keys[f"Нулевые байты '{str_b}'"] = b.ljust(32, b'\x00')
-    keys[f"Символы '0' '{str_b}'"] = b.ljust(32, b'0')
-    keys[f"Пробелы '{str_b}'"] = b.ljust(32, b' ')
-    keys[f"Повторение '{str_b}'"] = (b * 32)[:32]
-    keys[f"MD5 '{str_b}'"] = hashlib.md5(b).hexdigest().encode()
-    keys[f"SHA256 '{str_b}'"] = hashlib.sha256(b).digest()
+KEY = b"sikorsky"
+NONCE = b"\x00" * 12
 
-# Варианты nonce
-nonces = {
-    "8 байт (\\x00)": b'\x00' * 8,
-    "12 байт (\\x00)": b'\x00' * 12,
-    "8 символов '0'": b'0' * 8,
-}
 
-print("Начинаем умный поиск (Base64, Hex, Кириллица)...")
+# =====================
+# LOAD PI
+# =====================
+print("[*] Loading pi digits...")
+with open(PI_FILE, "r") as f:
+    pi_digits = f.read().strip()
 
-found = False
-for key_name, k in keys.items():
-    for nonce_name, n in nonces.items():
-        try:
-            cipher = ChaCha20.new(key=k, nonce=n)
-            
-            # 1. Поиск в сырых байтах (KPI, kpi, КПІ)
-            cipher.seek(target_pos)
-            chunk_raw = cipher.encrypt(b'\x00' * 6)
-            if chunk_raw.startswith(b'KPI') or chunk_raw.startswith(b'kpi'):
-                print(f"\n[НАЙДЕНО] Формат: Сырые байты (Raw KPI)")
-                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
-                found = True
-            elif chunk_raw == 'КПІ'.encode():
-                print(f"\n[НАЙДЕНО] Формат: Кириллица (КПІ)")
-                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
-                found = True
-                
-            # 2. Поиск в Hex-строке (ищем '4b5049')
-            byte_pos_hex = target_pos // 2
-            cipher.seek(byte_pos_hex)
-            chunk_hex = cipher.encrypt(b'\x00' * 4).hex()
-            offset_hex = target_pos % 2
-            if chunk_hex[offset_hex:offset_hex+6].lower() == '4b5049':
-                print(f"\n[НАЙДЕНО] Формат: Hex-строка")
-                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
-                found = True
+print(f"[+] Loaded {len(pi_digits)} digits of pi")
 
-            # 3. Поиск в Base64-строке (ищем 'KPI')
-            byte_pos_b64 = (target_pos // 4) * 3
-            cipher.seek(byte_pos_b64)
-            chunk_b64 = base64.b64encode(cipher.encrypt(b'\x00' * 6)).decode('ascii')
-            offset_b64 = target_pos % 4
-            if chunk_b64[offset_b64:offset_b64+3] == 'KPI':
-                print(f"\n[НАЙДЕНО] Формат: Base64")
-                print(f"Ключ: {key_name} | Nonce: {nonce_name}")
-                found = True
 
-        except Exception as e:
-            pass
+# =====================
+# LOAD ENCRYPTED FILE
+# =====================
+with open(INPUT_FILE, "rb") as f:
+    data = f.read()
 
-if not found:
-    print("\nСнова мимо. Возможно, автор использовал нестандартную библиотеку.")
+print(f"[+] Loaded encrypted file: {len(data)} bytes")
+
+
+# =====================
+# PREPARE CHACHA20
+# =====================
+key = KEY.ljust(32, b"\x00")  # pad to 32 bytes
+
+cipher = ChaCha20.new(key=key, nonce=NONCE)
+
+# генерируем достаточно байтов
+needed_bytes = len(data) * 4
+keystream = cipher.encrypt(b"\x00" * needed_bytes)
+
+print("[*] Generated ChaCha20 stream")
+
+
+# =====================
+# GENERATE POSITIONS
+# =====================
+positions = []
+
+for i in range(0, len(keystream), 4):
+    chunk = keystream[i:i+4]
+    if len(chunk) < 4:
+        break
+
+    val = struct.unpack("<I", chunk)[0]
+    positions.append(val)
+
+# Проверка первых 3 позиций
+print("[*] First 3 generated positions:")
+print(positions[:3])
+
+print("[!] Expected: [13991507, 15887797, 66894714]")
+
+
+# =====================
+# BUILD PI KEYSTREAM
+# =====================
+print("[*] Building pi-based keystream...")
+
+pi_stream = []
+
+for pos in positions[:len(data)]:
+    if pos >= len(pi_digits):
+        raise Exception("Not enough pi digits!")
+
+    digit = int(pi_digits[pos])
+    pi_stream.append(digit)
+
+keystream_bytes = bytes(pi_stream)
+
+
+# =====================
+# XOR DECRYPT
+# =====================
+print("[*] Decrypting...")
+
+decrypted = bytes([a ^ b for a, b in zip(data, keystream_bytes)])
+
+with open(OUTPUT_FILE, "wb") as f:
+    f.write(decrypted)
+
+print(f"[+] Done! Output saved to {OUTPUT_FILE}")
