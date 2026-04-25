@@ -7,7 +7,7 @@ https://national-icoa2026.ctf.in.ua/
 dd if=kapy.zip bs=1 skip=7075974 of=tail_data
 python3 -c "open('reflected_file','wb').write(open('tail_data','rb').read()[::-1])"
 strings reflected_file | grep -v "KPbw"
-
+foremost -i /home/kali/Downloads/kapy.zip -o result_capy
 
 
 import sys
