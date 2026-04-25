@@ -134,3 +134,42 @@ if len(unique) >= 2:
         print(line)
 else:
     print("[-] Недостаточно разных невидимых символов для бинарного кода.")
+
+
+
+
+from Crypto.Cipher import ChaCha20
+
+# Пробуємо доповнити ключ нулями до 32 байт
+key = b'sikorsky'.ljust(32, b'\x00')
+# Nonce 0, зазвичай 8 байт у pycryptodome
+nonce = b'\x00' * 8 
+
+cipher = ChaCha20.new(key=key, nonce=nonce)
+
+chunk_size = 1024 * 1024  # 1 Мегабайт
+target = b'KPI'
+offset = 0
+overlap = b''
+
+print("Шукаємо збіги...")
+
+# Шукаємо перші 5 збігів
+found_count = 0
+while found_count < 5:
+    # Шифрування нулів дає чистий keystream
+    chunk = cipher.encrypt(b'\x00' * chunk_size)
+    data = overlap + chunk
+    
+    pos = data.find(target)
+    while pos != -1:
+        # Враховуємо зсув (overlap) від попереднього шматка
+        global_pos = offset - len(overlap) + pos
+        print(f"Знайдено 'KPI' на позиції: {global_pos}")
+        found_count += 1
+        
+        pos = data.find(target, pos + 1)
+        
+    # Зберігаємо хвостик для перекриття на стику шматків
+    overlap = chunk[-(len(target)-1):]
+    offset += chunk_size
