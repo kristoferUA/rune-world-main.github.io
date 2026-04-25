@@ -7,42 +7,48 @@ import itertools
 with open('story.txt', 'rb') as f:
     data = f.read()
 
-hidden_bytes = b''
-for byte in data:
-    if byte > 127:
-        hidden_bytes += bytes([byte])
+# Точные байты наших невидимых символов
+zwc_bytes = [b'\xe2\x80\x8b', b'\xe2\x80\x8c', b'\xe2\x80\x8d']
+zw_chars = []
 
-chars = [hidden_bytes[i:i+3].hex() for i in range(0, len(hidden_bytes), 3) if len(hidden_bytes[i:i+3]) == 3]
-zw_chars = [c for c in chars if c in ['e2808b', 'e2808c', 'e2808d']]
+# Безопасный поиск без сдвигов выравнивания
+i = 0
+while i < len(data) - 2:
+    if data[i:i+3] in zwc_bytes:
+        zw_chars.append(data[i:i+3].hex())
+        i += 3
+    else:
+        i += 1
+
 unique_zw = list(set(zw_chars))
 
-print("Читаем сплошным потоком по 8 бит (без фильтров)...\n")
+print(f"Успешно извлечено {len(zw_chars)} скрытых символов.")
+print("Запускаем метод разделителя...\n")
 
 for i, perm in enumerate(itertools.permutations(unique_zw)):
-    char_0, char_1, char_ignore = perm
-
-    # Собираем сплошную строку нулей и единиц
-    bin_str = ""
+    char_0, char_1, char_sep = perm
+    
+    # Распределяем роли: нули, единицы и пробел-разделитель
+    mapped = []
     for c in zw_chars:
-        if c == char_0: bin_str += '0'
-        elif c == char_1: bin_str += '1'
-
-    # Рубим на блоки по 8 бит
+        if c == char_0: mapped.append('0')
+        elif c == char_1: mapped.append('1')
+        elif c == char_sep: mapped.append(' ')
+        
+    # Разделитель позволяет нам не зависеть от жесткой длины в 8 бит
+    bin_blocks = "".join(mapped).split(' ')
+    
     text = ""
-    for j in range(0, len(bin_str) - 7, 8):
-        byte_chunk = bin_str[j:j+8]
-        try:
-            char = chr(int(byte_chunk, 2))
-            # Печатные символы оставляем, мусор заменяем на точку
-            if 32 <= ord(char) <= 126:
-                text += char
-            else:
-                text += "."
-        except:
-            pass
-
-    # Выводим ВСЕ варианты без исключения
-    print(f"--- Вариант {i+1} ---")
-    print(f"0 = {char_0[-2:]} | 1 = {char_1[-2:]} | Игнор = {char_ignore[-2:]}")
-    print(text[:150]) 
-    print("-" * 40)
+    for block in bin_blocks:
+        if block: 
+            try:
+                text += chr(int(block, 2))
+            except:
+                text += "?" 
+    
+    print(f"Вариант {i+1}")
+    print(f"0={char_0[-2:]} | 1={char_1[-2:]} | Sep={char_sep[-2:]}")
+    
+    # Убираем возможные скрытые переносы строк для компактного вывода
+    clean_text = text.replace(chr(10), '').replace(chr(13), '')
+    print(f"Результат: {clean_text[:150]}\n")
