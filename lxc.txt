@@ -137,35 +137,34 @@ else:
 
 
 
-import ast
-import random
+pub_key = [35503, 76468, 505235, 125231, 620315, 408002, 481981, 702393]
+ct = [1891308, 1904411, 2386392, 2794394, 1188915, 1891308, 2386392, 2029642, 
+      2511623, 1188915, 1814840, 989705, 1817329, 1766077, 2222842, 1332859, 
+      630466, 2092001, 2414390, 1766077, 1202018, 1038468, 2312413, 706934, 
+      1332859, 630466, 2092001, 2437644, 1102296]
 
-# Открываем файл output и читаем из него массив шифротекстов
-with open('output', 'r') as f:
-    data = f.read()
-    # ast.literal_eval безопасно превратит строку из файла в Python список байт
-    ct = ast.literal_eval(data)
+# Создаем словарь для быстрого поиска
+lookup_table = {}
 
-l = len(ct) # Длина флага равна количеству сгенерированных блоков
-print(f"Длина флага: {l} символов")
+# Перебираем все 256 возможных значений байта
+for i in range(256):
+    # Превращаем число в 8-битную строку, как это делал автор
+    bin_str = bin(i)[2:].zfill(8)
+    
+    # Считаем сумму ключей для текущей комбинации бит
+    current_sum = 0
+    for pos, bit in enumerate(bin_str):
+        current_sum += pub_key[pos] * int(bit)
+        
+    # Сохраняем результат: сумма -> символ
+    lookup_table[current_sum] = chr(i)
 
-# Воссоздаем первый блок открытого текста pt_0
-# Мы знаем, что flag[0] == 's', ее код 115
-random.seed(ord('s'))
-pt_0 = [random.randint(0, 255) for _ in range(l)]
-pt_0[0] = ord('s')
+# Собираем флаг
+flag = ""
+for encrypted_char in ct:
+    if encrypted_char in lookup_table:
+        flag += lookup_table[encrypted_char]
+    else:
+        flag += "?" # На случай ошибки
 
-# Вычисляем общий keystream (XOR шифротекста и открытого текста)
-keystream = []
-for j in range(l):
-    keystream.append(ct[0][j] ^ pt_0[j])
-
-# Вытаскиваем флаг
-# В функции generate есть строка: result[index] = bytes([ch])
-# Это значит, что i-й символ флага всегда лежит на i-й позиции в i-м блоке
-flag = []
-for i in range(l):
-    flag_char = ct[i][i] ^ keystream[i]
-    flag.append(chr(flag_char))
-
-print("Флаг:", "".join(flag))
+print("Флаг:", flag)
