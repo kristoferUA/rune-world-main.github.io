@@ -4,15 +4,7 @@ https://national-icoa2026.ctf.in.ua/
 Пароль: k*fklDd*PvzDsU@C
 
 
-dd if=kapy.zip bs=1 skip=7075974 of=tail_data
-python3 -c "open('reflected_file','wb').write(open('tail_data','rb').read()[::-1])"
-strings reflected_file | grep -v "KPbw"
-foremost -i /home/kali/Downloads/kapy.zip -o result_capy
-dd if=reflected_file bs=1 skip=18 of=clean_zip.bin
-strings tail_data | grep -v "coa" | grep -v "KPbw" | grep -v "taaa" | grep -v "zzza" | grep -v "PK"
-python3 -c "open('xor_fixed','wb').write(bytes([b^97 for b in open('tail_data','rb').read()]))"
-python3 -c "open('capy_real','wb').write(open('secret_prefix','rb').read()[::-1])"
-python3 -c "d = open('secret_prefix', 'rb').read(); d = d.replace(b'KP\x03\x04', b'PK\x03\x04').replace(b'KP\x01\x02', b'PK\x01\x02').replace(b'KP\x05\x06', b'PK\x05\x06'); open('fixed_capy.zip', 'wb').write(d)"
+
 
 import sys
 from Crypto.Util.number import long_to_bytes
