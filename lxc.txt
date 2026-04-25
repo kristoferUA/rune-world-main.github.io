@@ -143,37 +143,54 @@ import hashlib
 
 base_key = b'sikorsky'
 
-# Собираем все адекватные варианты формирования ключа
-keys = [
-    (base_key.ljust(32, b'\x00'), "Дополнение нулями (ljust)"),
-    (base_key * 4, "Дублирование 4 раза"),
-    (hashlib.sha256(base_key).digest(), "SHA256 хеш"),
-    (hashlib.md5(base_key).digest() * 2, "MD5 хеш дважды")
-]
+# Розширений список KDF та варіантів доповнення
+keys = {
+    "Null-padding (ljust)": base_key.ljust(32, b'\x00'),
+    "Null-padding (rjust)": base_key.rjust(32, b'\x00'),
+    "Space-padding": base_key.ljust(32, b' '),
+    "Дублювання (x4)": base_key * 4,
+    "SHA-256": hashlib.sha256(base_key).digest(),
+    "MD5 (x2)": hashlib.md5(base_key).digest() * 2,
+}
 
-# И два разных стандарта длины Nonce
-nonces = [
-    (b'\x00' * 8, "8 байт (стандарт DJB)"),
-    (b'\x00' * 12, "12 байт (стандарт IETF / RFC 7539)")
-]
+# Варіанти Nonce (8 та 12 байт, нульові байти або символ '0')
+nonces = {
+    "8 bytes (\\x00)": b'\x00' * 8,
+    "12 bytes (\\x00)": b'\x00' * 12,
+    "8 bytes ('0')": b'0' * 8,
+    "12 bytes ('0')": b'0' * 12,
+}
 
 target_pos = 13991507
+window_size = 100  # Шукаємо в околі +/- 100 байт (компенсує 1-indexed)
+
+print(f"[*] Шукаємо 'KPI' в околі позиції {target_pos}...")
+
 correct_k = None
 correct_n = None
+exact_match_pos = None
 
-print("[*] Начинаем моментальный перебор параметров через seek()...")
-
-for k_val, k_name in keys:
-    for n_val, n_name in nonces:
+for k_name, k_val in keys.items():
+    for n_name, n_val in nonces.items():
         try:
             cipher = ChaCha20.new(key=k_val, nonce=n_val)
-            # Магия: моментально прыгаем на нужный байт
-            cipher.seek(target_pos)
-            if cipher.encrypt(b'\x00\x00\x00') == b'KPI':
-                print(f"[+] БИНГО! Найдена правильная конфигурация:")
+            
+            # Відступаємо трохи назад, щоб захопити сусідні індекси
+            start_read = max(0, target_pos - window_size)
+            cipher.seek(start_read)
+            
+            # Читаємо вікно даних навколо цілі
+            chunk = cipher.encrypt(b'\x00' * (window_size * 2))
+            
+            if b'KPI' in chunk:
+                found_idx = start_read + chunk.find(b'KPI')
+                print(f"\n[+] БІНГО! Знайдено збіг!")
                 print(f"    Ключ: {k_name}")
                 print(f"    Nonce: {n_name}")
+                print(f"    Фактична позиція: {found_idx} (різниця з умовою: {target_pos - found_idx})")
+                
                 correct_k, correct_n = k_val, n_val
+                exact_match_pos = found_idx
                 break
         except Exception:
             continue
@@ -181,8 +198,7 @@ for k_val, k_name in keys:
         break
 
 if correct_k:
-    print("\n[*] Запускаем полный поиск (выводим первые 5 совпадений)...")
-    # Пересоздаем шифр с нуля с правильными параметрами
+    print("\n[*] Запускаємо пошук 4-ї позиції (твого пароля)...")
     cipher = ChaCha20.new(key=correct_k, nonce=correct_n)
     chunk_size = 1024 * 1024
     offset = 0
@@ -196,10 +212,14 @@ if correct_k:
         pos = data.find(b'KPI')
         while pos != -1:
             global_pos = offset - len(overlap) + pos
-            print(f"[{found_count+1}] Позиция: {global_pos}")
+            
+            # Коригуємо виведення так, як це рахував автор таски (наприклад, +1)
+            display_pos = global_pos + (target_pos - exact_match_pos)
+            
+            print(f"[{found_count+1}] Позиція: {display_pos} (реальний індекс Python: {global_pos})")
             found_count += 1
             if found_count == 4:
-                print(f"\n[!!!] ТВОЙ ПАРОЛЬ ОТ secret.kdbx: {global_pos}\n")
+                print(f"\n[!!!] ТВІЙ ПАРОЛЬ ВІД secret.kdbx: {display_pos}\n")
             if found_count >= 5:
                 break
             pos = data.find(b'KPI', pos + 1)
@@ -207,4 +227,4 @@ if correct_k:
         overlap = chunk[-2:]
         offset += chunk_size
 else:
-    print("[-] Стандартные комбинации не подошли. Возможно, используется специфичный KDF.")
+    print("[-] У вікні +/- 100 байт нічого. Автор використав ще хитріший KDF.")
