@@ -9,6 +9,9 @@ python3 -c "open('reflected_file','wb').write(open('tail_data','rb').read()[::-1
 strings reflected_file | grep -v "KPbw"
 foremost -i /home/kali/Downloads/kapy.zip -o result_capy
 dd if=reflected_file bs=1 skip=18 of=clean_zip.bin
+strings tail_data | grep -v "coa" | grep -v "KPbw" | grep -v "taaa" | grep -v "zzza" | grep -v "PK"
+
+
 
 import sys
 from Crypto.Util.number import long_to_bytes
