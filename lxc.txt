@@ -2,7 +2,7 @@ A: UA575T709V
 B: UAQJSNAD9Q
 C: UATGA2XP2B
 
-
+echo "UEsDBBQAAAAIANmGk1wI0A81FQAAABUAAAAIAAAAZmxhZy50eHRzdPZ3rK7KLIjPzCvOTEmNBzJruQBQsWECFAMUAAAACADZhpNcCNAPNRUAAAAVAAAACAAAAAAAAAAAAAAAgAEAAAAAZmxhZy50eHRQSwUGAAAAAAEAAQA2AAAAOwAAAAAA" | base64 -d > flag.zip && unzip -p flag.zip
 !echo "ping" | python3 -c "import sys; print('pong' if sys.stdin.read().strip() == 'ping' else '')"
 
 https://national-icoa2026.ctf.in.ua/
