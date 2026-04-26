@@ -5,7 +5,7 @@ https://practice.icoa2026.au//register
 Пароль: k*fklDd*PvzDsU@C
 
 
-
+docker run --rm -v $(pwd):/app -w /app python:3.12 bash -c "pip install pyarmor==9.1.8 pycryptodome >/dev/null 2>&1 && echo 'x=1' > dummy.py && pyarmor gen dummy.py >/dev/null 2>&1 && cp -r dist/pyarmor_runtime_000000 . && python3 test1.py"
 
 
 import base64
