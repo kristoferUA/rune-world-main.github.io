@@ -261,24 +261,443 @@ else:
 
 
 
-[*] Читаем секретные переменные библиотеки:
-hexa: 2k7bzzr745kqdgxuye1e9z3ixcbomd5owmnh7hk9zk828bh8ufn9q8my9eioekjambhlkpxuevdsujveq0vrt52om3qua4bz6bs8avdtumt3o0jb2zecrg9gkizp0l68vkhvm99owab3g788v9b4vv4krvszcwrz1khgqzxol3x3wfgbdfga9x6v41vy4s1xhd3nf1uu6jx8r9z7ks3u4846tsnc8hf21f35fwvz6ky8tevl82ewvl910nlxxnw65ilpop4nu5d7rbnhkgj52z351arcziadd9a8smiu1bkhnmtho6xodkbro43i5rg1xzg83895mam2ncavezg40113wxewz72qzh3sqgdf4pe4a7n0tslz877kqzi6f1ao6qcz1emkh81b9edtu4dhxzl2mjvmos15lq0k0fpjofi23x6ykhvowluraf880jmy9ndwze7yqzkrpn9vgv2kuk7o2pymfz85y68tt8jcc7bxyv9xo126e2xz7j82a5ta5vdg3k4qadmwfhamazcyxakgeicha63gewt3cwgcbuqvr8mqij4cpp1b0d9p4o2341yb9pz3a31xt9l4ppclz9bqbqfnyz9milwh6j5yptzph03zpb0ctg1csxr1tx705cphx42icqc1u0i9h2grxg6e06y9z98dug3uq65upmkvan488x1rmowl7psefikafdcdqxy62elvp1a4zubsjuza47th2j93z77sn27xlk5mntsrjs6yqsf45pxcuxg7htkg3enfm6ofzrc4ebpzg7jgpkqg1wk41xrbx1kjigd79iveqkvf6ndumyik98nc0hr6jysj4s81y7j6ui6gfv7sebdirh4m7jn491x05trjgxjsr6ea6nz4h28gqc7iktaufle9vq6cvjlvsgbd7bsuya04mxg6i492z0o6kl9iicrf7vm3hlla20vgzcsm06tp8fnvbud0poz25jt9d2zl2vznke4pw0dyx9m2zw2di2o2f8ruu0ob47bhqyexbpehinmp7qqp8279w2kbqk4naweltolbkx9g0kuo2lb2cwh4ggnlvx6y748a57exyjq7x5uelowjb0xj4fn14ya6wlh85us6iiaz3w36xu2tot8mdywsm0ikzb272i8ed1bve1kx2tn90iy5as0j16etayxlk791saj1t4jv135l5k98qvbo9ta752g2boguyzzkuizpo3xcl2bp7hg67b049sn0hoongh6drfvqpg0k90umkh83awbnw18gn0ctogmp5ew4vn876v871z8c4jhes41gj58yvmyxyctzjrdq43w8aj8r2ua94qx8wvja9zy2v4i8b1avev6d0bl389x5tdyp83augmzsuay3kgzojqyfxa1xl1f6xt5ebd4tyws4ev1h1ekj9y19byi46dmzk7yi6ci256usscsx15xun9wczawop0mlv0h07b695ykkqo5eoaylpkoz2yhjkwoccr5az1r31oqu6xw7m4ny6xa4tt3l65bojr6vxi3r1urm2u705kozeqkss5nchmo69sc72bnlwx9640wfufqz7mazsw2wegqd2irocl3rkiwkz3iqbe20u3s0gcb5cos7u98izeaakksclcqxpmme3io6lev6nvcmrpti0ki4whtr5r1fxzpev6gco9ssl7nf7v81cj7vtougvlvwi45smee92dif4d68mmtzidviwnnjx9dp8rn77v0jemncxfpcu7qcav3x1pxhfih9ddoxlq2ttdmou8vm0gjvsudk3av75j62x9vxas7dzbgvyln8r43mloc47hfw6kxekp11h0nljvh64ihf9cif169ph96iql31iv0zcixqe2x12ks5poqbld4wezl0egg1qua2x6afzdqcuje2135f7gjd9ez7tihiympl8v1fz5jxghsrbazm8tm1kocqfqfof9dd1bkik3ffjw7685g5alottezu7e0r9c0r0grpozcvxky9losuaaoxhvx3zjv4qc8l02hxyhvrt76ft7hkvq3s3o5r9bowqltjwftnlglp9uxcwvwabpfoq0ses2ltjqu6czk3xzchqd7gqyn3bn9oeijmw9q92tlc1u2tgadsqpbj9yypksgr4f7fs68jc5kxm4mgjbhs85copls2xe8hd1cnybqwwrfsjq4ir1mlxceyalu0uf9psyp1pe4g48merwqjptz0uy9wbz231hheoytwrhzj49fgdc3hj65a3zzj5dxnf9z4ze7cn8zrdejb87ck2afpgqzwh35eb8qejpuuc3nysuntr2m0mxinx5d2ul5km1b4k6mze24ayll2btrrd9wbk4vi5fkvcfij95mcahnfyamrq0js6eovvycqlf0usft0tnfyp5ug6nckzziovfk421aj5e3ep29o7k92kyegy8amim2n0b3yunojpsj82vyymtd3o4y1aritl24qd291zj4r8a2xhvio6roxk24muvtpup2fgy2jec33tj90w8bdftau3aml2yej5lcfsi8hg1uxek8lqtl2q2jgdzqbrirywbdyrusno9acl3k5d9ijbwksi4wm2qt5q243u7p98xdflapbulvp0k8682okthdh633yomavntglv8ztt9s1bbxmlr2dehbegkjvtuzk8hjafnbu5c4dlye4q03igs2al5bkmvhiegoshsrduzgvry23nzbshmfvjrfhuvwhrzciy15zkw8i5t34j3wa7o3yhc1d7lg8hfv6n89kpja5vgdnd3fb8gvxc4txcn24f3ym29fn8kn2qwhreh9p3sezip53ibm321xt86usvkqfyahleh8zkqw5xk8tgj167g0fzqabkxo31qv4cnpr06f3dc60ajqm490zmnbhdnibzksw1h8571cbe7knwi7jwdgmk81tzw9wordjwpgmyvz0zdf5q8xj3wavnvf23xi45lqwfh8rasm78jn8824cyazelmoa0eadyhpaakiehsvidejasa744l3myammkrs5k31miiohhyduzaa6xxk93lh68j39k31l2tpmclsk3zfbt2rbh5yrl591uivk9px0tjvi638s2l9n6ltmtj2hzhv375y9p35yhiyl399uvdygdiqq9mt332iqhmneemaq0n6ae4hokl7rg457kw9hzq3d76o0xzatl9x5hoi47kykolsle5wi28od93vlcyz2oohj0on6cj47vk3r0vdpao
-page: 164
-shelf: 3
-volume: 15
-wall: 3
-
-[*] Ищем коллизию для хеш-функции...
-[+] Коллизия найдена!
-Значение 1: test_string_1
-Значение 2: test_string_0
-Хеш: cf4e341e1c4f02cd0417a091b60c794a
-
-[*] Вызываем Flagger с найденной коллизией...
-Collision Detected! Heres where your flag is in the Library of babel:
-Hex = 
-2k7bzzr745kqdgxuye1e9z3ixcbomd5owmnh7hk9zk828bh8ufn9q8my9eioekjambhlkpxuevdsujveq0vrt52om3qua4bz6bs8avdtumt3o0jb2zecrg9gkizp0l68vkhvm99owab3g788v9b4vv4krvszcwrz1khgqzxol3x3wfgbdfga9x6v41vy4s1xhd3nf1uu6jx8r9z7ks3u4846tsnc8hf21f35fwvz6ky8tevl82ewvl910nlxxnw65ilpop4nu5d7rbnhkgj52z351arcziadd9a8smiu1bkhnmtho6xodkbro43i5rg1xzg83895mam2ncavezg40113wxewz72qzh3sqgdf4pe4a7n0tslz877kqzi6f1ao6qcz1emkh81b9edtu4dhxzl2mjvmos15lq0k0fpjofi23x6ykhvowluraf880jmy9ndwze7yqzkrpn9vgv2kuk7o2pymfz85y68tt8jcc7bxyv9xo126e2xz7j82a5ta5vdg3k4qadmwfhamazcyxakgeicha63gewt3cwgcbuqvr8mqij4cpp1b0d9p4o2341yb9pz3a31xt9l4ppclz9bqbqfnyz9milwh6j5yptzph03zpb0ctg1csxr1tx705cphx42icqc1u0i9h2grxg6e06y9z98dug3uq65upmkvan488x1rmowl7psefikafdcdqxy62elvp1a4zubsjuza47th2j93z77sn27xlk5mntsrjs6yqsf45pxcuxg7htkg3enfm6ofzrc4ebpzg7jgpkqg1wk41xrbx1kjigd79iveqkvf6ndumyik98nc0hr6jysj4s81y7j6ui6gfv7sebdirh4m7jn491x05trjgxjsr6ea6nz4h28gqc7iktaufle9vq6cvjlvsgbd7bsuya04mxg6i492z0o6kl9iicrf7vm3hlla20vgzcsm06tp8fnvbud0poz25jt9d2zl2vznke4pw0dyx9m2zw2di2o2f8ruu0ob47bhqyexbpehinmp7qqp8279w2kbqk4naweltolbkx9g0kuo2lb2cwh4ggnlvx6y748a57exyjq7x5uelowjb0xj4fn14ya6wlh85us6iiaz3w36xu2tot8mdywsm0ikzb272i8ed1bve1kx2tn90iy5as0j16etayxlk791saj1t4jv135l5k98qvbo9ta752g2boguyzzkuizpo3xcl2bp7hg67b049sn0hoongh6drfvqpg0k90umkh83awbnw18gn0ctogmp5ew4vn876v871z8c4jhes41gj58yvmyxyctzjrdq43w8aj8r2ua94qx8wvja9zy2v4i8b1avev6d0bl389x5tdyp83augmzsuay3kgzojqyfxa1xl1f6xt5ebd4tyws4ev1h1ekj9y19byi46dmzk7yi6ci256usscsx15xun9wczawop0mlv0h07b695ykkqo5eoaylpkoz2yhjkwoccr5az1r31oqu6xw7m4ny6xa4tt3l65bojr6vxi3r1urm2u705kozeqkss5nchmo69sc72bnlwx9640wfufqz7mazsw2wegqd2irocl3rkiwkz3iqbe20u3s0gcb5cos7u98izeaakksclcqxpmme3io6lev6nvcmrpti0ki4whtr5r1fxzpev6gco9ssl7nf7v81cj7vtougvlvwi45smee92dif4d68mmtzidviwnnjx9dp8rn77v0jemncxfpcu7qcav3x1pxhfih9ddoxlq2ttdmou8vm0gjvsudk3av75j62x9vxas7dzbgvyln8r43mloc47hfw6kxekp11h0nljvh64ihf9cif169ph96iql31iv0zcixqe2x12ks5poqbld4wezl0egg1qua2x6afzdqcuje2135f7gjd9ez7tihiympl8v1fz5jxghsrbazm8tm1kocqfqfof9dd1bkik3ffjw7685g5alottezu7e0r9c0r0grpozcvxky9losuaaoxhvx3zjv4qc8l02hxyhvrt76ft7hkvq3s3o5r9bowqltjwftnlglp9uxcwvwabpfoq0ses2ltjqu6czk3xzchqd7gqyn3bn9oeijmw9q92tlc1u2tgadsqpbj9yypksgr4f7fs68jc5kxm4mgjbhs85copls2xe8hd1cnybqwwrfsjq4ir1mlxceyalu0uf9psyp1pe4g48merwqjptz0uy9wbz231hheoytwrhzj49fgdc3hj65a3zzj5dxnf9z4ze7cn8zrdejb87ck2afpgqzwh35eb8qejpuuc3nysuntr2m0mxinx5d2ul5km1b4k6mze24ayll2btrrd9wbk4vi5fkvcfij95mcahnfyamrq0js6eovvycqlf0usft0tnfyp5ug6nckzziovfk421aj5e3ep29o7k92kyegy8amim2n0b3yunojpsj82vyymtd3o4y1aritl24qd291zj4r8a2xhvio6roxk24muvtpup2fgy2jec33tj90w8bdftau3aml2yej5lcfsi8hg1uxek8lqtl2q2jgdzqbrirywbdyrusno9acl3k5d9ijbwksi4wm2qt5q243u7p98xdflapbulvp0k8682okthdh633yomavntglv8ztt9s1bbxmlr2dehbegkjvtuzk8hjafnbu5c4dlye4q03igs2al5bkmvhiegoshsrduzgvry23nzbshmfvjrfhuvwhrzciy15zkw8i5t34j3wa7o3yhc1d7lg8hfv6n89kpja5vgdnd3fb8gvxc4txcn24f3ym29fn8kn2qwhreh9p3sezip53ibm321xt86usvkqfyahleh8zkqw5xk8tgj167g0fzqabkxo31qv4cnpr06f3dc60ajqm490zmnbhdnibzksw1h8571cbe7knwi7jwdgmk81tzw9wordjwpgmyvz0zdf5q8xj3wavnvf23xi45lqwfh8rasm78jn8824cyazelmoa0eadyhpaakiehsvidejasa744l3myammkrs5k31miiohhyduzaa6xxk93lh68j39k31l2tpmclsk3zfbt2rbh5yrl591uivk9px0tjvi638s2l9n6ltmtj2hzhv375y9p35yhiyl399uvdygdiqq9mt332iqhmneemaq0n6ae4hokl7rg457kw9hzq3d76o0xzatl9x5hoi47kykolsle5wi28od93vlcyz2oohj0on6cj47vk3r0vdpao 
-Wall = 3   
-Shelf = 3   
-Volume = 15   
-Page = 164
+<FixedPage xmlns="http://schemas.microsoft.com/xps/2005/06" Width="816"
+Height="1056" xml:lang="en-US">
+ <Canvas>
+  <Canvas.RenderTransform>
+   <MatrixTransform Matrix="1.333333333,0,0,1.333333333,0,0"/>
+  </Canvas.RenderTransform>
+  <Path Data="M 72,72 L 544.7,72 L 544.7,459.1 L 72,459.1 Z"
+  Clip="M 0,0 L 612,0 L 612,792 L 0,792 Z ">
+   <Path.Fill>
+    <ImageBrush ImageSource="/Resources/Images/image_0.jpg"
+    Viewbox="0,0,413.33,266.67" TileMode="None" ViewboxUnits="Absolute"
+    ViewportUnits="Absolute" Viewport="0,0,1,1">
+     <ImageBrush.Transform>
+      <MatrixTransform Matrix="472.7,0,0,387.1,72,72"/>
+     </ImageBrush.Transform>
+    </ImageBrush>
+   </Path.Fill>
+  </Path>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a0" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="468.07" UnicodeString=" " Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a1" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="490.75" UnicodeString="The" Indices=",101.2;,113.25;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a2" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="104.42"
+   OriginY="490.75" UnicodeString="%" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a3" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="111.26"
+   OriginY="490.75" UnicodeString="u" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a4" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="121.82"
+   OriginY="490.75" UnicodeString="se of hieroglyphic writing"
+   Indices=",104.82;,110.84;,28.916;,108.43;,104.82;,28.916;,113.25;,103.61;,110.84;,112.05;,108.43;,106.02;,91.566;,115.66;,106.02;,113.25;,104.82;,116.87;,28.916;,116.87;,112.05;,104.82;,116.87;,104.82;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a5" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="379.87"
+   OriginY="490.75" UnicodeString="$" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a6" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="386.47"
+   OriginY="490.75" UnicodeString="a" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a7" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="394.87"
+   OriginY="490.75" UnicodeString="rose from "
+   Indices=",112.05;,108.43;,104.82;,110.84;,28.916;,104.82;,112.05;,108.43;,116.87;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a8" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="505.51" UnicodeString="proto"
+   Indices=",106.02;,112.05;,108.43;,116.87;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a9" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="126.98"
+   OriginY="505.51" UnicodeString="-" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a10" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="133.58"
+   OriginY="505.51" UnicodeString="literate symbol systems in the Early Bronze "
+   Indices=",91.566;,104.82;,116.87;,110.84;,112.05;,84.337;,116.87;,110.84;,28.916;,104.82;,114.46;,116.87;,101.2;,108.43;,91.566;,28.916;,104.82;,113.25;,104.82;,116.87;,110.84;,116.87;,104.82;,28.916;,104.82;,110.84;,28.916;,116.87;,113.25;,110.84;,28.916;,65.06;,84.337;,112.05;,91.566;,114.46;,28.916;,68.675;,112.05;,108.43;,110.84;,110.84;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a11" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="520.27" UnicodeString="Age, around"
+   Indices=",63.855;,106.02;,110.84;,68.675;,28.916;,84.337;,112.05;,108.43;,106.02;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a12" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="173.06"
+   OriginY="520.27" UnicodeString=";" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a13" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="179.66"
+   OriginY="520.27" UnicodeString="the 32nd century BC, with the first "
+   Indices=",116.87;,113.25;,110.84;,28.916;,66.265;,62.651;,110.84;,114.46;,28.916;,116.87;,110.84;,110.84;,116.87;,107.23;,112.05;,114.46;,28.916;,68.675;,65.06;,68.675;,28.916;,115.66;,104.82;,116.87;,113.25;,28.916;,116.87;,112.05;,110.84;,28.916;,104.82;,104.82;,112.05;,104.82;,115.66;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a14" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="535.03"
+   UnicodeString="decipherable sentence written in the Egyptian "
+   Indices=",114.46;,110.84;,116.87;,104.82;,107.23;,113.25;,110.84;,112.05;,84.337;,101.2;,92.771;,110.84;,28.916;,104.82;,110.84;,110.84;,116.87;,110.84;,110.84;,116.87;,110.84;,28.916;,116.87;,112.05;,104.82;,116.87;,116.87;,110.84;,110.84;,28.916;,104.82;,110.84;,28.916;,116.87;,112.05;,110.84;,28.916;,65.06;,106.02;,114.46;,106.02;,116.87;,104.82;,84.337;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a15" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="549.79" UnicodeString="language dating to the Second "
+   Indices=",91.566;,84.337;,110.84;,106.02;,106.02;,85.542;,106.02;,110.84;,28.916;,114.46;,84.337;,116.87;,104.82;,110.84;,106.02;,28.916;,116.87;,108.43;,28.916;,116.87;,113.25;,110.84;,28.916;,124.1;,110.84;,116.87;,108.43;,110.84;,114.46;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a16" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="354.43"
+   OriginY="549.79" UnicodeString="Dynasty (28th "
+   Indices=",67.47;,114.46;,110.84;,84.337;,104.82;,116.87;,114.46;,28.916;,65.06;,62.651;,65.06;,116.87;,113.25;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a17" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="564.43" UnicodeString="century"
+   Indices=",116.87;,110.84;,110.84;,116.87;,106.02;,112.05;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a18" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="150.5"
+   OriginY="564.43" UnicodeString="@" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a19" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="157.1"
+   OriginY="564.43" UnicodeString="BC)." Indices=",68.675;,66.265;,66.265;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a20" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="183.74"
+   OriginY="564.43" UnicodeString="#" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a21" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="190.97"
+   OriginY="564.43" UnicodeString="Egyptian hieroglyphs developed into "
+   Indices=",65.06;,106.02;,114.46;,106.02;,116.87;,104.82;,84.337;,110.84;,28.916;,113.25;,104.82;,112.05;,112.05;,108.43;,106.02;,91.566;,114.46;,107.23;,113.25;,104.82;,28.916;,114.46;,110.84;,109.64;,110.84;,91.566;,108.43;,106.02;,112.05;,114.46;,28.916;,104.82;,110.84;,116.87;,108.43;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a22" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="579.19" UnicodeString="a mature writing system used for monumental "
+   Indices=",84.337;,28.916;,116.87;,84.337;,116.87;,106.02;,112.05;,110.84;,28.916;,115.66;,112.05;,103.61;,116.87;,104.82;,110.84;,106.02;,28.916;,104.82;,114.46;,104.82;,116.87;,110.84;,116.87;,28.916;,106.02;,104.82;,110.84;,114.46;,28.916;,104.82;,108.43;,112.05;,28.916;,116.87;,108.43;,110.84;,106.02;,116.87;,110.84;,110.84;,116.87;,84.337;,91.566;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a23" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="593.98" UnicodeString="inscription in the"
+   Indices=",104.82;,110.84;,104.82;,116.87;,112.05;,104.82;,106.02;,116.87;,104.82;,108.43;,110.84;,28.916;,104.82;,110.84;,28.916;,116.87;,113.25;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a24" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="252.89"
+   OriginY="593.98" UnicodeString="67" Indices=",65.06;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a25" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="266.33"
+   OriginY="593.98" UnicodeString=" " Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a26" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="269.21"
+   OriginY="593.98" UnicodeString="classical language of the "
+   Indices=",116.87;,91.566;,84.337;,104.82;,104.82;,104.82;,116.87;,84.337;,91.566;,28.916;,91.566;,84.337;,110.84;,106.02;,106.02;,84.337;,107.23;,110.84;,28.916;,108.43;,104.82;,28.916;,116.87;,113.25;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a27" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="608.74"
+   UnicodeString="Middle Kingdom period; during this period, the "
+   Indices=",104.82;,104.82;,114.46;,114.46;,91.566;,110.84;,28.916;,116.87;,104.82;,112.05;,106.02;,115.66;,108.43;,116.87;,28.916;,106.02;,110.84;,112.05;,104.82;,108.43;,114.46;,66.265;,28.916;,114.46;,107.23;,112.05;,104.82;,110.84;,106.02;,28.916;,116.87;,113.25;,104.82;,104.82;,28.916;,106.02;,110.84;,112.05;,104.82;,108.43;,114.46;,68.675;,28.916;,116.87;,113.25;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a28" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="623.5"
+   UnicodeString="system made use of about 900 distinct signs. The "
+   Indices=",104.82;,114.46;,104.82;,116.87;,110.84;,116.87;,28.916;,116.87;,84.337;,114.46;,110.84;,28.916;,106.02;,104.82;,110.84;,28.916;,108.43;,104.82;,28.916;,83.133;,101.2;,108.43;,106.02;,116.87;,28.916;,63.855;,65.06;,65.06;,28.916;,114.46;,104.82;,104.82;,115.66;,104.82;,110.84;,116.87;,116.87;,28.916;,103.61;,104.82;,106.02;,110.84;,104.82;,66.265;,28.916;,101.2;,113.25;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a29" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="638.26" UnicodeString="use of t"
+   Indices=",106.02;,104.82;,110.84;,28.916;,108.43;,104.82;,28.916;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a30" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="142.7"
+   OriginY="638.26" UnicodeString="his writing system continued through "
+   Indices=",113.25;,104.82;,103.61;,28.916;,115.66;,112.05;,104.82;,116.87;,104.82;,110.84;,106.02;,28.916;,104.82;,114.46;,104.82;,115.66;,110.84;,116.87;,28.916;,116.87;,108.43;,110.84;,116.87;,104.82;,110.84;,106.02;,112.05;,114.46;,28.916;,116.87;,113.25;,112.05;,108.43;,106.02;,106.02;,113.25;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a31" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="653.02" UnicodeString="the New"
+   Indices=",116.87;,113.25;,110.84;,28.916;,110.84;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a32" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="142.46"
+   OriginY="653.02" UnicodeString="+" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a33" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="149.3"
+   OriginY="653.02" UnicodeString="Kingdom and Late Period, and on into the "
+   Indices=",116.87;,104.82;,112.05;,107.23;,114.46;,108.43;,116.87;,28.916;,84.337;,110.84;,114.46;,28.916;,110.84;,84.337;,116.87;,110.84;,30.12;,110.84;,110.84;,112.05;,104.82;,108.43;,114.46;,68.675;,28.916;,84.337;,110.84;,114.46;,28.916;,108.43;,110.84;,28.916;,104.82;,110.84;,116.87;,108.43;,28.916;,116.87;,113.25;,110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a34" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="667.66" UnicodeString="Persian and Ptolemaic periods. Late"
+   Indices=",110.84;,110.84;,112.05;,104.82;,104.82;,84.337;,110.84;,28.916;,84.337;,110.84;,114.46;,28.916;,110.84;,116.87;,108.43;,91.566;,110.84;,116.87;,84.337;,104.82;,116.87;,28.916;,106.02;,110.84;,113.25;,104.82;,108.43;,114.46;,104.82;,66.265;,28.916;,110.84;,84.337;,116.87;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a35" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="408.43"
+   OriginY="667.66" UnicodeString="&lt;" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a36" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="415.27"
+   OriginY="667.66" UnicodeString="survival"
+   Indices=",104.82;,104.82;,112.05;,108.43;,104.82;,108.43;,84.337;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a37" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="496.9"
+   OriginY="667.66" UnicodeString="s" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a38" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="507.34"
+   OriginY="667.66" UnicodeString="&gt;" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a39" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="513.94"
+   OriginY="667.66" UnicodeString="of " Indices=",108.43;,104.82;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a40" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="682.42" UnicodeString="hieroglyphic use are found well into the Rom"
+   Indices=",113.25;,104.82;,110.84;,112.05;,108.43;,107.23;,91.566;,114.46;,106.02;,113.25;,106.02;,116.87;,28.916;,106.02;,104.82;,110.84;,28.916;,84.337;,112.05;,109.64;,28.916;,104.82;,108.43;,104.82;,110.84;,114.46;,28.916;,115.66;,110.84;,92.771;,91.566;,28.916;,104.82;,110.84;,116.87;,108.43;,28.916;,116.87;,113.25;,110.84;,28.916;,118.07;,108.43;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a41" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="491.86"
+   OriginY="682.42" UnicodeString="A" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a42" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="498.34"
+   OriginY="682.42" UnicodeString="n " Indices=",110.84;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a43" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="72.024"
+   OriginY="697.18" UnicodeString="period, extending into the"
+   Indices=",106.02;,110.84;,112.05;,104.82;,108.43;,114.46;,68.675;,28.916;,110.84;,113.25;,116.87;,110.84;,110.84;,114.46;,104.82;,112.05;,106.02;,28.916;,104.82;,110.84;,116.87;,108.43;,28.916;,116.87;,113.25;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a44" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="330.43"
+   OriginY="697.18" UnicodeString="*" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a45" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="337.15"
+   OriginY="697.18" UnicodeString="4th century"
+   Indices=",67.47;,116.87;,113.25;,28.916;,116.87;,110.84;,110.84;,116.87;,107.23;,112.05;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a46" BidiLevel="0" Fill="#FFFFFFFF"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="448.27"
+   OriginY="697.18" UnicodeString=":" Indices="">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a47" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="454.9"
+   OriginY="697.18" UnicodeString="AD." Indices=",63.855;,67.47;">
+   </Glyphs>
+  </Canvas>
+  <Canvas
+  Clip="M 0.00000912,0.000011802 L 612,0.000011802 L 612,792 L 0.00000912,792 L 0.00000912,0.000011802 Z ">
+   <Glyphs Name="a48" BidiLevel="0" Fill="#FF000000"
+   FontUri="/Resources/7BD90B2F-535B-7A40-813F-613B8C389533.odttf"
+   FontRenderingEmSize="9.96" StyleSimulations="None" OriginX="474.58"
+   OriginY="697.18" UnicodeString=" " Indices="">
+   </Glyphs>
+  </Canvas>
+ </Canvas>
+</FixedPage>
