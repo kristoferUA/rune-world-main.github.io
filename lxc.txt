@@ -3,7 +3,7 @@ B: UAQJSNAD9Q
 C: UATGA2XP2B
 
 
-
+!echo "ping" | python3 -c "import sys; print('pong' if sys.stdin.read().strip() == 'ping' else '')"
 
 https://national-icoa2026.ctf.in.ua/
 https://practice.icoa2026.au//register
