@@ -10,42 +10,34 @@ s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 from PIL import Image
 
-def extract_tlsb(image_path):
-    # Відкриваємо зображення
-    img = Image.open(image_path).convert('RGB')
-    pixels = img.load()
-    width, height = img.size
-
+def solve_tlsb(image_path):
+    img = Image.open(image_path)
+    # Автоматично визначаємо канали (RGB або RGBA)
+    pixels = list(img.getdata())
+    
     extracted_bits = []
+    for pixel in pixels:
+        for channel in pixel:
+            # Витягуємо 3-й біт (вага 4, індекс 2)
+            bit = (channel >> 2) & 1
+            extracted_bits.append(bit)
 
-    # Проходимо по кожному пікселю і кожному каналу (R, G, B)
-    for y in range(height):
-        for x in range(width):
-            r, g, b = pixels[x, y]
-            for channel in [r, g, b]:
-                # Витягуємо 3-й біт (індекс 2, вага 4)
-                # Зсуваємо на 2 вправо і беремо останній біт
-                bit = (channel >> 2) & 1
-                extracted_bits.append(bit)
-
-    # Групуємо біти по 8 і перетворюємо в байти
-    all_bytes = []
+    # Варіант 1: Звичайний порядок (як у попередньому коді)
+    # Варіант 2: Зворотний порядок бітів у байті (найчастіша причина "сміття")
+    output_bytes = []
     for i in range(0, len(extracted_bits), 8):
         byte_bits = extracted_bits[i:i+8]
-        if len(byte_bits) < 8:
-            break
+        if len(byte_bits) < 8: break
         
-        # Перетворюємо список бітів у число
+        # Спробуємо LSB-first порядок (перший біт - наймолодший)
         byte_val = 0
-        for bit in byte_bits:
-            byte_val = (byte_val << 1) | bit
-        all_bytes.append(byte_val)
+        for j in range(8):
+            byte_val |= (byte_bits[j] << j)
+        output_bytes.append(byte_val)
 
-    # Виводимо результат як текст
-    return bytes(all_bytes).decode('ascii', errors='ignore')
+    return bytes(output_bytes).decode('ascii', errors='ignore')
 
-# Вкажи шлях до свого файлу "червоний квадрат"
-print(extract_tlsb('tlsb_image.png'))
+print(solve_tlsb('image.png'))
 
 
 
