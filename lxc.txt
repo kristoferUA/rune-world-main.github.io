@@ -4,6 +4,41 @@ https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
+
+import xml.etree.ElementTree as ET
+import glob
+
+namespaces = {'xps': 'http://schemas.microsoft.com/xps/2005/06'}
+glyphs_data = []
+
+# Шукаємо всі fpage файли
+for filepath in glob.glob("*.fpage"):
+    tree = ET.parse(filepath)
+    root = tree.getroot()
+    
+    # Знаходимо всі теги Glyphs
+    for glyphs in root.findall('.//xps:Glyphs', namespaces):
+        # Відбираємо тільки ті, що ми зробили чорними (колишні приховані)
+        if glyphs.get('Fill') == '#FF000000':
+            char = glyphs.get('UnicodeString')
+            # Захист від порожніх рядків
+            if not char or char.isspace():
+                continue
+                
+            x = float(glyphs.get('OriginX'))
+            y = float(glyphs.get('OriginY'))
+            glyphs_data.append((y, x, char))
+
+# Сортуємо: спочатку за Y (зверху вниз), потім за X (зліва направо)
+glyphs_data.sort(key=lambda item: (item[0], item[1]))
+
+# Збираємо прапор
+flag = "".join([item[2] for item in glyphs_data])
+print(f"Відсортований рядок: {flag}")
+
+
+
+
 grep 'Fill="#FFFFFFFF"' *.fpage | sed 's/.*UnicodeString="//;s/".*//' | tr -d '\n'
 docker run --rm -v $(pwd):/app -w /app python:3.12 bash -c "pip install pyarmor==9.1.8 pycryptodome >/dev/null 2>&1 && echo 'x=1' > dummy.py && pyarmor gen dummy.py >/dev/null 2>&1 && cp -r dist/pyarmor_runtime_000000 . && python3 test1.py"
 
