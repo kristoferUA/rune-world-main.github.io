@@ -46,32 +46,41 @@ import base64
 import zlib
 import itertools
 
-# Зашифрованный ответ сервера (из пакета №5)
-payload = "Sa4CVgcBUWYxMSViNQ=="
-data = bytearray(base64.b64decode(payload))
+payload1 = "Sa4CVgcBUWYxMSViNQ=="
+payload2 = "Sa4CUAAGU4MzMjVNNyM="
+data1 = bytearray(base64.b64decode(payload1))
+data2 = bytearray(base64.b64decode(payload2))
 
-# Мы знаем, что ключ состоит из 8 hex-символов. 
-# Первые два ('1' и '2') мы вычислили через магические байты Zlib
 prefix = b"12"
 hex_chars = b"0123456789abcdef"
 
-print("[*] Начинаем брутфорс оставшихся 6 символов ключа...")
+print("[*] Шукаємо точний ключ без колізій...")
 
 for p in itertools.product(hex_chars, repeat=6):
     key = prefix + bytes(p)
     
-    xored = bytearray(len(data))
-    for i in range(len(data)):
-        xored[i] = data[i] ^ key[i % 8]
+    xored1 = bytearray(len(data1))
+    for i in range(len(data1)):
+        xored1[i] = data1[i] ^ key[i % 8]
         
     try:
-        decompressed = zlib.decompress(xored)
-        print(f"\n[+] УСПЕХ! Ключ найден: {key.decode()}")
-        print(f"[+] Расшифрованные данные: {decompressed.decode(errors='ignore')}")
+        dec1 = zlib.decompress(xored1)
+    except zlib.error:
+        continue
+        
+    # Якщо перший зійшовся, обов'язково перевіряємо другий пакет!
+    xored2 = bytearray(len(data2))
+    for i in range(len(data2)):
+        xored2[i] = data2[i] ^ key[i % 8]
+        
+    try:
+        dec2 = zlib.decompress(xored2)
+        print(f"\n[+] БІНГО! Справжній ключ: {key.decode()}")
+        print(f"Пакет 1: {dec1.decode(errors='ignore')}")
+        print(f"Пакет 2: {dec2.decode(errors='ignore')}")
         break
     except zlib.error:
         continue
-
 
 
 
