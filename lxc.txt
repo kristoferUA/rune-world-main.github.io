@@ -9,7 +9,46 @@ flag{MIQSDHIVCHLUXJIHWXBT}
 NIRTDHIXCHMWZKIHYZBU
 
 
-76w+uPFDEucqSmaoL4Do5y2J+jyRfgAervbORLM2whk03FFpBsCw
+import gc
+import sys
+import base64
+
+# Перехватываем вызовы Base32, чтобы поймать момент декодирования
+old_b32decode = base64.b32decode
+def hook_b32decode(s, *args, **kwargs):
+    print(f"\n[!] ПОЙМАН ВЫЗОВ BASE32 DECODE!\nДанные: {s}")
+    return old_b32decode(s, *args, **kwargs)
+base64.b32decode = hook_b32decode
+
+# Перехватываем вызовы функций, чтобы увидеть, что из Crypto используется
+def trace_calls(frame, event, arg):
+    if event == 'c_call':
+        func_name = arg.__name__ if hasattr(arg, '__name__') else str(arg)
+        if 'Crypto' in func_name or 'hash' in func_name.lower():
+            print(f"[!] Вызов крипто-функции: {func_name}")
+    return trace_calls
+
+sys.setprofile(trace_calls)
+
+print("[*] Запускаем обфусцированный скрипт Collider.py...")
+try:
+    import Collider
+except SystemExit:
+    print("\n[-] Скрипт попытался завершить работу (SystemExit)")
+except Exception as e:
+    print(f"\n[-] Скрипт выдал ошибку (возможно, ждал ввода): {e}")
+
+sys.setprofile(None)
+
+print("\n[*] Сканируем оперативную память на наличие Base32 и зацепок...")
+for obj in gc.get_objects():
+    if isinstance(obj, str) and len(obj) > 5 and len(obj) < 200:
+        # Проверяем, состоит ли строка только из символов Base32 (A-Z, 2-7, =)
+        if all(c in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567=' for c in obj.upper()):
+            print(f"[ВОЗМОЖНЫЙ BASE32] {obj}")
+        # Ищем куски кода, импорты или флаг
+        elif 'pecan' in obj.lower() or 'def ' in obj or 'hash' in obj.lower():
+            print(f"[ИНТЕРЕСНАЯ СТРОКА] {obj}")
 
 import base64
 import random
