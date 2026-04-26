@@ -7,6 +7,40 @@ https://practice.icoa2026.au//register
 s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 
+
+import base64
+import zlib
+import urllib.parse
+
+key = "098f6bcd"
+
+def decrypt(payload):
+    # Убираем URL-кодировку, если она есть в POST-запросе
+    payload = urllib.parse.unquote(payload)
+    
+    try:
+        data = base64.b64decode(payload)
+    except Exception as e:
+        return f"Ошибка Base64: {e}"
+        
+    xored = bytearray()
+    for i in range(len(data)):
+        xored.append(data[i] ^ ord(key[i % len(key)]))
+        
+    try:
+        decompressed = zlib.decompress(xored)
+        return decompressed.decode('utf-8', errors='ignore')
+    except Exception as e:
+        return f"Ошибка Zlib: {e}"
+
+print("Вставь зашифрованную строку (БЕЗ маркеров):")
+user_input = input("> ").strip()
+print("\n[+] Расшифровано:")
+print(decrypt(user_input))
+
+
+
+
 import xml.etree.ElementTree as ET
 import glob
 
