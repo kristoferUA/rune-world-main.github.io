@@ -2,8 +2,7 @@ A: UA575T709V
 B: UAQJSNAD9Q
 C: UATGA2XP2B
 
-!python3 -c "import base64,zlib; d=base64.b64decode('UEsDBBQAAAAIANmGk1wI0A81FQAAABUAAAAIAAAAZmxhZy50eHRzdPZ3rK7KLIjPzCvOTEmNBzJruQBQsWECFAMUAAAACADZhpNcCNAPNRUAAAAVAAAACAAAAAAAAAAAAAAAgAEAAAAAZmxhZy50eHRQSwUGAAAAAAEAAQA2AAAAOwAAAAAA'); exec('for i in range(len(d)):\\n try:\\n  s=zlib.decompressobj(-15).decompress(d[i:]).decode()\\n  if len(s)>10: print(s)\\n except: pass')"
-!echo "ping" | python3 -c "import sys; print('pong' if sys.stdin.read().strip() == 'ping' else '')"
+echo "UEsDBBQAAAAIANmGk1wI0A81FQAAABUAAAAIAAAAZmxhZy50eHRzdPZ3rK7KLIjPzCvOTEmNBzJruQBQsWECFAMUAAAACADZhpNcCNAPNRUAAAAVAAAACAAAAAAAAAAAAAAAgAEAAAAAZmxhZy50eHRQSwUGAAAAAAEAAQA2AAAAOwAAAAAA" | base64 -d > flag.zip && unzip -p flag.zip
 
 https://national-icoa2026.ctf.in.ua/
 https://practice.icoa2026.au//register
