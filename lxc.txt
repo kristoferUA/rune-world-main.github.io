@@ -4,6 +4,8 @@ https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
+s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
+
 
 import xml.etree.ElementTree as ET
 import glob
