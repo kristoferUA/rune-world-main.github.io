@@ -8,79 +8,26 @@ s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 
 
-import base64
-import zlib
-import urllib.parse
+def extract_tlsb(filename):
+    with open(filename, 'rb') as f:
+        data = f.read()
 
-key = "098f6bcd"
+    bits = ""
+    for byte in data:
+        # Витягаємо 2-й біт (3-й з кінця)
+        bit = (byte >> 2) & 1
+        bits += str(bit)
 
-def decrypt(payload):
-    # Убираем URL-кодировку, если она есть в POST-запросе
-    payload = urllib.parse.unquote(payload)
+    # Групуємо біти по 8 і перетворюємо в ASCII
+    flag = ""
+    for i in range(0, len(bits), 8):
+        byte_str = bits[i:i+8]
+        if len(byte_str) == 8:
+            flag += chr(int(byte_str, 2))
     
-    try:
-        data = base64.b64decode(payload)
-    except Exception as e:
-        return f"Ошибка Base64: {e}"
-        
-    xored = bytearray()
-    for i in range(len(data)):
-        xored.append(data[i] ^ ord(key[i % len(key)]))
-        
-    try:
-        decompressed = zlib.decompress(xored)
-        return decompressed.decode('utf-8', errors='ignore')
-    except Exception as e:
-        return f"Ошибка Zlib: {e}"
+    return flag
 
-print("Вставь зашифрованную строку (БЕЗ маркеров):")
-user_input = input("> ").strip()
-print("\n[+] Расшифровано:")
-print(decrypt(user_input))
-
-
-
-
-
-import base64
-import zlib
-import itertools
-
-payload1 = "Sa4CVgcBUWYxMSViNQ=="
-payload2 = "Sa4CUAAGU4MzMjVNNyM="
-data1 = bytearray(base64.b64decode(payload1))
-data2 = bytearray(base64.b64decode(payload2))
-
-prefix = b"12"
-hex_chars = b"0123456789abcdef"
-
-print("[*] Шукаємо точний ключ без колізій...")
-
-for p in itertools.product(hex_chars, repeat=6):
-    key = prefix + bytes(p)
-    
-    xored1 = bytearray(len(data1))
-    for i in range(len(data1)):
-        xored1[i] = data1[i] ^ key[i % 8]
-        
-    try:
-        dec1 = zlib.decompress(xored1)
-    except zlib.error:
-        continue
-        
-    # Якщо перший зійшовся, обов'язково перевіряємо другий пакет!
-    xored2 = bytearray(len(data2))
-    for i in range(len(data2)):
-        xored2[i] = data2[i] ^ key[i % 8]
-        
-    try:
-        dec2 = zlib.decompress(xored2)
-        print(f"\n[+] БІНГО! Справжній ключ: {key.decode()}")
-        print(f"Пакет 1: {dec1.decode(errors='ignore')}")
-        print(f"Пакет 2: {dec2.decode(errors='ignore')}")
-        break
-    except zlib.error:
-        continue
+print(extract_tlsb('TLSB'))
 
 
 
