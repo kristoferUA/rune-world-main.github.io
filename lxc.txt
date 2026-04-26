@@ -10,35 +10,42 @@ s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 from PIL import Image
 
-def solve_tlsb(path):
-    img = Image.open(path).convert('RGB')
+def extract_tlsb(image_path):
+    # Відкриваємо зображення
+    img = Image.open(image_path).convert('RGB')
     pixels = img.load()
     width, height = img.size
 
-    bits = ""
+    extracted_bits = []
+
+    # Проходимо по кожному пікселю і кожному каналу (R, G, B)
     for y in range(height):
         for x in range(width):
             r, g, b = pixels[x, y]
-            # Извлекаем 3-й бит (индекс 2, значение 4) из каждого канала
             for channel in [r, g, b]:
-                bits += str((channel >> 2) & 1)
+                # Витягуємо 3-й біт (індекс 2, вага 4)
+                # Зсуваємо на 2 вправо і беремо останній біт
+                bit = (channel >> 2) & 1
+                extracted_bits.append(bit)
 
-    # Превращаем биты в символы
-    output = ""
-    for i in range(0, len(bits), 8):
-        byte = bits[i:i+8]
-        if len(byte) == 8:
-            output += chr(int(byte, 2))
-    
-    # Ищем начало флага, чтобы не смотреть на весь мусор
-    if "pecan{" in output:
-        print("Нашел!")
-        print(output[output.index("pecan{"):output.index("}")+1])
-    else:
-        print("Флаг не найден, вот начало вывода:")
-        print(output[:100])
+    # Групуємо біти по 8 і перетворюємо в байти
+    all_bytes = []
+    for i in range(0, len(extracted_bits), 8):
+        byte_bits = extracted_bits[i:i+8]
+        if len(byte_bits) < 8:
+            break
+        
+        # Перетворюємо список бітів у число
+        byte_val = 0
+        for bit in byte_bits:
+            byte_val = (byte_val << 1) | bit
+        all_bytes.append(byte_val)
 
-solve_tlsb('TLSB')
+    # Виводимо результат як текст
+    return bytes(all_bytes).decode('ascii', errors='ignore')
+
+# Вкажи шлях до свого файлу "червоний квадрат"
+print(extract_tlsb('tlsb_image.png'))
 
 
 
