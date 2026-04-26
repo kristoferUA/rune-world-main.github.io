@@ -2,8 +2,7 @@ A: UA575T709V
 B: UAQJSNAD9Q
 C: UATGA2XP2B
 
-python3 -c "import requests; print(requests.get('https://practice.icoa2026.au/api/icoa/exam-challenge/34', headers={'X-ICOA-Auth': 'contestant'}).text)"
-https://national-icoa2026.ctf.in.ua/
+python3 -c "import struct; d=bytes.fromhex('8949434f1300000049434f417b7374727563745f756e7061636b7d0000000000'); l=struct.unpack('<H', d[4:6])[0]; print(d[8:8+l].decode())"https://national-icoa2026.ctf.in.ua/
 https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
