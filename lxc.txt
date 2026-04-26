@@ -4,6 +4,9 @@ https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
+
+flag{MIQSDHIVCHLUXJIHWXBT}
+
 76w+uPFDEucqSmaoL4Do5y2J+jyRfgAervbORLM2whk03FFpBsCw
 
 import base64
