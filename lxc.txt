@@ -2,8 +2,7 @@ A: UA575T709V
 B: UAQJSNAD9Q
 C: UATGA2XP2B
 
-echo "UEsDBBQAAAAIANmGk1wI0A81FQAAABUAAAAIAAAAZmxhZy50eHRzdPZ3rK7KLIjPzCvOTEmNBzJruQBQsWECFAMUAAAACADZhpNcCNAPNRUAAAAVAAAACAAAAAAAAAAAAAAAgAEAAAAAZmxhZy50eHRQSwUGAAAAAAEAAQA2AAAAOwAAAAAA" | base64 -d > flag.zip && unzip -p flag.zip
-
+python3 -c "import base64; from Crypto.Cipher import AES; from Crypto.Util.Padding import unpad; k=bytes.fromhex('49434f41323032365f4145535f4b4559'); iv=bytes.fromhex('00000000000000000000000000000000'); ct=base64.b64decode('SMdsj8VdoAGCK+T6KUUTxYRM6GH2gYOgCTBYWORX0jY='); print(unpad(AES.new(k, AES.MODE_CBC, iv).decrypt(ct), 16).decode())"
 https://national-icoa2026.ctf.in.ua/
 https://practice.icoa2026.au//register
 Логін: kristofer_ua
