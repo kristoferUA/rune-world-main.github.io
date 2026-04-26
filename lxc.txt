@@ -6,7 +6,7 @@ https://practice.icoa2026.au//register
 
 s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
-
+PECAN{MO0S1C_4U_L0L!}
 
 def solve_bmp_stego(file_path):
     with open(file_path, 'rb') as f:
