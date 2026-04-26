@@ -8,26 +8,37 @@ s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 
 
-def extract_tlsb(filename):
-    with open(filename, 'rb') as f:
-        data = f.read()
+from PIL import Image
+
+def solve_tlsb(path):
+    img = Image.open(path).convert('RGB')
+    pixels = img.load()
+    width, height = img.size
 
     bits = ""
-    for byte in data:
-        # Витягаємо 2-й біт (3-й з кінця)
-        bit = (byte >> 2) & 1
-        bits += str(bit)
+    for y in range(height):
+        for x in range(width):
+            r, g, b = pixels[x, y]
+            # Извлекаем 3-й бит (индекс 2, значение 4) из каждого канала
+            for channel in [r, g, b]:
+                bits += str((channel >> 2) & 1)
 
-    # Групуємо біти по 8 і перетворюємо в ASCII
-    flag = ""
+    # Превращаем биты в символы
+    output = ""
     for i in range(0, len(bits), 8):
-        byte_str = bits[i:i+8]
-        if len(byte_str) == 8:
-            flag += chr(int(byte_str, 2))
+        byte = bits[i:i+8]
+        if len(byte) == 8:
+            output += chr(int(byte, 2))
     
-    return flag
+    # Ищем начало флага, чтобы не смотреть на весь мусор
+    if "pecan{" in output:
+        print("Нашел!")
+        print(output[output.index("pecan{"):output.index("}")+1])
+    else:
+        print("Флаг не найден, вот начало вывода:")
+        print(output[:100])
 
-print(extract_tlsb('TLSB'))
+solve_tlsb('TLSB')
 
 
 
