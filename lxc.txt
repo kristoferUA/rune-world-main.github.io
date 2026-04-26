@@ -9,29 +9,46 @@ docker run --rm -v $(pwd):/app -w /app python:3.12 bash -c "pip install pyarmor=
 
 
 import base64
-import sys
 
-# Хук для перехоплення Base32
-old_b32decode = base64.b32decode
-def hook_b32decode(s, *args, **kwargs):
-    print(f"\n[!] СПІЙМАНО ВИКЛИК BASE32 DECODE!\nСирі дані: {s}")
-    res = old_b32decode(s, *args, **kwargs)
-    print(f"Розшифровано: {res}")
-    return res
-base64.b32decode = hook_b32decode
+print("[*] Загружаем обфусцированный модуль...")
+import Collider
 
-print("[*] Завантажуємо обфускований модуль...")
+print("\n[*] Читаем секретные переменные библиотеки:")
 try:
-    import Collider
-    print("\n[*] Модуль успішно завантажено! Доступні об'єкти:")
-    for obj_name in dir(Collider):
-        if not obj_name.startswith("__"):
-            obj = getattr(Collider, obj_name)
-            print(f" -> {obj_name}: {type(obj)}")
-except SystemExit:
-    print("\n[-] Скрипт спробував завершити роботу (SystemExit)")
+    print(f"hexa: {Collider.hexa}")
+    print(f"page: {Collider.page}")
+    print(f"shelf: {Collider.shelf}")
+    print(f"volume: {Collider.volume}")
+    print(f"wall: {Collider.wall}")
 except Exception as e:
-    print(f"\n[-] Помилка під час завантаження: {e}")
+    print(f"[-] Ошибка чтения переменных: {e}")
+
+print("\n[*] Ищем коллизию для хеш-функции...")
+seen = {}
+try:
+    for i in range(1000000):
+        test_str = f"test_string_{i}"
+        
+        # Пробуем передать как строку, если ошибка - передаем как байты
+        try:
+            h = Collider.hasher(test_str)
+        except TypeError:
+            h = Collider.hasher(test_str.encode())
+            test_str = test_str.encode()
+            
+        if h in seen:
+            print(f"[+] Коллизия найдена!\nЗначение 1: {test_str}\nЗначение 2: {seen[h]}\nХеш: {h}")
+            
+            print("\n[*] Вызываем Flagger с найденной коллизией...")
+            try:
+                result = Collider.Flagger(test_str, seen[h])
+                print(f"[+] Ответ Flagger: {result}")
+            except Exception as e:
+                print(f"[-] Ошибка вызова Flagger: {e}")
+            break
+        seen[h] = test_str
+except Exception as e:
+    print(f"[-] Ошибка брутфорса коллизии: {e}")
 
 
 
