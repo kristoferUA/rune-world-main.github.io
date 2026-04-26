@@ -5,6 +5,38 @@ https://practice.icoa2026.au//register
 Пароль: k*fklDd*PvzDsU@C
 
 
+
+
+
+import base64
+import sys
+
+# Хук для перехоплення Base32
+old_b32decode = base64.b32decode
+def hook_b32decode(s, *args, **kwargs):
+    print(f"\n[!] СПІЙМАНО ВИКЛИК BASE32 DECODE!\nСирі дані: {s}")
+    res = old_b32decode(s, *args, **kwargs)
+    print(f"Розшифровано: {res}")
+    return res
+base64.b32decode = hook_b32decode
+
+print("[*] Завантажуємо обфускований модуль...")
+try:
+    import Collider
+    print("\n[*] Модуль успішно завантажено! Доступні об'єкти:")
+    for obj_name in dir(Collider):
+        if not obj_name.startswith("__"):
+            obj = getattr(Collider, obj_name)
+            print(f" -> {obj_name}: {type(obj)}")
+except SystemExit:
+    print("\n[-] Скрипт спробував завершити роботу (SystemExit)")
+except Exception as e:
+    print(f"\n[-] Помилка під час завантаження: {e}")
+
+
+
+
+
 flag{MIQSDHIVCHLUXJIHWXBT}
 NIRTDHIXCHMWZKIHYZBU
 
