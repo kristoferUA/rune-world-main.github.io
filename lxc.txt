@@ -15,11 +15,10 @@ from concurrent.futures import ProcessPoolExecutor
 ciphertext = base64.b64decode("76w+uPFDEucqSmaoL4Do5y2J+jyRfgAervbORLM2whkO3FFpBsCw")
 target = b"icoa2026{"
 
-# Заранее вычисляем нужную гамму для первых 9 байт
+# Заздалегідь обчислюємо гамму для перших 9 байт
 target_gamma = bytes(c ^ t for c, t in zip(ciphertext[:9], target))
 
 def check_epoch(epoch):
-    """Функция, которую будет выполнять каждый отдельный процесс"""
     for microsec in range(1000000):
         mcs = epoch * 1000000 + microsec
         random.seed(mcs)
@@ -32,32 +31,34 @@ def check_epoch(epoch):
     return None
 
 def main():
-    start_time = calendar.timegm(time.strptime("2025-11-27 14:11:58", "%Y-%m-%d %H:%M:%S"))
-    end_time = calendar.timegm(time.strptime("2025-11-27 14:13:44", "%Y-%m-%d %H:%M:%S"))
-    
-    # Собираем все секунды, которые нужно проверить (со сдвигами времени)
     epochs_to_check = []
-    for offset_hours in [0, -5, 5]:
-        for epoch in range(start_time, end_time + 1):
-            epochs_to_check.append(epoch + (offset_hours * 3600))
-            
-    print(f"Запускаем мультипроцессорный перебор ({len(epochs_to_check)} млн комбинаций)...")
     
-    # Запускаем пул процессов (автоматически займет все ядра CPU)
+    # Роки: 2025 (оригінал) та 1990 (Інтерстеллар: 5 годин = 35 років)
+    # Місяці: 11 (листопад) та 9 (вісімковий баг: 011 -> 9)
+    for year in [2025, 1990]:
+        for month in [11, 9]:
+            # Розширене вікно часу: від 14:09 до 14:15
+            start_t = calendar.timegm((year, month, 27, 14, 9, 0, 0, 0, -1))
+            end_t = calendar.timegm((year, month, 27, 14, 15, 0, 0, 0, -1))
+            
+            for epoch in range(start_t, end_t + 1):
+                # Зміщення: 0, -5 годин, +5 годин
+                for offset in [0, -5, 5]:
+                    epochs_to_check.append(epoch + (offset * 3600))
+                    
+    print(f"Запускаємо 4D-перебір ({len(epochs_to_check)} млн комбінацій)...")
+    
     with ProcessPoolExecutor() as executor:
-        # map раскидывает задачи по процессам и возвращает результаты по мере выполнения
         results = executor.map(check_epoch, epochs_to_check)
         
         for res in results:
             if res:
-                print(f"\n[+] Бинго! Флаг: {res}")
-                # Как только нашли, отменяем остальные задачи
+                print(f"\n[+] БІНГО! Прапор знайдено: {res}")
                 executor.shutdown(wait=False, cancel_futures=True)
                 return
                 
-    print("\n[-] Перебор завершен, флаг не найден.")
+    print("\n[-] Перебір завершено, прапор не знайдено.")
 
-# Эта конструкция обязательна для мультипроцессорности в Python
 if __name__ == '__main__':
     main()
 
