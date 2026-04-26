@@ -10,33 +10,33 @@ s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 import base64
 import zlib
-import urllib.parse
+import itertools
 
-key = "098f6bcd"
+# Зашифрованный ответ сервера (из пакета №5)
+payload = "Sa4CVgcBUWYxMSViNQ=="
+data = bytearray(base64.b64decode(payload))
 
-def decrypt(payload):
-    # Убираем URL-кодировку, если она есть в POST-запросе
-    payload = urllib.parse.unquote(payload)
+# Мы знаем, что ключ состоит из 8 hex-символов. 
+# Первые два ('1' и '2') мы вычислили через магические байты Zlib
+prefix = b"12"
+hex_chars = b"0123456789abcdef"
+
+print("[*] Начинаем брутфорс оставшихся 6 символов ключа...")
+
+for p in itertools.product(hex_chars, repeat=6):
+    key = prefix + bytes(p)
     
-    try:
-        data = base64.b64decode(payload)
-    except Exception as e:
-        return f"Ошибка Base64: {e}"
-        
-    xored = bytearray()
+    xored = bytearray(len(data))
     for i in range(len(data)):
-        xored.append(data[i] ^ ord(key[i % len(key)]))
+        xored[i] = data[i] ^ key[i % 8]
         
     try:
         decompressed = zlib.decompress(xored)
-        return decompressed.decode('utf-8', errors='ignore')
-    except Exception as e:
-        return f"Ошибка Zlib: {e}"
-
-print("Вставь зашифрованную строку (БЕЗ маркеров):")
-user_input = input("> ").strip()
-print("\n[+] Расшифровано:")
-print(decrypt(user_input))
+        print(f"\n[+] УСПЕХ! Ключ найден: {key.decode()}")
+        print(f"[+] Расшифрованные данные: {decompressed.decode(errors='ignore')}")
+        break
+    except zlib.error:
+        continue
 
 
 
