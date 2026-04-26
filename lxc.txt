@@ -4,7 +4,7 @@ https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
-
+WPA*01*7692495c2e25cf041aacc377f31e05e6*f60003062946*044de88e3ba3*5903783bf2cba18085195189
 
 from Cryptodome.Cipher import ARC4
 
