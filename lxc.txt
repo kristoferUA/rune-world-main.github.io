@@ -4,6 +4,43 @@ https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
+
+
+import base64
+import random
+import time
+import calendar
+
+ciphertext = base64.b64decode("76w+uPFDEucqSmaoL4Do5y2J+jyRfgAervbORLM2whkO3FFpBsCw")
+target = b"icoa2026{"
+
+# Заранее вычисляем нужную гамму для первых 9 байт
+target_gamma = bytes(c ^ t for c, t in zip(ciphertext[:9], target))
+
+# Базовое время из логов
+base_epoch = calendar.timegm(time.strptime("2025-11-27 14:13:44", "%Y-%m-%d %H:%M:%S"))
+
+print("Запускаю перебор микросекунд. Это займет около 15 секунд...")
+
+# Проверяем все возможные сдвиги в часах (часовые пояса + отставание Боба на 5 часов)
+for offset_hours in range(-24, 25):
+    epoch = base_epoch + offset_hours * 3600
+    for microsec in range(1000000):
+        mcs = epoch * 1000000 + microsec
+        random.seed(mcs)
+        
+        # Сравниваем сгенерированную гамму с нашей целью
+        if random.randbytes(9) == target_gamma:
+            random.seed(mcs)
+            full_gamma = random.randbytes(len(ciphertext))
+            flag = bytes(c ^ g for c, g in zip(ciphertext, full_gamma))
+            print(f"\n[+] Бинго! Флаг: {flag.decode('utf-8', errors='ignore')}")
+            exit()
+
+
+
+
+
 WPA*01*7692495c2e25cf041aacc377f31e05e6*f60003062946*044de88e3ba3*7777772e7365637572657472756569702e636f2e6b72***
 
 from Cryptodome.Cipher import ARC4
