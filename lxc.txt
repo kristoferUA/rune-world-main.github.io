@@ -11,24 +11,28 @@ from Cryptodome.Cipher import ARC4
 hex_data = "7692495c2e25cf041aacc377f31e05e6f60003062946044de88e3ba35903783bf2cba18085195189"
 data = bytes.fromhex(hex_data)
 
-# Список всех логичных зацепок из условия
 keys_to_try = [
-    b"INside", b"BankINside", b"bankINside", b"Bank INside",
-    b"interezen", b"securetrueip", b"IPinsideLWS", b"IpinLWS",
-    b"bank", b"Bank", b"inside", b"INSIDE"
+    b"interezen", b"Interezen", b"INTEREZEN", 
+    b"IPinside", b"IPINside", b"IPinsideLWS", b"IPinside LWS Agent",
+    b"BankINside", b"Bank INside", b"Bank", b"INside",
+    b"securetrueip", b"securetrueip.co.kr", b"www.securetrueip.co.kr",
+    b"interezen.co.kr", b"IPinside_LWS"
 ]
 
+found = False
 for key in keys_to_try:
     cipher = ARC4.new(key)
     decrypted = cipher.decrypt(data)
     
-    # Ищем характерные признаки нашего флага
-    if b"sikor" in decrypted.lower() or b"{" in decrypted:
+    # Строгая проверка - ищем только осмысленный текст флага
+    if b"sikor" in decrypted.lower():
         print(f"[+] Бинго! Ключ найден: {key.decode('utf-8')}")
         print(f"[+] Флаг: {decrypted.decode('utf-8', errors='ignore')}")
+        found = True
         break
-else:
-    print("[-] В базовом списке ключа нет, нужно копать глубже.")
+
+if not found:
+    print("[-] Среди этих ключей ответа нет.")
 
 
 
