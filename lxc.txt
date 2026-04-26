@@ -8,36 +8,34 @@ s[Kvf[wrNawrM]~%i[~6e]~6eapvf]~6eadjL]h$q5pvtdqe@K,lBp,wOeee
 
 
 
-def brute_force_tlsb(filename):
-    with open(filename, 'rb') as f:
-        data = f.read()
+from PIL import Image
 
-    for bit_pos in range(8):
-        bits = ""
-        for byte in data:
-            # Витягаємо біт на поточній позиції
-            bits += str((byte >> bit_pos) & 1)
-        
-        # Перетворюємо в текст
-        text = ""
-        for i in range(0, len(bits), 8):
-            chunk = bits[i:i+8]
-            if len(chunk) == 8:
-                try:
-                    text += chr(int(chunk, 2))
-                except:
-                    text += "?"
-        
-        # Шукаємо початок прапора
-        if "pecan" in text.lower():
-            print(f"Знайдено на біті №{bit_pos}!")
-            start = text.lower().find("pecan")
-            print(text[start:text.find("}", start)+1])
-            return
+def solve_final(path):
+    img = Image.open(path).convert('RGB')
+    pixels = img.getdata()
+    
+    bits = ""
+    for pixel in pixels:
+        for channel in pixel:
+            # Витягаємо 2-й біт (який є третім, якщо рахувати з 0)
+            bits += str((channel >> 2) & 1)
+            
+    # Конвертуємо отримані біти в текст
+    output = ""
+    for i in range(0, len(bits), 8):
+        byte_bits = bits[i:i+8]
+        if len(byte_bits) == 8:
+            output += chr(int(byte_bits, 2))
+            
+    if "pecan" in output:
+        print("Флаг знайдено!")
+        start = output.find("pecan")
+        end = output.find("}", start) + 1
+        print(output[start:end])
+    else:
+        print("У цьому режимі флага немає. Спробуй встановити zsteg.")
 
-    print("У сирих байтах нічого. Спробуй запустити zsteg -a")
-
-brute_force_tlsb('TLSB')
+solve_final('TLSB')
 
 
 
