@@ -7,6 +7,14 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 Пароль: k*fklDd*PvzDsU@C
 
 
+import base64
+
+def ham(b1, b2): return sum(bin(x^y).count('1') for x, y in zip(b1, b2))
+def score(t): return sum(1 for b in t if b in b"etaoin shrdluETAOINSHRDLU")
+
+data = base64.b64decode(open('6.txt').read())
+
+# Ищем длину ключа (усредняем по 4 парам блоков)
 ks = min(range(2, 41), key=lambda k: sum(ham(data[i*2*k:(i*2+1)*k], data[(i*2+1)*k:(i*2+2)*k]) for i in range(4)) / k)
 
 # Подбираем каждый байт ключа
