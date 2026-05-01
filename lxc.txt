@@ -22,3 +22,16 @@ key = bytes(max(range(256), key=lambda c: score(bytes(b^c for b in data[i::ks]))
 
 print(f"Ключ: {key.decode()}")
 print(bytes(data[i] ^ key[i%ks] for i in range(len(data))).decode('ascii', errors='ignore'))
+
+
+
+
+import base64
+def ham(b1, b2): return sum(bin(x^y).count('1') for x, y in zip(b1, b2))
+def score(t): return sum(1 for b in t if b in b"etaoin shrdluETAOINSHRDLU")
+data = base64.b64decode(open('6.txt').read())
+ks = min(range(2, 41), key=lambda k: sum(ham(data[i*2*k:(i*2+1)*k], data[(i*2+1)*k:(>
+key = bytes(max(range(256), key=lambda c: score(bytes(b^c for b in data[i::ks]))) fo>
+print(f"1: {key.decode()}")
+print(bytes(data[i] ^ key[i%ks] for i in range(len(data))).decode('ascii', errors='i>
+
