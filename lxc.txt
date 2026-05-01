@@ -8,27 +8,9 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 
 import base64
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-def ham(b1, b2): return sum(bin(x^y).count('1') for x, y in zip(b1, b2))
-def score(t): return sum(1 for b in t if b in b"etaoin shrdluETAOINSHRDLU")
-
-data = base64.b64decode(open('6.txt').read())
-
-ks = min(range(2, 41), key=lambda k: sum(ham(data[i*k:(i+1)*k], data[(i+1)*k:(i+2)*k]) for i in range(20)) / k)
-
-key = bytes(max(range(256), key=lambda c: score(bytes(b^c for b in data[i::ks]))) for i in range(ks))
-
-print(f"Ключ: {key.decode(errors='ignore')}")
-print(bytes(data[i] ^ key[i%ks] for i in range(len(data))).decode('ascii', errors='ignore'))
-
-
-
-import base64
-def ham(b1, b2): return sum(bin(x^y).count('1') for x, y in zip(b1, b2))
-def score(t): return sum(1 for b in t if b in b"etaoin shrdluETAOINSHRDLU")
-data = base64.b64decode(open('6.txt').read())
-ks = min(range(2, 41), key=lambda k: sum(ham(data[i*2*k:(i*2+1)*k], data[(i*2+1)*k:(>
-key = bytes(max(range(256), key=lambda c: score(bytes(b^c for b in data[i::ks]))) fo>
-print(f"1: {key.decode()}")
-print(bytes(data[i] ^ key[i%ks] for i in range(len(data))).decode('ascii', errors='i>
+data = base64.b64decode(open('7.txt').read())
+c = Cipher(algorithms.AES(b"YELLOW SUBMARINE"), modes.ECB()).decryptor()
+print((c.update(data) + c.finalize()).decode('ascii', errors='ignore'))
 
