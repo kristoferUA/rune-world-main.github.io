@@ -10,19 +10,16 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 import base64
 
 def ham(b1, b2): return sum(bin(x^y).count('1') for x, y in zip(b1, b2))
-def score(t): return sum(chr(b).isalpha() or b == 32 for b in t)
+def score(t): return sum(1 for b in t if b in b"etaoin shrdluETAOINSHRDLU")
 
 data = base64.b64decode(open('6.txt').read())
 
-# Усредняем по 20 парам блоков для точного нахождения длины ключа
 ks = min(range(2, 41), key=lambda k: sum(ham(data[i*k:(i+1)*k], data[(i+1)*k:(i+2)*k]) for i in range(20)) / k)
 
-# Подбираем ключ
 key = bytes(max(range(256), key=lambda c: score(bytes(b^c for b in data[i::ks]))) for i in range(ks))
 
-print(f"Ключ: {key.decode()}")
+print(f"Ключ: {key.decode(errors='ignore')}")
 print(bytes(data[i] ^ key[i%ks] for i in range(len(data))).decode('ascii', errors='ignore'))
-
 
 
 
