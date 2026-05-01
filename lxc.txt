@@ -7,10 +7,9 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 Пароль: k*fklDd*PvzDsU@C
 
 
-import base64
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-
-data = base64.b64decode(open('7.txt').read())
-c = Cipher(algorithms.AES(b"YELLOW SUBMARINE"), modes.ECB()).decryptor()
-print((c.update(data) + c.finalize()).decode('ascii', errors='ignore'))
+for line in open('8.txt'):
+    b = bytes.fromhex(line.strip())
+    chunks = [b[i:i+16] for i in range(0, len(b), 16)]
+    if len(set(chunks)) < len(chunks):
+        print(line.strip())
 
