@@ -6,6 +6,7 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
 
+https://pentesterlab.com/exercises/web-for-pentester-II
 
 for line in open('8.txt'):
     b = bytes.fromhex(line.strip())
