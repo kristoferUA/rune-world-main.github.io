@@ -4,6 +4,9 @@ A: UA575T709V
 B: UAQJSNAD9Q
 C: UATGA2XP2B
 
+
+well at least ive dumped all the traffic from here. So if i cant find the source myself, ill pass it on to the appropriate authorities
+
 python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d322b0b36343a3b'), b'CTF').decode())"https://practice.icoa2026.au//register
 Логін: kristofer_ua
 Пароль: k*fklDd*PvzDsU@C
