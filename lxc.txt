@@ -1,4 +1,5 @@
-curl -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36" URL > dump.html
+
+Why are you combining phishing pages into one network? You can jump between them using a dump. Plus, you've implemented automatic checking of read messages; it's not safe.
 
 A: UA575T709V
 B: UAQJSNAD9Q
