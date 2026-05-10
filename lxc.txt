@@ -1,3 +1,6 @@
+a3Jpc3RvZmVyX19nb29kX2pvYiEhIQ==
+
+
 wget https://repo.protonvpn.com/debian/dists/stable/main/binary-all/protonvpn-stable-release_1.0.3-3_all.deb
 sudo dpkg -i protonvpn-stable-release_1.0.3-3_all.deb
 sudo apt update
