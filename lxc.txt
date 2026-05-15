@@ -55,14 +55,10 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
+#!/usr/bin/env python3
 from sage.all import GF, EllipticCurve
-from hashlib import sha256
-import random
-import multiprocessing as mp
-import time
-import sys
+import hashlib
 
-# Глобальные параметры кривой (безопасно для чтения из форков)
 p = 2**49 * 3**36 - 1
 K = GF(p**2, "x", modulus=[1, 0, 1])
 x = K.gen()
@@ -70,9 +66,18 @@ x = K.gen()
 def deterministic_sqrt(val):
     return min(val.sqrt(all=True))
 
+def select0(E0, b0):
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    if b0:
+        return torsion_points[-1], torsion_points[1]
+    else:
+        return torsion_points[1], torsion_points[-1]
+
 def select(lambda0, lambda1, b):
-    if b: return max(lambda0, lambda1)
-    else: return min(lambda0, lambda1)
+    if b:
+        return max(lambda0, lambda1)
+    else:
+        return min(lambda0, lambda1)
 
 def next_curve(A, alpha, b):
     xi = alpha**2
@@ -85,134 +90,103 @@ def next_curve(A, alpha, b):
     return new_A, new_alpha
 
 def data_to_bits(data):
-    if isinstance(data, str): data = data.encode()
-    bits = [int(b) for c in data for b in "{:08b}".format(c)]
+    bits = [int(b) for c in data.encode() for b in "{:08b}".format(c)]
     return bits
 
-def prev_curve(A_next, alpha_next, b):
-    disc = -3 * alpha_next**2 - 4 * A_next
-    sqrts = disc.sqrt(all=True)
-    if not sqrts: return None
-    for s in sqrts:
-        alpha_cand = (alpha_next + s) / 4
-        A_cand = (-A_next - 15 * alpha_cand**2) / 4
-        try:
-            fA, falpha = next_curve(A_cand, alpha_cand, b)
-            if fA == A_next and falpha == alpha_next:
-                return A_cand, alpha_cand
-        except Exception:
-            pass
-    return None
-
-def worker(worker_id, found_event, attempts_counter, result_queue):
-    local_attempts = 0
-    while not found_event.is_set():
-        local_attempts += 1
+def solve():
+    print("[*] Начинаем поиск коллизии...")
+    # Начинаем с произвольной валидной точки
+    A_curr, alpha_curr = K(1), -x
+    attempts = 0
+    
+    while True:
+        attempts += 1
+        # Делаем случайный шаг вперед для получения новой целевой кривой
+        b_rand = attempts % 2
+        A_curr, alpha_curr = next_curve(A_curr, alpha_curr, b_rand)
+        A_target, alpha_target = A_curr, alpha_curr
         
-        # Обновляем общий счетчик каждые 10 попыток, чтобы не блокировать память
-        if local_attempts % 10 == 0:
-            with attempts_counter.get_lock():
-                attempts_counter.value += 10
-
-        A = K(1)
-        alpha = K(x)
-        for _ in range(20):
-            A, alpha = next_curve(A, alpha, random.choice([0, 1]))
-
-        A_N, alpha_N = A, alpha
-        xi = alpha_N**2
-        new_A = -(4 * A_N + 15 * xi)
-        new_B = -alpha_N * (8 * A_N + 22 * xi)
-
-        try:
-            E = EllipticCurve(K, [new_A, new_B])
-        except ArithmeticError:
-            continue
-
-        j_str = str(E.j_invariant()).encode()
-        credential = sha256(j_str).hexdigest()
-        bits = data_to_bits(credential)
-
-        curr_A, curr_alpha = A_N, alpha_N
-        success = True
-        for b in reversed(bits[1:]):
-            res = prev_curve(curr_A, curr_alpha, b)
-            if res is None:
-                success = False
+        # Вычисляем E_final и D
+        xi = alpha_target**2
+        new_A = -(4 * A_target + 15 * xi)
+        new_B = -alpha_target * (8 * A_target + 22 * xi)
+        
+        E_final = EllipticCurve(K, [new_A, new_B])
+        j_inv = str(E_final.j_invariant()).encode()
+        D = hashlib.sha256(j_inv).hexdigest()
+        
+        data_bits = data_to_bits(D)
+        
+        # Идем назад
+        A_back, alpha_back = A_target, alpha_target
+        valid_path = True
+        
+        for i in range(511, 0, -1):
+            bit = data_bits[i]
+            Delta = -12 * alpha_back**2 - 16 * A_back
+            
+            if not Delta.is_square():
+                valid_path = False
                 break
-            curr_A, curr_alpha = res
-
-        if not success: continue
-
-        A_0, alpha_0 = curr_A, curr_alpha
+                
+            r = deterministic_sqrt(Delta)
+            alpha_cand1 = (2 * alpha_back + r) / 8
+            alpha_cand2 = (2 * alpha_back - r) / 8
+            
+            found_step = False
+            for alpha_cand in [alpha_cand1, alpha_cand2]:
+                A_cand = (-A_back - 15 * alpha_cand**2) / 4
+                
+                # Проверяем шаг
+                test_A, test_alpha = next_curve(A_cand, alpha_cand, bit)
+                if test_A == A_back and test_alpha == alpha_back:
+                    A_back = A_cand
+                    alpha_back = alpha_cand
+                    found_step = True
+                    break
+                    
+            if not found_step:
+                valid_path = False
+                break
+                
+        if not valid_path:
+            continue
+            
+        # Восстанавливаем E0
+        A_0 = A_back
+        alpha_0 = alpha_back
         a6 = -alpha_0**3 - A_0 * alpha_0
-
+        
         try:
             E0 = EllipticCurve(K, [A_0, a6])
         except ArithmeticError:
             continue
-
+            
+        if not E0.is_supersingular():
+            continue
+            
+        # Проверяем условие для select0
         torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-        if len(torsion_points) < 3: continue
-
-        if bits[0] == 1: expected_alpha = torsion_points[-1]
-        else: expected_alpha = torsion_points[1]
-
-        if alpha_0 == expected_alpha:
-            # Нашли! Сообщаем остальным процессам остановиться
-            found_event.set()
+        b0 = data_bits[0]
+        
+        selected_alpha = torsion_points[-1] if b0 == 1 else torsion_points[1]
             
-            # Парсим в нативные инты для безопасной передачи через Queue
-            a4_list = E0.a4().polynomial().list() if hasattr(E0.a4(), 'polynomial') else [E0.a4()]
-            a6_list = E0.a6().polynomial().list() if hasattr(E0.a6(), 'polynomial') else [E0.a6()]
-
-            a4_0 = int(a4_list[0]) if len(a4_list) > 0 else 0
-            a4_1 = int(a4_list[1]) if len(a4_list) > 1 else 0
-            a6_0 = int(a6_list[0]) if len(a6_list) > 0 else 0
-            a6_1 = int(a6_list[1]) if len(a6_list) > 1 else 0
+        if selected_alpha == alpha_0:
+            a4_coeffs = A_0.polynomial().list()
+            a6_coeffs = a6.polynomial().list()
             
-            result_queue.put((a4_0, a4_1, a6_0, a6_1, credential))
+            a4_0 = a4_coeffs[0] if len(a4_coeffs) > 0 else 0
+            a4_1 = a4_coeffs[1] if len(a4_coeffs) > 1 else 0
+            a6_0 = a6_coeffs[0] if len(a6_coeffs) > 0 else 0
+            a6_1 = a6_coeffs[1] if len(a6_coeffs) > 1 else 0
+            
+            print(f"[+] Успех на попытке {attempts}!")
+            print(f"a4.0 > {a4_0}")
+            print(f"a4.1 > {a4_1}")
+            print(f"a6.0 > {a6_0}")
+            print(f"a6.1 > {a6_1}")
+            print(f"data > {D}")
             break
 
-def main():
-    cores = mp.cpu_count()
-    print(f"[*] Инициализация брутфорса на {cores} ядрах...")
-
-    found_event = mp.Event()
-    attempts_counter = mp.Value('i', 0)
-    result_queue = mp.Queue()
-
-    processes = []
-    for i in range(cores):
-        p = mp.Process(target=worker, args=(i, found_event, attempts_counter, result_queue))
-        p.start()
-        processes.append(p)
-
-    start_time = time.time()
-    
-    # Динамическое отслеживание прогресса
-    while not found_event.is_set():
-        time.sleep(0.5)
-        elapsed = time.time() - start_time
-        rate = attempts_counter.value / elapsed if elapsed > 0 else 0
-        sys.stdout.write(f"\r[*] Попыток: {attempts_counter.value} | Время: {elapsed:.1f}c | Скорость: {rate:.1f} поп/сек")
-        sys.stdout.flush()
-
-    print("\n[+] Ожидание завершения потоков...")
-    a4_0, a4_1, a6_0, a6_1, cred = result_queue.get()
-
-    for p in processes:
-        p.terminate() # Жестко глушим процессы, так как они нам больше не нужны
-        p.join()
-
-    print("\n[+] УСПЕХ! Вставь эти значения в Pwn-скрипт для отправки:")
-    print("-" * 40)
-    print(f"A4_0 = {a4_0}")
-    print(f"A4_1 = {a4_1}")
-    print(f"A6_0 = {a6_0}")
-    print(f"A6_1 = {a6_1}")
-    print(f"CREDENTIAL = '{cred}'")
-    print("-" * 40)
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    solve()
