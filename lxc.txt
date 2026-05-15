@@ -40,14 +40,12 @@ from pwn import *
 from Crypto.Util.number import long_to_bytes, bytes_to_long
 from hashlib import sha256
 
-# Подставь данные поднятого докера
-HOST = '127.0.0.1'
-PORT = 1337
+HOST = '154.57.164.67'
+PORT = 30098
 
 def main():
     p = remote(HOST, PORT)
     
-    # Парсим публичные параметры LCG
     p.recvuntil(b"Ledger hash parameters are a = ")
     a = int(p.recvuntil(b",", drop=True))
     p.recvuntil(b"b = ")
@@ -57,7 +55,6 @@ def main():
     
     log.info(f"Параметры перехвачены: n = {n}")
 
-    # Вычисляем genesis хэш, как это делает сервер
     genesis_block = sha256(b"Korvia command channel genesis").digest()
     last_hash = (a * bytes_to_long(genesis_block) + b) % n
 
@@ -66,49 +63,41 @@ def main():
     for i in range(100):
         p.recvuntil(b"Validate proxy transaction batch:\n")
         
-        # Читаем ровно 3 строки транзакций
         blockdata = b""
         for _ in range(3):
             blockdata += p.recvline()
             
-        # P - предыдущий хэш в виде байтов
         P = long_to_bytes(last_hash)
-        
-        # X - склеенные P и D
         X = bytes_to_long(P + blockdata)
         
-        # Наш target hash
         h = 1
-        
-        # Математически вычисляем нужный nonce
         N = (pow(a, -1, n) * (h - b - a * X * (1 << 256))) % n
         
-        # Упаковываем в 32 байта hex-формата
         nonce_hex = hex(N)[2:].zfill(64)
         p.sendlineafter(b"Enter block nonce in hex: ", nonce_hex.encode())
         
+        # Читаем ответ сервера на отправленный блок
         res = p.recvline().decode()
+        
         if "[REJECTED]" in res:
             log.error("Блок отклонен! Проверь математику.")
             break
+        elif "Flag payload:" in res:
+            # Ловим флаг прямо здесь, на 100-й итерации
+            log.success("Получен хэш флага!")
+            flag_hash_hex = res.split("Flag payload: ")[1].strip()
+            flag_hash = int(flag_hash_hex, 16)
             
-        # Обновляем last_hash нашей единицей
+            log.info("Оборачиваем хэш-функцию для расшифровки флага...")
+            F = (pow(a, -1, n) * (flag_hash - b)) % n
+            flag = long_to_bytes(F).decode()
+            print(f"\n[+] Взлом завершен. Флаг: {flag}")
+            return
+            
         last_hash = h
         
         if (i + 1) % 10 == 0:
             log.success(f"Пройдено блоков: {i + 1}/100")
-
-    # Перехватываем хэш флага
-    p.recvuntil(b"Flag payload: ")
-    flag_hash_hex = p.recvline().strip().decode()
-    flag_hash = int(flag_hash_hex, 16)
-    
-    log.info("Оборачиваем хэш-функцию для расшифровки флага...")
-    # Реверсим LCG
-    F = (pow(a, -1, n) * (flag_hash - b)) % n
-    
-    flag = long_to_bytes(F).decode()
-    print(f"\n[+] Взлом завершен. Флаг: {flag}")
 
 if __name__ == "__main__":
     main()
