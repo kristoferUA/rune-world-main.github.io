@@ -36,104 +36,73 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-from pwn import *
+from hashlib import sha256
+from Crypto.Util.number import long_to_bytes, bytes_to_long
+from Crypto.Util.number import getPrime
+import time
 import os
-import hashlib
-import re
 
-HOST = '154.57.164.67'
-PORT = 32600
+FLAG = open("flag.txt", "rb").read()
 
-def get_bits(data):
-    # Хэшируем сообщение и переводим в массив из 256 бит (от старшего к младшему)
-    h = hashlib.sha256(data).digest()
-    return [(b >> i) & 1 for b in h for i in range(7, -1, -1)]
-
-def generate_covering_payloads(target_msg):
-    target_bits = get_bits(target_msg)
-    log.info("Начинаем локальный подбор покрывающих сообщений...")
-    
-    # Крутим цикл, пока не уложимся в лимит из 6 сообщений
-    while True:
-        payloads = []
-        source_map = {} # Запоминаем, из какого пэйлоада берем нужный бит
-        covered = [False] * 256
+class KorviaLedger:
+    def __init__(self):
+        self.POW_hardness = 50 # 50 bits seems reasonable
+        self.n = getPrime(256)
+        while True:
+            self.a = getPrime(256)
+            self.b = getPrime(256)
+            if self.a < self.n and self.b < self.n:
+                break
+        genesis_block = sha256(b"Korvia command channel genesis").digest()
+        self.ledger = [self.ledger_hash(genesis_block)]
         
-        while not all(covered):
-            best_msg = None
-            best_cover_count = -1
-            best_msg_bits = None
-            
-            # Генерируем 5000 случайных строк и выбираем ту, которая закроет больше всего недостающих бит
-            for _ in range(5000):
-                msg = os.urandom(8)
-                bits = get_bits(msg)
-                cover_count = sum(1 for i in range(256) if not covered[i] and bits[i] == target_bits[i])
-                
-                if cover_count > best_cover_count:
-                    best_cover_count = cover_count
-                    best_msg = msg
-                    best_msg_bits = bits
-                    
-            p_idx = len(payloads)
-            payloads.append(best_msg)
-            
-            # Отмечаем биты, которые мы смогли добыть
-            for i in range(256):
-                if not covered[i] and best_msg_bits[i] == target_bits[i]:
-                    covered[i] = True
-                    source_map[i] = p_idx
-                    
-        if len(payloads) <= 6:
-            log.success(f"Найдено оптимальное покрытие за {len(payloads)} сообщений!")
-            return payloads, source_map, target_bits
-
-def get_signature(p, hex_msg):
-    p.sendlineafter(b"> ", b"1")
-    p.sendlineafter(b"hex: ", hex_msg.encode())
-    p.recvuntil(b"Token issued: ")
+    def ledger_hash(self, data):
+        hash = (self.a * bytes_to_long(data) + self.b) % self.n
+        return hash
     
-    token_data = p.recvuntil(b"]").decode()
-    
-    clean_tokens = []
-    for m in re.finditer(r'(?:0x)?([0-9a-fA-F]+)', token_data):
-        val = m.group(1).lower().zfill(64)
-        if len(val) == 64:
-            clean_tokens.append(val)
-            
-    return clean_tokens[:256]
+    def validate_block(self, blockdata, nonce):
+        hash = self.ledger_hash(long_to_bytes(self.ledger[-1]) + blockdata + nonce)
+        hash_bits = bin(hash)[2:]
+        hash_bits = "0"*(256 - len(hash_bits)) + hash_bits
+        if hash_bits[:self.POW_hardness] == self.POW_hardness*"0":
+            self.ledger.append(hash)
+            return True
+        else:
+            return False
+         
+def generate_proxy_transactions(tx_count):
+    block_data = b""
+    for i in range(tx_count):
+        block_data += b"Proxy 0x" + os.urandom(8).hex().encode() + b" delivered payload to asset 0x" + os.urandom(8).hex().encode() + b"\n"
+    return block_data
 
 def main():
-    target = b"d9_netadmin"
-    payloads, source_map, target_bits = generate_covering_payloads(target)
-    
-    p = remote(HOST, PORT)
-    
-    signatures = []
-    for i, payload in enumerate(payloads):
-        log.info(f"Запрашиваем подпись {i+1}/{len(payloads)}...")
-        sig = get_signature(p, payload.hex())
-        signatures.append(sig)
-        
-    log.info("Сборка финального токена...")
-    forged_token = []
-    for i in range(256):
-        p_idx = source_map[i]
-        forged_token.append(signatures[p_idx][i])
-        
-    log.info("Отправляем поддельную подпись серверу...")
-    p.sendlineafter(b"> ", b"2")
-    p.sendlineafter(b"validate: ", target)
-    
-    payload_str = ",".join(forged_token)
-    p.sendlineafter(b"(comma-separated hex): ", payload_str.encode())
-    
-    log.success("Запрос отправлен. Читаем ответ сервера...")
-    try:
-        response = p.recvall(timeout=5).decode()
-        print(response)
-    except EOFError:
-        print("[-] Сервер разорвал соединение.")
+    print("Task Force Nightfall — intercepting DeadDrop Cartel proxy-payment ledger. Mine 100 blocks before the window closes.")
+    korvia_ledger = KorviaLedger()
+    a = korvia_ledger.a
+    b = korvia_ledger.b
+    n = korvia_ledger.n
+    print(f"Ledger hash parameters are {a = }, {b = } and {n = }")
 
-if __name__ == "__main__":
+    timeout = 30
+    start = time.time()
+    while time.time() < start + timeout:
+        next_block_data = generate_proxy_transactions(3)
+        print("Validate proxy transaction batch:")
+        print(next_block_data.decode())
+        nonce = bytes.fromhex(input("Enter block nonce in hex: "))
+        assert len(nonce) == 32
+        if not korvia_ledger.validate_block(next_block_data, nonce):
+            print("[REJECTED] Invalid nonce. Vane's operators have been alerted.")
+            break
+        elif len(korvia_ledger.ledger) > 100:
+            print("[SUCCESS] Ledger breached. Flag payload: " + hex(korvia_ledger.ledger_hash(FLAG))[2:])
+            break
+        else:
+            print("[VALIDATED] Block accepted. Proceed to next intercept.")
+
+    if time.time() > start + timeout:
+        print("[TIMEOUT] Window closed. Korvia shifted their routing.")
+
+if __name__ == '__main__':
     main()
