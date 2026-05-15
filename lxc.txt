@@ -66,13 +66,6 @@ x = K.gen()
 def deterministic_sqrt(val):
     return min(val.sqrt(all=True))
 
-def select0(E0, b0):
-    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-    if b0:
-        return torsion_points[-1], torsion_points[1]
-    else:
-        return torsion_points[1], torsion_points[-1]
-
 def select(lambda0, lambda1, b):
     if b:
         return max(lambda0, lambda1)
@@ -89,104 +82,60 @@ def next_curve(A, alpha, b):
     new_alpha = select(lambda0, lambda1, b)
     return new_A, new_alpha
 
-def data_to_bits(data):
-    bits = [int(b) for c in data.encode() for b in "{:08b}".format(c)]
-    return bits
-
-def solve():
-    print("[*] Начинаем поиск коллизии...")
-    # Начинаем с произвольной валидной точки
-    A_curr, alpha_curr = K(1), -x
-    attempts = 0
+def explore_forward():
+    print("[*] Сканирование аномальных компонент графа...")
     
-    while True:
-        attempts += 1
-        # Делаем случайный шаг вперед для получения новой целевой кривой
-        b_rand = attempts % 2
-        A_curr, alpha_curr = next_curve(A_curr, alpha_curr, b_rand)
-        A_target, alpha_target = A_curr, alpha_curr
-        
-        # Вычисляем E_final и D
-        xi = alpha_target**2
-        new_A = -(4 * A_target + 15 * xi)
-        new_B = -alpha_target * (8 * A_target + 22 * xi)
-        
-        E_final = EllipticCurve(K, [new_A, new_B])
-        j_inv = str(E_final.j_invariant()).encode()
-        D = hashlib.sha256(j_inv).hexdigest()
-        
-        data_bits = data_to_bits(D)
-        
-        # Идем назад
-        A_back, alpha_back = A_target, alpha_target
-        valid_path = True
-        
-        for i in range(511, 0, -1):
-            bit = data_bits[i]
-            Delta = -12 * alpha_back**2 - 16 * A_back
+    # Начинаем с известных суперсингулярных j-инвариантов (0 и 1728)
+    base_curves = [
+        EllipticCurve(K, [0, 1]),  # j = 0
+        EllipticCurve(K, [1, 0])   # j = 1728
+    ]
+    
+    for E_start in base_curves:
+        if not E_start.is_supersingular():
+            continue
             
-            if not Delta.is_square():
-                valid_path = False
-                break
+        print(f"[*] Анализ кривой с a4={E_start.a4()}, a6={E_start.a6()}")
+        
+        # Получаем начальные точки кручения
+        torsion_points = sorted(E_start.torsion_polynomial(2).roots(multiplicities=False))
+        
+        for alpha_start in torsion_points:
+            for b_init in (0, 1):
+                A_curr = E_start.a4()
+                alpha_curr = alpha_start
                 
-            r = deterministic_sqrt(Delta)
-            alpha_cand1 = (2 * alpha_back + r) / 8
-            alpha_cand2 = (2 * alpha_back - r) / 8
-            
-            found_step = False
-            for alpha_cand in [alpha_cand1, alpha_cand2]:
-                A_cand = (-A_back - 15 * alpha_cand**2) / 4
+                # Ищем короткие циклы или предсказуемое поведение
+                history = [(A_curr, alpha_curr)]
+                cycle_found = False
                 
-                # Проверяем шаг
-                test_A, test_alpha = next_curve(A_cand, alpha_cand, bit)
-                if test_A == A_back and test_alpha == alpha_back:
-                    A_back = A_cand
-                    alpha_back = alpha_cand
-                    found_step = True
-                    break
+                for step in range(512):
+                    # Эмулируем детерминированный путь (например, всегда берем бит 0 или 1)
+                    # В реальном хеше биты псевдослучайны, но структура hex-строки имеет паттерны
+                    A_curr, alpha_curr = next_curve(A_curr, alpha_curr, b_init)
                     
-            if not found_step:
-                valid_path = False
-                break
-                
-        if not valid_path:
-            continue
-            
-        # Восстанавливаем E0
-        A_0 = A_back
-        alpha_0 = alpha_back
-        a6 = -alpha_0**3 - A_0 * alpha_0
-        
-        try:
-            E0 = EllipticCurve(K, [A_0, a6])
-        except ArithmeticError:
-            continue
-            
-        if not E0.is_supersingular():
-            continue
-            
-        # Проверяем условие для select0
-        torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-        b0 = data_bits[0]
-        
-        selected_alpha = torsion_points[-1] if b0 == 1 else torsion_points[1]
-            
-        if selected_alpha == alpha_0:
-            a4_coeffs = A_0.polynomial().list()
-            a6_coeffs = a6.polynomial().list()
-            
-            a4_0 = a4_coeffs[0] if len(a4_coeffs) > 0 else 0
-            a4_1 = a4_coeffs[1] if len(a4_coeffs) > 1 else 0
-            a6_0 = a6_coeffs[0] if len(a6_coeffs) > 0 else 0
-            a6_1 = a6_coeffs[1] if len(a6_coeffs) > 1 else 0
-            
-            print(f"[+] Успех на попытке {attempts}!")
-            print(f"a4.0 > {a4_0}")
-            print(f"a4.1 > {a4_1}")
-            print(f"a6.0 > {a6_0}")
-            print(f"a6.1 > {a6_1}")
-            print(f"data > {D}")
-            break
+                    if (A_curr, alpha_curr) in history:
+                        cycle_len = len(history) - history.index((A_curr, alpha_curr))
+                        print(f"[+] Найден цикл длины {cycle_len} на шаге {step}!")
+                        
+                        # Вычисляем финальный хеш этого цикла
+                        xi = alpha_curr**2
+                        new_A = -(4 * A_curr + 15 * xi)
+                        new_B = -alpha_curr * (8 * A_curr + 22 * xi)
+                        try:
+                            E_final = EllipticCurve(K, [new_A, new_B])
+                            target_hash = hashlib.sha256(str(E_final.j_invariant()).encode()).hexdigest()
+                            print(f"[!] Возможный credential-отпечаток: {target_hash}")
+                        except ArithmeticError:
+                            pass
+                        
+                        cycle_found = True
+                        break
+                        
+                    history.append((A_curr, alpha_curr))
+                    
+                if cycle_found:
+                    continue
 
 if __name__ == "__main__":
-    solve()
+    explore_forward()
