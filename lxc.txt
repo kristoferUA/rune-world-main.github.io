@@ -55,70 +55,57 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-#!/usr/bin/env python3
-from sage.all import GF, EllipticCurve
-from collections import deque
+from sage.all import GF, PolynomialRing
 
+# Инициализация поля из оригинального скрипта
 p = 2**49 * 3**36 - 1
 K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
+R = PolynomialRing(K, 'X')
+X_var = R.gen()
 
 def deterministic_sqrt(val):
     return min(val.sqrt(all=True))
 
-def select0(E0, b0):
-    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-    return torsion_points[-1] if b0 else torsion_points[1]
-
 def select(lambda0, lambda1, b):
-    return max(lambda0, lambda1) if b else min(lambda0, lambda1)
+    if b:
+        return max(lambda0, lambda1)
+    else:
+        return min(lambda0, lambda1)
 
 def next_curve(A, alpha, b):
     xi = alpha**2
     zeta = 3 * xi + A
     eta = deterministic_sqrt(zeta)
     new_A = -(4 * A + 15 * xi)
+
     lambda0 = alpha + 2 * eta
     lambda1 = alpha - 2 * eta
     new_alpha = select(lambda0, lambda1, b)
     return new_A, new_alpha
 
-def find_cycles():
-    print("[*] Ищем короткие циклы для j=1728 (A=1, a6=0)...")
-    A_start = K(1)
-    E0 = EllipticCurve(K, [A_start, K(0)])
-
-    # Перебираем оба возможных стартовых бита
-    for b0 in [0, 1]:
-        alpha_start = select0(E0, b0)
-        # Очередь для BFS: (текущий A, текущая alpha, пройденный путь в битах)
-        queue = deque([(A_start, alpha_start, [b0])])
-        visited = set()
-
-        while queue:
-            curr_A, curr_alpha, path = queue.popleft()
-
-            # Ограничиваем глубину поиска
-            if len(path) > 16:
-                continue
-
-            # Пробуем шагнуть по обоим битам
-            for b_next in [0, 1]:
-                new_A, new_alpha = next_curve(curr_A, curr_alpha, b_next)
-                new_path = path + [b_next]
-
-                # Если вернулись в начало - цикл найден
-                if new_A == A_start and new_alpha == alpha_start:
-                    print(f"[+] Найден цикл! Длина: {len(new_path)} бит")
-                    print(f"[+] Битовая последовательность: {new_path}")
-                    return new_path
-
-                # Иначе добавляем состояние в очередь
-                state = (new_A, new_alpha)
-                if state not in visited:
-                    visited.add(state)
-                    queue.append((new_A, new_alpha, new_path))
-                    
-    print("[-] На заданной глубине циклов не найдено.")
-
-if __name__ == "__main__":
-    find_cycles()
+def prev_curve(new_A, new_alpha, b):
+    # Квадратное уравнение: 16*X^2 + (4*new_alpha^2 + 8*new_A)*X + (new_alpha^2 + new_A)^2 = 0
+    c2 = K(16)
+    c1 = K(4 * new_alpha**2 + 8 * new_A)
+    c0 = K((new_alpha**2 + new_A)**2)
+    
+    poly = c2 * X_var**2 + c1 * X_var + c0
+    roots = poly.roots(multiplicities=False)
+    
+    for xi in roots:
+        # Восстанавливаем A из формулы: new_A = -(4*A + 15*xi)
+        A_cand = (-new_A - 15 * xi) / K(4)
+        
+        try:
+            alphas = xi.sqrt(all=True)
+        except ValueError:
+            continue # Если корня нет в поле, пропускаем ветку
+            
+        for alpha_cand in alphas:
+            # Делаем проверочный шаг вперед, чтобы убедиться в правильности выбора
+            test_A, test_alpha = next_curve(A_cand, alpha_cand, b)
+            if test_A == new_A and test_alpha == new_alpha:
+                return A_cand, alpha_cand
+                
+    raise ValueError("Не удалось найти предыдущую кривую. Тупиковая ветвь.")
