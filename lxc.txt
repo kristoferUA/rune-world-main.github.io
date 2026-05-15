@@ -38,9 +38,8 @@ https://pentesterlab.com/exercises/web-for-pentester-II
 
 from pwn import *
 
-# Замени на данные из запущенного докера на HTB
-HOST = '127.0.0.1'
-PORT = 1337
+HOST = '154.57.164.63'
+PORT = 32073
 
 def get_signature(p, hex_msg):
     p.sendlineafter(b"> ", b"1")
@@ -48,12 +47,13 @@ def get_signature(p, hex_msg):
     p.recvuntil(b"Token issued: [")
     token_str = p.recvline().strip().decode()[:-1]
     
-    # Очищаем от мусора, кавычек и префиксов 0x если они есть
     clean_tokens = []
     for x in token_str.split(','):
         val = x.strip().replace('"', '').replace("'", "")
-        if val.startswith('0x'):
+        if val.lower().startswith('0x'):
             val = val[2:]
+        # Добиваем нулями до 64 символов, как того требует U256::from_be_hex
+        val = val.zfill(64)
         clean_tokens.append(val)
     return clean_tokens
 
@@ -68,7 +68,6 @@ def main():
 
     print("[*] Формируем подпись для d9_netadmin...")
     target = b"d9_netadmin"
-    # Дополняем нулями до 32 байт (256 бит), как это делает Rust скрипт
     padded_target = target.rjust(32, b'\x00')
 
     target_bits = []
@@ -87,12 +86,11 @@ def main():
     p.sendlineafter(b"> ", b"2")
     p.sendlineafter(b"validate: ", target)
     
-    # Сервер ожидает токены через запятую в hex-формате
     payload = ",".join(forged_token)
     p.sendlineafter(b"(comma-separated hex): ", payload.encode())
     
-    # Получаем флаг
-    print(p.recvall().decode())
+    print("[+] Переход в интерактивный режим. Флаг должен быть здесь:")
+    p.interactive()
 
 if __name__ == "__main__":
     main()
