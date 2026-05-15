@@ -58,8 +58,11 @@ https://pentesterlab.com/exercises/web-for-pentester-II
 from sage.all import GF, EllipticCurve
 from hashlib import sha256
 import random
-from pwn import remote
+import multiprocessing as mp
+import time
+import sys
 
+# Глобальные параметры кривой (безопасно для чтения из форков)
 p = 2**49 * 3**36 - 1
 K = GF(p**2, "x", modulus=[1, 0, 1])
 x = K.gen()
@@ -90,7 +93,6 @@ def prev_curve(A_next, alpha_next, b):
     disc = -3 * alpha_next**2 - 4 * A_next
     sqrts = disc.sqrt(all=True)
     if not sqrts: return None
-    
     for s in sqrts:
         alpha_cand = (alpha_next + s) / 4
         A_cand = (-A_next - 15 * alpha_cand**2) / 4
@@ -102,27 +104,35 @@ def prev_curve(A_next, alpha_next, b):
             pass
     return None
 
-def solve():
-    while True:
+def worker(worker_id, found_event, attempts_counter, result_queue):
+    local_attempts = 0
+    while not found_event.is_set():
+        local_attempts += 1
+        
+        # Обновляем общий счетчик каждые 10 попыток, чтобы не блокировать память
+        if local_attempts % 10 == 0:
+            with attempts_counter.get_lock():
+                attempts_counter.value += 10
+
         A = K(1)
         alpha = K(x)
         for _ in range(20):
             A, alpha = next_curve(A, alpha, random.choice([0, 1]))
-        
+
         A_N, alpha_N = A, alpha
         xi = alpha_N**2
         new_A = -(4 * A_N + 15 * xi)
         new_B = -alpha_N * (8 * A_N + 22 * xi)
-        
+
         try:
             E = EllipticCurve(K, [new_A, new_B])
         except ArithmeticError:
             continue
-            
+
         j_str = str(E.j_invariant()).encode()
         credential = sha256(j_str).hexdigest()
         bits = data_to_bits(credential)
-        
+
         curr_A, curr_alpha = A_N, alpha_N
         success = True
         for b in reversed(bits[1:]):
@@ -131,48 +141,78 @@ def solve():
                 success = False
                 break
             curr_A, curr_alpha = res
-            
+
         if not success: continue
-        
+
         A_0, alpha_0 = curr_A, curr_alpha
         a6 = -alpha_0**3 - A_0 * alpha_0
-        
+
         try:
             E0 = EllipticCurve(K, [A_0, a6])
         except ArithmeticError:
             continue
-            
+
         torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
         if len(torsion_points) < 3: continue
-        
+
         if bits[0] == 1: expected_alpha = torsion_points[-1]
         else: expected_alpha = torsion_points[1]
-        
+
         if alpha_0 == expected_alpha:
-            return E0.a4(), E0.a6(), credential
+            # Нашли! Сообщаем остальным процессам остановиться
+            found_event.set()
+            
+            # Парсим в нативные инты для безопасной передачи через Queue
+            a4_list = E0.a4().polynomial().list() if hasattr(E0.a4(), 'polynomial') else [E0.a4()]
+            a6_list = E0.a6().polynomial().list() if hasattr(E0.a6(), 'polynomial') else [E0.a6()]
+
+            a4_0 = int(a4_list[0]) if len(a4_list) > 0 else 0
+            a4_1 = int(a4_list[1]) if len(a4_list) > 1 else 0
+            a6_0 = int(a6_list[0]) if len(a6_list) > 0 else 0
+            a6_1 = int(a6_list[1]) if len(a6_list) > 1 else 0
+            
+            result_queue.put((a4_0, a4_1, a6_0, a6_1, credential))
+            break
 
 def main():
-    print("[*] Вычисляем инвертированный путь изогений (поиск займет пару секунд)...")
-    a4, a6, cred = solve()
+    cores = mp.cpu_count()
+    print(f"[*] Инициализация брутфорса на {cores} ядрах...")
+
+    found_event = mp.Event()
+    attempts_counter = mp.Value('i', 0)
+    result_queue = mp.Queue()
+
+    processes = []
+    for i in range(cores):
+        p = mp.Process(target=worker, args=(i, found_event, attempts_counter, result_queue))
+        p.start()
+        processes.append(p)
+
+    start_time = time.time()
     
-    a4_list = a4.polynomial().list() if hasattr(a4, 'polynomial') else [a4]
-    a6_list = a6.polynomial().list() if hasattr(a6, 'polynomial') else [a6]
-    
-    a4_0 = int(a4_list[0]) if len(a4_list) > 0 else 0
-    a4_1 = int(a4_list[1]) if len(a4_list) > 1 else 0
-    a6_0 = int(a6_list[0]) if len(a6_list) > 0 else 0
-    a6_1 = int(a6_list[1]) if len(a6_list) > 1 else 0
-    
-    print("[+] Стартовая кривая найдена!")
-    
-    p = remote('154.57.164.83', 31266)
-    p.sendlineafter(b"> ", str(a4_0).encode())
-    p.sendlineafter(b"> ", str(a4_1).encode())
-    p.sendlineafter(b"> ", str(a6_0).encode())
-    p.sendlineafter(b"> ", str(a6_1).encode())
-    p.sendlineafter(b"> ", cred.encode())
-    
-    print(p.recvall(timeout=5).decode())
+    # Динамическое отслеживание прогресса
+    while not found_event.is_set():
+        time.sleep(0.5)
+        elapsed = time.time() - start_time
+        rate = attempts_counter.value / elapsed if elapsed > 0 else 0
+        sys.stdout.write(f"\r[*] Попыток: {attempts_counter.value} | Время: {elapsed:.1f}c | Скорость: {rate:.1f} поп/сек")
+        sys.stdout.flush()
+
+    print("\n[+] Ожидание завершения потоков...")
+    a4_0, a4_1, a6_0, a6_1, cred = result_queue.get()
+
+    for p in processes:
+        p.terminate() # Жестко глушим процессы, так как они нам больше не нужны
+        p.join()
+
+    print("\n[+] УСПЕХ! Вставь эти значения в Pwn-скрипт для отправки:")
+    print("-" * 40)
+    print(f"A4_0 = {a4_0}")
+    print(f"A4_1 = {a4_1}")
+    print(f"A6_0 = {a6_0}")
+    print(f"A6_1 = {a6_1}")
+    print(f"CREDENTIAL = '{cred}'")
+    print("-" * 40)
 
 if __name__ == '__main__':
     main()
