@@ -36,66 +36,153 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-import cv2
-import time
-import os
+use sha2::{Sha256, Digest};
+use crypto_bigint::{U256, Encoding};
+use rand::{rng, prelude::*};
+use std::io::{self, Write};
+use hex;
 
-def play_binary_video(video_path):
-    # Открываем видеофайл
-    cap = cv2.VideoCapture(video_path)
-    
-    if not cap.isOpened():
-        print("Не удалось открыть видеофайл.")
-        return
+const N: usize = 256;
+const TARGET_MSG: &str = "d9_netadmin";
 
-    # Получаем FPS для синхронизации скорости
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_delay = 1.0 / fps if fps > 0 else 1.0 / 30.0
+#[derive(Debug,Clone)]
+struct AuthKey {
+    key_pairs: [(U256, U256); N]
+}
+#[derive(Debug,Clone)]
+struct AuthPub {
+    commitments: [([u8; N/8], [u8; N/8]); N]
+}
 
-    # Очищаем терминал перед началом
-    os.system('cls' if os.name == 'nt' else 'clear')
+fn to_bits(n: U256) -> [bool; N] {
+    std::array::from_fn(|i| n.bit_vartime((N - 1 - i) as u32))
+}
 
-    while True:
-        start_time = time.time()
-        ret, frame = cap.read()
+fn get_random_bytes(len: usize) -> Vec<u8> {
+    let mut buf = vec![0u8; len];
+    rng().fill_bytes(&mut buf);
+    buf
+}
+
+fn hash_digest(s: &[u8]) -> [u8; N/8] {
+    Sha256::digest(s).into()
+}
+
+fn issue_credentials() -> (AuthKey, AuthPub) {
+    let key_pairs = std::array::from_fn(|_| {
+        (
+            U256::from_be_slice(&get_random_bytes(N/8)),
+            U256::from_be_slice(&get_random_bytes(N/8))
+        )
+    });
+    let commitments = key_pairs.iter().map(|(s0, s1)| {
+                                (hash_digest(&s0.to_be_bytes()), hash_digest(&s1.to_be_bytes()))
+                            })
+                            .collect::<Vec<_>>()
+                            .try_into()
+                            .unwrap();
+    (AuthKey { key_pairs }, AuthPub { commitments })
+}
+
+fn issue_token(m: &[u8], auth_key: AuthKey) -> [U256; N] {
+    let mut padded = [0u8; N/8];
+    padded[(N/8 - m.len().min(N/8))..].copy_from_slice(&m[..m.len().min(N/8)]);
+    let message_bits = U256::from_be_bytes((&padded).into());
+    let hash_bits = to_bits(message_bits);
+    assert!(hash_bits.len() == auth_key.key_pairs.len(), "ERROR: The number of hash bits and the size of the secret key must match.");
+    std::array::from_fn(|i| {
+        let (zero, one) = auth_key.key_pairs[i];
+        if hash_bits[i] { one } else { zero }
+    })
+}
+
+fn validate_token(m: &[u8], token: [U256; N], auth_pub: AuthPub) -> bool {
+    let mut padded = [0u8; N/8];
+    padded[(N/8 - m.len().min(N/8))..].copy_from_slice(&m[..m.len().min(N/8)]);
+    let message_bits = U256::from_be_bytes((&padded).into());
+    let hash_bits = to_bits(message_bits);
+    assert!(hash_bits.len() == auth_pub.commitments.len(), "ERROR: The number of hash bits and the size of the public key must match.");
+    let chosen_pk = std::array::from_fn(|i| {
+        let (zero, one) = auth_pub.commitments[i];
+        if hash_bits[i] { U256::from_be_slice(&one) } else { U256::from_be_slice(&zero) }
+    });
+    let hashed_token: [U256; N] = token.map(|s| { U256::from_be_bytes(hash_digest(&s.to_be_bytes()).into()) });
+    chosen_pk == hashed_token
+}
+
+fn main() {
+    let (auth_key, auth_pub) = issue_credentials();
+    println!("--- D9 Authentication Gateway ---");
+    println!("Issuing access tokens for Korvia's infrastructure nodes. Use wisely.");
+    loop {
+        let mut choice = String::new();
+        println!("1. Issue authentication token");
+        println!("2. Validate authentication token");
+        println!("3. Abort session");
+        print!("> ");
+
+        io::stdout().flush().unwrap();
+        if io::stdin().read_line(&mut choice).is_err() { break; }
+
+        match choice.as_str().trim() {
+            "1" => {
+                print!("Enter credential payload in hex: ");
+                io::stdout().flush().unwrap();
         
-        if not ret:
-            break  # Видео закончилось
+                let mut input = String::new();
+                if io::stdin().read_line(&mut input).is_err() { break; }
+        
+                let msg = input.trim();
+                if msg.is_empty() { continue; }
+        
+                match hex::decode(msg) {
+                    Ok(msg) if msg.windows(TARGET_MSG.len()).any(|w| w == TARGET_MSG.as_bytes()) => {
+                        println!("ERROR: [REJECTED] Target admin token is restricted.")
+                    },
+                    Ok(msg) => {
+                        let token = issue_token(&msg, auth_key.clone());
+                        println!("Token issued: {:?}", token);
+                    }
+                    Err(_) => println!("ERROR: Invalid hex input!"),
+                }
+            },
+            "2" => {
+                let mut msg_input = String::new();
+                let mut sig_input = String::new();
 
-        # Пытаемся получить текущий размер терминала
-        try:
-            term_cols, term_lines = os.get_terminal_size()
-        except OSError:
-            term_cols, term_lines = 80, 24
+                print!("Enter admin message to validate: ");
+                io::stdout().flush().unwrap();
+                io::stdin().read_line(&mut msg_input).expect("ERROR: Failed to read message");
+                let msg = msg_input.trim();
 
-        # Учитываем высоту шрифта (символы обычно вытянуты по вертикали)
-        # Оставляем 1 строку для избежания сдвига вывода
-        width = term_cols
-        height = term_lines - 1 
+                print!("Enter token segments (comma-separated hex): ");
+                io::stdout().flush().unwrap();
+                io::stdin().read_line(&mut sig_input).expect("ERROR: Failed to read signature");
 
-        # Меняем размер кадра и переводим в градации серого
-        resized = cv2.resize(frame, (width, height))
-        gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
-
-        output = ""
-        for row in gray:
-            for pixel in row:
-                # Порог 127: разделяем на два символа
-                output += "1" if pixel > 127 else "0"
-            output += "\n"
-
-        # \033[H возвращает курсор в левый верхний угол (без мерцания)
-        print("\033[H" + output, end="")
-
-        # Высчитываем время для поддержания правильного FPS
-        elapsed = time.time() - start_time
-        sleep_time = frame_delay - elapsed
-        if sleep_time > 0:
-            time.sleep(sleep_time)
-
-    cap.release()
-    print("\nВоспроизведение завершено.")
-
-# Запуск скрипта
-# Укажи путь к своему mp4 файлу
-play_binary_video("video.mp4")
+                let token_array: [U256; N]= sig_input.trim().split(",")
+                    .map(|s| U256::from_be_hex(s))
+                    .collect::<Vec<_>>()
+                    .try_into()
+                    .unwrap_or_else(|_| { panic!("ERROR: Expected exactly 256 parts!") });
+                let verified = validate_token(msg.as_bytes(), token_array, auth_pub.clone());
+                if verified {
+                    if msg == TARGET_MSG {
+                        let flag = std::fs::read_to_string("flag.txt")
+                            .unwrap_or_else(|_| "HTB{f4ke_fl4g_f0r_t3st1ng}".to_string());
+                        println!("{}", flag);
+                    } else {
+                        println!("[AUTH GRANTED] Token validated. Access permitted.");
+                    }
+                } else {
+                    println!("ERROR: [AUTH FAILED] Invalid token. Intrusion logged.");
+                }
+            },
+            "3" => {
+                println!("Session terminated.");
+                break;
+            }
+            _ => println!("Unknown option!"),
+        
+        }
+    }
+}
