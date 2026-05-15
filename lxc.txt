@@ -55,9 +55,9 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-from sage.all import GF, PolynomialRing
+from sage.all import GF, EllipticCurve, PolynomialRing
+from hashlib import sha256
 
-# Инициализация поля из оригинального скрипта
 p = 2**49 * 3**36 - 1
 K = GF(p**2, "x", modulus=[1, 0, 1])
 x = K.gen()
@@ -66,6 +66,13 @@ X_var = R.gen()
 
 def deterministic_sqrt(val):
     return min(val.sqrt(all=True))
+
+def select0(E0, b0):
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    if b0:
+        return torsion_points[-1], torsion_points[1]
+    else:
+        return torsion_points[1], torsion_points[-1]
 
 def select(lambda0, lambda1, b):
     if b:
@@ -78,34 +85,79 @@ def next_curve(A, alpha, b):
     zeta = 3 * xi + A
     eta = deterministic_sqrt(zeta)
     new_A = -(4 * A + 15 * xi)
-
     lambda0 = alpha + 2 * eta
     lambda1 = alpha - 2 * eta
     new_alpha = select(lambda0, lambda1, b)
     return new_A, new_alpha
 
 def prev_curve(new_A, new_alpha, b):
-    # Квадратное уравнение: 16*X^2 + (4*new_alpha^2 + 8*new_A)*X + (new_alpha^2 + new_A)^2 = 0
     c2 = K(16)
     c1 = K(4 * new_alpha**2 + 8 * new_A)
     c0 = K((new_alpha**2 + new_A)**2)
-    
     poly = c2 * X_var**2 + c1 * X_var + c0
     roots = poly.roots(multiplicities=False)
     
     for xi in roots:
-        # Восстанавливаем A из формулы: new_A = -(4*A + 15*xi)
         A_cand = (-new_A - 15 * xi) / K(4)
-        
         try:
             alphas = xi.sqrt(all=True)
         except ValueError:
-            continue # Если корня нет в поле, пропускаем ветку
+            continue
             
         for alpha_cand in alphas:
-            # Делаем проверочный шаг вперед, чтобы убедиться в правильности выбора
             test_A, test_alpha = next_curve(A_cand, alpha_cand, b)
             if test_A == new_A and test_alpha == new_alpha:
                 return A_cand, alpha_cand
                 
-    raise ValueError("Не удалось найти предыдущую кривую. Тупиковая ветвь.")
+    raise ValueError("Тупиковая ветвь")
+
+def data_to_bits(data):
+    return [int(b) for c in data for b in "{:08b}".format(c)]
+
+print("[*] Запускаю поиск параметров E0...")
+
+seed = 1
+while True:
+    try:
+        A_end = K(seed)
+        E_temp = EllipticCurve(K, [A_end, 0])
+        alpha_end, _ = select0(E_temp, 0)
+        
+        xi_final = alpha_end**2
+        final_A = -(4 * A_end + 15 * xi_final)
+        final_B = -alpha_end * (8 * A_end + 22 * xi_final)
+        E_final = EllipticCurve(K, [final_A, final_B])
+        
+        target_hash = sha256(str(E_final.j_invariant()).encode()).hexdigest()
+        payload = f'"{target_hash}"'.encode()
+        bits = data_to_bits(payload)
+        
+        curr_A = A_end
+        curr_alpha = alpha_end
+        
+        for b in reversed(bits[1:]):
+            curr_A, curr_alpha = prev_curve(curr_A, curr_alpha, b)
+            
+        a4 = curr_A
+        a6 = -(curr_alpha**3 + a4 * curr_alpha)
+        E0 = EllipticCurve(K, [a4, a6])
+        
+        if not E0.is_supersingular():
+            seed += 1
+            continue
+            
+        alpha_test, _ = select0(E0, bits[0])
+        if alpha_test == curr_alpha:
+            print("[+] Успех! Параметры найдены.")
+            print(f"a4.0 > {a4[0]}")
+            print(f"a4.1 > {a4[1]}")
+            print(f"a6.0 > {a6[0]}")
+            print(f"a6.1 > {a6[1]}")
+            print(f"\nchoice > 1")
+            print(f"data (hex) > {payload.hex()}")
+            break
+        else:
+            seed += 1
+            
+    except ValueError:
+        seed += 1
