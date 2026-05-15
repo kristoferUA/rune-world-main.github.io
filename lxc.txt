@@ -37,36 +37,44 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 https://pentesterlab.com/exercises/web-for-pentester-II
 
 from pwn import *
+import re
 
+# Замени IP и порт, если инстанс перезапускался
 HOST = '154.57.164.63'
 PORT = 32073
 
 def get_signature(p, hex_msg):
     p.sendlineafter(b"> ", b"1")
     p.sendlineafter(b"hex: ", hex_msg.encode())
-    p.recvuntil(b"Token issued: [")
-    token_str = p.recvline().strip().decode()[:-1]
+    p.recvuntil(b"Token issued: ")
     
+    # Читаем вплоть до закрывающей скобки массива
+    token_data = p.recvuntil(b"]").decode()
+    
+    # Регулярка для извлечения только hex-символов (игнорируя 0x)
     clean_tokens = []
-    for x in token_str.split(','):
-        val = x.strip().replace('"', '').replace("'", "")
-        if val.lower().startswith('0x'):
-            val = val[2:]
-        # Добиваем нулями до 64 символов, как того требует U256::from_be_hex
-        val = val.zfill(64)
-        clean_tokens.append(val)
-    return clean_tokens
+    for m in re.finditer(r'(?:0x)?([0-9a-fA-F]+)', token_data):
+        # Очищаем, переводим в нижний регистр и добиваем нулями
+        val = m.group(1).lower().zfill(64)
+        if len(val) == 64:
+            clean_tokens.append(val)
+    
+    if len(clean_tokens) < 256:
+        log.error(f"Получено {len(clean_tokens)} токенов. Ожидалось 256.")
+        
+    # Возвращаем ровно 256 частей
+    return clean_tokens[:256]
 
 def main():
     p = remote(HOST, PORT)
 
-    print("[*] Вытягиваем 'нулевые' части ключа...")
+    log.info("Вытягиваем 'нулевые' части ключа...")
     zero_keys = get_signature(p, "00" * 32)
     
-    print("[*] Вытягиваем 'единичные' части ключа...")
+    log.info("Вытягиваем 'единичные' части ключа...")
     one_keys = get_signature(p, "ff" * 32)
 
-    print("[*] Формируем подпись для d9_netadmin...")
+    log.info("Формируем подпись для d9_netadmin...")
     target = b"d9_netadmin"
     padded_target = target.rjust(32, b'\x00')
 
@@ -82,15 +90,20 @@ def main():
         else:
             forged_token.append(zero_keys[i])
 
-    print("[*] Отправляем поддельную подпись серверу...")
+    log.info("Отправляем поддельную подпись серверу...")
     p.sendlineafter(b"> ", b"2")
     p.sendlineafter(b"validate: ", target)
     
     payload = ",".join(forged_token)
     p.sendlineafter(b"(comma-separated hex): ", payload.encode())
     
-    print("[+] Переход в интерактивный режим. Флаг должен быть здесь:")
-    p.interactive()
+    log.success("Запрос отправлен. Читаем ответ сервера...")
+    
+    try:
+        response = p.recvall(timeout=5).decode()
+        print(response)
+    except EOFError:
+        print("[-] Сервер снова разорвал соединение.")
 
 if __name__ == "__main__":
     main()
