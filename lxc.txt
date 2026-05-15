@@ -36,73 +36,79 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-from hashlib import sha256
+from pwn import *
 from Crypto.Util.number import long_to_bytes, bytes_to_long
-from Crypto.Util.number import getPrime
-import time
-import os
+from hashlib import sha256
 
-FLAG = open("flag.txt", "rb").read()
-
-class KorviaLedger:
-    def __init__(self):
-        self.POW_hardness = 50 # 50 bits seems reasonable
-        self.n = getPrime(256)
-        while True:
-            self.a = getPrime(256)
-            self.b = getPrime(256)
-            if self.a < self.n and self.b < self.n:
-                break
-        genesis_block = sha256(b"Korvia command channel genesis").digest()
-        self.ledger = [self.ledger_hash(genesis_block)]
-        
-    def ledger_hash(self, data):
-        hash = (self.a * bytes_to_long(data) + self.b) % self.n
-        return hash
-    
-    def validate_block(self, blockdata, nonce):
-        hash = self.ledger_hash(long_to_bytes(self.ledger[-1]) + blockdata + nonce)
-        hash_bits = bin(hash)[2:]
-        hash_bits = "0"*(256 - len(hash_bits)) + hash_bits
-        if hash_bits[:self.POW_hardness] == self.POW_hardness*"0":
-            self.ledger.append(hash)
-            return True
-        else:
-            return False
-         
-def generate_proxy_transactions(tx_count):
-    block_data = b""
-    for i in range(tx_count):
-        block_data += b"Proxy 0x" + os.urandom(8).hex().encode() + b" delivered payload to asset 0x" + os.urandom(8).hex().encode() + b"\n"
-    return block_data
+# Подставь данные поднятого докера
+HOST = '127.0.0.1'
+PORT = 1337
 
 def main():
-    print("Task Force Nightfall — intercepting DeadDrop Cartel proxy-payment ledger. Mine 100 blocks before the window closes.")
-    korvia_ledger = KorviaLedger()
-    a = korvia_ledger.a
-    b = korvia_ledger.b
-    n = korvia_ledger.n
-    print(f"Ledger hash parameters are {a = }, {b = } and {n = }")
+    p = remote(HOST, PORT)
+    
+    # Парсим публичные параметры LCG
+    p.recvuntil(b"Ledger hash parameters are a = ")
+    a = int(p.recvuntil(b",", drop=True))
+    p.recvuntil(b"b = ")
+    b = int(p.recvuntil(b" ", drop=True))
+    p.recvuntil(b"n = ")
+    n = int(p.recvline())
+    
+    log.info(f"Параметры перехвачены: n = {n}")
 
-    timeout = 30
-    start = time.time()
-    while time.time() < start + timeout:
-        next_block_data = generate_proxy_transactions(3)
-        print("Validate proxy transaction batch:")
-        print(next_block_data.decode())
-        nonce = bytes.fromhex(input("Enter block nonce in hex: "))
-        assert len(nonce) == 32
-        if not korvia_ledger.validate_block(next_block_data, nonce):
-            print("[REJECTED] Invalid nonce. Vane's operators have been alerted.")
+    # Вычисляем genesis хэш, как это делает сервер
+    genesis_block = sha256(b"Korvia command channel genesis").digest()
+    last_hash = (a * bytes_to_long(genesis_block) + b) % n
+
+    log.info("Начинаем майнинг блоков алгебраическим методом...")
+    
+    for i in range(100):
+        p.recvuntil(b"Validate proxy transaction batch:\n")
+        
+        # Читаем ровно 3 строки транзакций
+        blockdata = b""
+        for _ in range(3):
+            blockdata += p.recvline()
+            
+        # P - предыдущий хэш в виде байтов
+        P = long_to_bytes(last_hash)
+        
+        # X - склеенные P и D
+        X = bytes_to_long(P + blockdata)
+        
+        # Наш target hash
+        h = 1
+        
+        # Математически вычисляем нужный nonce
+        N = (pow(a, -1, n) * (h - b - a * X * (1 << 256))) % n
+        
+        # Упаковываем в 32 байта hex-формата
+        nonce_hex = hex(N)[2:].zfill(64)
+        p.sendlineafter(b"Enter block nonce in hex: ", nonce_hex.encode())
+        
+        res = p.recvline().decode()
+        if "[REJECTED]" in res:
+            log.error("Блок отклонен! Проверь математику.")
             break
-        elif len(korvia_ledger.ledger) > 100:
-            print("[SUCCESS] Ledger breached. Flag payload: " + hex(korvia_ledger.ledger_hash(FLAG))[2:])
-            break
-        else:
-            print("[VALIDATED] Block accepted. Proceed to next intercept.")
+            
+        # Обновляем last_hash нашей единицей
+        last_hash = h
+        
+        if (i + 1) % 10 == 0:
+            log.success(f"Пройдено блоков: {i + 1}/100")
 
-    if time.time() > start + timeout:
-        print("[TIMEOUT] Window closed. Korvia shifted their routing.")
+    # Перехватываем хэш флага
+    p.recvuntil(b"Flag payload: ")
+    flag_hash_hex = p.recvline().strip().decode()
+    flag_hash = int(flag_hash_hex, 16)
+    
+    log.info("Оборачиваем хэш-функцию для расшифровки флага...")
+    # Реверсим LCG
+    F = (pow(a, -1, n) * (flag_hash - b)) % n
+    
+    flag = long_to_bytes(F).decode()
+    print(f"\n[+] Взлом завершен. Флаг: {flag}")
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
