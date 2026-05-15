@@ -1,3 +1,22 @@
+# 1. Скачиваем установщик Miniconda (если у тебя её еще нет)
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+
+# 2. Устанавливаем (жми Enter, читай лицуху пробелом, пиши 'yes')
+bash miniconda.sh
+
+# 3. Применяем изменения для текущей сессии терминала
+source ~/.bashrc
+# (или source ~/.zshrc, если у тебя zsh)
+
+# 4. Создаем изолированную среду (назовем её ctf_sage), ставим туда sage и pwntools
+conda create -n ctf_sage -c conda-forge sage pwntools -y
+
+# 5. Активируем нашу новую среду
+conda activate ctf_sage
+
+
+
+
 https://ctf.hackthebox.com/event/3296
 
 
