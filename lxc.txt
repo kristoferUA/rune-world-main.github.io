@@ -620,50 +620,148 @@ if __name__ == "__main__":
 
 
 
-def solve_smart():
-    print("[*] Подготовка целевой кривой...")
-    E_t = EllipticCurve(K, [1, 0])
-    target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
+from sage.all import GF, EllipticCurve
+from hashlib import sha256
+import random
+
+p = 2**49 * 3**36 - 1
+K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
+
+def deterministic_sqrt(val):
+    sqrts = val.sqrt(all=True)
+    if not sqrts: return None
+    return min(sqrts)
+
+def select(lambda0, lambda1, b):
+    if b: return max(lambda0, lambda1)
+    else: return min(lambda0, lambda1)
+
+def next_curve(A, alpha, b):
+    xi = alpha**2
+    zeta = 3 * xi + A
+    eta = deterministic_sqrt(zeta)
+    new_A = -(4 * A + 15 * xi)
+    lambda0 = alpha + 2 * eta
+    lambda1 = alpha - 2 * eta
+    new_alpha = select(lambda0, lambda1, b)
+    return new_A, new_alpha
+
+def data_to_bits(data):
+    return [int(b) for c in data for b in "{:08b}".format(c)]
+
+def get_predecessors(new_A, new_alpha, b):
+    preds = []
+    a_c = K(4)
+    b_c = K(-2 * new_alpha)
+    c_c = K(new_alpha**2 + new_A)
+    delta = b_c**2 - 4*a_c*c_c
     
-    torsion_points = sorted(E_t.torsion_polynomial(2).roots(multiplicities=False))
-    target_A = E_t.a4()
-    target_alpha = torsion_points[-1]
+    sqrts = delta.sqrt(all=True)
+    for r in sqrts:
+        alpha = (-b_c + r) / (2*a_c)
+        A = (-new_A - 15*alpha**2) / 4
+        
+        xi = alpha**2
+        zeta = 3 * xi + A
+        eta = deterministic_sqrt(zeta)
+        if eta is None: continue
+        
+        test_new_A = -(4 * A + 15 * xi)
+        lambda0 = alpha + 2 * eta
+        lambda1 = alpha - 2 * eta
+        test_new_alpha = select(lambda0, lambda1, b)
+        
+        if test_new_A == new_A and test_new_alpha == new_alpha:
+            preds.append((A, alpha))
+    return preds
+
+def get_valid_random_state():
+    # Начинаем с известной кривой и делаем случайные шаги для получения валидного узла
+    E = EllipticCurve(K, [1, 0])
+    A = E.a4()
+    alpha = sorted(E.torsion_polynomial(2).roots(multiplicities=False))[1]
+    for _ in range(50):
+        b = random.randint(0, 1)
+        A, alpha = next_curve(A, alpha, b)
+    return A, alpha
+
+def CGL_hash(E0, data):
+    bits = data_to_bits(data)
+    n = len(bits)
+    A = E0.a4()
     
-    E0 = None
-    m1 = b''
-    
-    print("[*] Ищем E0 (теперь должно быть быстро)...")
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    if bits[0]: alpha = torsion_points[-1]
+    else: alpha = torsion_points[1]
+        
+    for i in range(n - 1):
+        A, alpha = next_curve(A, alpha, bits[i + 1])
+    xi = alpha**2
+    new_A = -(4 * A + 15 * xi)
+    new_B = -alpha * (8 * A + 22 * xi)
+    E = EllipticCurve(K, [new_A, new_B])
+    return sha256(str(E.j_invariant()).encode()).hexdigest()
+
+def solve_step1():
+    print("[*] Ищем подходящую стартовую кривую (может занять около минуты)...")
     attempt = 0
     while True:
         attempt += 1
         if attempt % 10 == 0:
             print(f"[*] Попытка {attempt}...")
             
-        # Генерируем от 15 до 40 случайных пробелов и табов
-        pad_len = random.randint(15, 40)
-        pad = bytes(random.choices(b' \t', k=pad_len))
-        m1 = b'"' + target_hash.encode() + b'"' + pad
-        bits1 = data_to_bits(m1)
+        A_n, alpha_n = get_valid_random_state()
+        xi = alpha_n**2
+        new_A = -(4 * A_n + 15 * xi)
+        new_B = -alpha_n * (8 * A_n + 22 * xi)
         
-        # 1. Находим E0 для M1
-        E0 = find_E0_for_M1(bits1, target_A, target_alpha)
-        if E0:
-            print(f"\n[+] Найден E0: a4_0={E0.a4().list()[0]}")
-            break
+        try:
+            E_t = EllipticCurve(K, [new_A, new_B])
+            target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
+        except:
+            continue
             
-    # 2. Формируем M2 так, чтобы он НАЧИНАЛСЯ с M1
-    rce_tail = b' and __import__("os").system("cat flag.txt") #'
-    m2_base = m1 + rce_tail
-    
-    print("[*] Вычисляем отклонение от j=1728...")
-    A = target_A
-    alpha = target_alpha
-    tail_bits = data_to_bits(rce_tail)
-    
-    for b in tail_bits:
-        A, alpha = next_curve(A, alpha, b)
+        payload = b'"' + target_hash.encode() + b'"'
+        bits = data_to_bits(payload)
         
-    # 3. Ищем петлю возврата в j=1728 (BFS)
-    print("[*] Ищем петлю возврата в j=1728 (BFS)...")
-    
-    # ... (дальше твой старый код с deque)
+        states = [(A_n, alpha_n)]
+        
+        died = False
+        for i, b in enumerate(reversed(bits[1:])):
+            new_states = []
+            for A, alpha in states:
+                new_states.extend(get_predecessors(A, alpha, b))
+            states = list(set(new_states))[:100]
+            if not states:
+                died = True
+                break
+                
+        if died:
+            continue
+            
+        b0 = bits[0]
+        for A, alpha in states:
+            a6 = -(alpha**3 + A*alpha)
+            try:
+                E0 = EllipticCurve(K, [A, a6])
+                if not E0.is_supersingular(): continue
+                
+                torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+                selected_alpha = torsion_points[-1] if b0 else torsion_points[1]
+                
+                if selected_alpha == alpha:
+                    if CGL_hash(E0, payload) == target_hash:
+                        print("\n[+] УСПЕХ! Введи эти данные на сервере:")
+                        print(f"a4.0 > {A.list()[0]}")
+                        print(f"a4.1 > {A.list()[1]}")
+                        print(f"a6.0 > {a6.list()[0]}")
+                        print(f"a6.1 > {a6.list()[1]}")
+                        print("\nchoice > 1")
+                        print(f"data (hex) > {payload.hex()}")
+                        return E0, payload, target_hash
+            except:
+                pass
+
+if __name__ == "__main__":
+    solve_step1()
