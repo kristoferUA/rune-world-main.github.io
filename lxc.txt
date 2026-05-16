@@ -733,3 +733,33 @@ if suffix:
     print(f"data (hex) > {final_payload.hex()}")
 else:
     print("[-] Путь не найден или содержал перенос строки. Попробуй изменить пробелы в payload_code.")
+
+
+
+
+
+# Подставь сюда полную hex-строку твоего ПЕРВОГО пейлоада
+first_payload_hex = "22333463653238383035343335622376361616339366266636433313165653261613163306333363646661383536646565386634373338656432323538633134655642" 
+payload_bytes = bytes.fromhex(first_payload_hex)
+
+# Твоя стартовая кривая E0
+a4 = a4_0 + a4_1 * x
+a6 = a6_0 + a6_1 * x
+E0 = EllipticCurve(K, [a4, a6])
+
+# Полностью повторяем шаги CGL_hash, но без финального sha256
+bits = data_to_bits(payload_bytes)
+A = E0.a4()
+alpha, _ = select0(E0, bits[0])
+
+for i in range(len(bits) - 1):
+    A, alpha = next_curve(A, alpha, bits[i + 1])
+
+xi = alpha**2
+new_A = -(4 * A + 15 * xi)
+new_B = -alpha * (8 * A + 22 * xi)
+
+E_target = EllipticCurve(K, [new_A, new_B])
+target_j = E_target.j_invariant()
+
+print(f"Твой target_j для финального скрипта: {target_j}")
