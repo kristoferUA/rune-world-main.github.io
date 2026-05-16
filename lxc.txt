@@ -55,18 +55,29 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-from sage.all import GF, EllipticCurve, PolynomialRing
+#!/usr/bin/env python3
+
+from sage.all import GF, EllipticCurve_from_j, EllipticCurve
+import json
+import os
 from hashlib import sha256
+from ast import literal_eval
+
+FLAG = open("flag.txt").read()
 
 p = 2**49 * 3**36 - 1
 K = GF(p**2, "x", modulus=[1, 0, 1])
 x = K.gen()
-R = PolynomialRing(K, 'X')
-X_var = R.gen()
 
-def deterministic_sqrt(val):
-    return min(val.sqrt(all=True))
 
+def deterministic_sqrt(x):
+    return min(x.sqrt(all=True))
+
+
+### Helper Functions ###
+# Algorithm 3 & 4
+# Yoshida, R., Takashima, K., (2009). Simple Algorithms for Computing a Sequence of 2-Isogenies
+# https://doi.org/10.1007/978-3-642-00730-9_4
 def select0(E0, b0):
     torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
     if b0:
@@ -74,90 +85,87 @@ def select0(E0, b0):
     else:
         return torsion_points[1], torsion_points[-1]
 
+
 def select(lambda0, lambda1, b):
     if b:
         return max(lambda0, lambda1)
     else:
         return min(lambda0, lambda1)
 
+
 def next_curve(A, alpha, b):
     xi = alpha**2
     zeta = 3 * xi + A
     eta = deterministic_sqrt(zeta)
     new_A = -(4 * A + 15 * xi)
+
     lambda0 = alpha + 2 * eta
     lambda1 = alpha - 2 * eta
     new_alpha = select(lambda0, lambda1, b)
     return new_A, new_alpha
 
-def prev_curve(new_A, new_alpha, b):
-    c2 = K(16)
-    c1 = K(4 * new_alpha**2 + 8 * new_A)
-    c0 = K((new_alpha**2 + new_A)**2)
-    poly = c2 * X_var**2 + c1 * X_var + c0
-    roots = poly.roots(multiplicities=False)
-    
-    for xi in roots:
-        A_cand = (-new_A - 15 * xi) / K(4)
-        try:
-            alphas = xi.sqrt(all=True)
-        except ValueError:
-            continue
-            
-        for alpha_cand in alphas:
-            test_A, test_alpha = next_curve(A_cand, alpha_cand, b)
-            if test_A == new_A and test_alpha == new_alpha:
-                return A_cand, alpha_cand
-                
-    raise ValueError("Тупиковая ветвь")
+
+def CGL_hash(E0, data):
+    data = data_to_bits(data)
+    n = len(data)
+
+    A = E0.a4()
+    alpha, _ = select0(E0, data[0])
+    for i in range(n - 1):
+        A, alpha = next_curve(A, alpha, data[i + 1])
+
+    xi = alpha**2
+    new_A = -(4 * A + 15 * xi)
+    new_B = -alpha * (8 * A + 22 * xi)
+
+    E = EllipticCurve(E0.base_field(), [new_A, new_B])
+    j = str(E.j_invariant()).encode()
+    return sha256(j).hexdigest()
+
 
 def data_to_bits(data):
-    return [int(b) for c in data for b in "{:08b}".format(c)]
+    bits = [int(b) for c in data for b in "{:08b}".format(c)]
+    assert bits and all(b in (0, 1) for b in bits)
+    return bits
 
-print("[*] Запускаю поиск параметров E0...")
 
-seed = 1
-while True:
-    try:
-        A_end = K(seed)
-        E_temp = EllipticCurve(K, [A_end, 0])
-        alpha_end, _ = select0(E_temp, 0)
-        
-        xi_final = alpha_end**2
-        final_A = -(4 * A_end + 15 * xi_final)
-        final_B = -alpha_end * (8 * A_end + 22 * xi_final)
-        E_final = EllipticCurve(K, [final_A, final_B])
-        
-        target_hash = sha256(str(E_final.j_invariant()).encode()).hexdigest()
-        payload = f'"{target_hash}"'.encode()
-        bits = data_to_bits(payload)
-        
-        curr_A = A_end
-        curr_alpha = alpha_end
-        
-        for b in reversed(bits[1:]):
-            curr_A, curr_alpha = prev_curve(curr_A, curr_alpha, b)
-            
-        a4 = curr_A
-        a6 = -(curr_alpha**3 + a4 * curr_alpha)
-        E0 = EllipticCurve(K, [a4, a6])
-        
-        if not E0.is_supersingular():
-            seed += 1
-            continue
-            
-        alpha_test, _ = select0(E0, bits[0])
-        if alpha_test == curr_alpha:
-            print("[+] Успех! Параметры найдены.")
-            print(f"a4.0 > {a4[0]}")
-            print(f"a4.1 > {a4[1]}")
-            print(f"a6.0 > {a6[0]}")
-            print(f"a6.1 > {a6[1]}")
-            print(f"\nchoice > 1")
-            print(f"data (hex) > {payload.hex()}")
-            break
+### Challenge ###
+def main():
+    print("╔══════════════════════════════════════════════════════════╗")
+    print("║      OPERATION FORGED NORMALITY  —  D9 ATTEST NODE      ║")
+    print("║                  [ TASK FORCE NIGHTFALL ]                ║")
+    print("╚══════════════════════════════════════════════════════════╝")
+    print()
+    print("Initialising attestation engine. Define your starting point.")
+
+    a4_0 = int(input("a4.0 > "))
+    a4_1 = int(input("a4.1 > "))
+    a6_0 = int(input("a6.0 > "))
+    a6_1 = int(input("a6.1 > "))
+
+    a4 = a4_0 + a4_1 * x
+    a6 = a6_0 + a6_1 * x
+    E0 = EllipticCurve(K, [a4, a6])
+
+    if not E0.is_supersingular():
+        print("[REJECTED] Protocol violation: curve must be supersingular.")
+        return
+
+    registry = set()
+    print("--- D9 ATTESTATION ENGINE ---")
+    print("1 > register quine credential")
+    print("2 > deploy quine payload")
+    while True:
+        choice = int(input("choice > "))
+        payload = bytes.fromhex(input("data (hex) > "))
+        hsh = CGL_hash(E0, payload)
+        if choice == 1 and hsh == literal_eval(payload.decode("latin-1")):
+            registry.add(hsh)
+        elif choice == 2 and hsh in registry:
+            eval(payload)
         else:
-            seed += 1
-            
-    except ValueError:
-        seed += 1
+            print("[REJECTED] Attestation mismatch. Quines only.")
+
+
+if __name__ == "__main__":
+    main()
