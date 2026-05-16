@@ -884,100 +884,102 @@ if __name__ == "__main__":
     main()
 
 
-from sage.all import QuaternionAlgebra
+from sage.all import GF, EllipticCurve, QuaternionAlgebra, matrix, ZZ
+from hashlib import sha256
 
+# ==========================================
+# 1. Базовые параметры поля и алгебры
+# ==========================================
 p = 2**49 * 3**36 - 1
-# Проверка условия для выбора базиса
-assert p % 4 == 3
+K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
 
-# Инициализация кватернионной алгебры B_{p, \infty}
 B = QuaternionAlgebra(-1, -p)
 i, j, k = B.gens()
-
-# Максимальный порядок O_0, соответствующий кривой j=1728
-# Базис: 1, i, (1+k)/2, (i+j)/2
-basis = [
-    B(1), 
-    i, 
-    (B(1) + k) / 2, 
-    (i + j) / 2
-]
+basis = [B(1), i, (B(1) + k) / 2, (i + j) / 2]
 O_0 = B.quaternion_order(basis)
 
-print("[+] Кватернионная алгебра инициализирована")
-print(f"[+] Базис O_0: {O_0.basis()}")
+# ==========================================
+# 2. Базовые криптографические функции
+# ==========================================
+def deterministic_sqrt(val):
+    sqrts = val.sqrt(all=True)
+    if not sqrts: return None
+    return min(sqrts)
+
+def select(lambda0, lambda1, b):
+    if b: return max(lambda0, lambda1)
+    else: return min(lambda0, lambda1)
+
+def next_curve(A, alpha, b):
+    xi = alpha**2
+    zeta = 3 * xi + A
+    eta = deterministic_sqrt(zeta)
+    new_A = -(4 * A + 15 * xi)
+    lambda0 = alpha + 2 * eta
+    lambda1 = alpha - 2 * eta
+    new_alpha = select(lambda0, lambda1, b)
+    return new_A, new_alpha
+
+def data_to_bits(data):
+    return [int(b) for c in data for b in "{:08b}".format(c)]
+
+# ==========================================
+# 3. Функции KLPT (Идеалы и решетки)
+# ==========================================
 def ideal_to_lattice(I, O_0):
-    """Преобразует левый идеал I в базис решетки над ZZ."""
     basis_I = I.basis()
-    
-    # Матрица 4x4 для коэффициентов
     M = matrix(ZZ, 4, 4)
-    for i in range(4):
-        # Получаем координаты элемента идеала относительно базиса порядка O_0
-        coords = O_0.coordinate_vector(basis_I[i])
-        for j in range(4):
-            M[i, j] = ZZ(coords[j])
+    for row in range(4):
+        coords = O_0.coordinate_vector(basis_I[row])
+        for col in range(4):
+            M[row, col] = ZZ(coords[col])
     return M
 
 def find_smooth_alpha(I, O_0):
-    """Эвристика KLPT: поиск элемента alpha для формирования гладкого идеала."""
     M = ideal_to_lattice(I, O_0)
-    
     print("[*] Запускаем LLL-редукцию решетки идеала...")
-    # LLL найдет базис из кратчайших векторов решетки
     L = M.LLL()
-    
-    # Берем самый короткий ненулевой вектор
     short_vec = L[0]
     
-    # Восстанавливаем кватернион alpha из найденных коэффициентов
     basis_O = O_0.basis()
-    alpha = sum(short_vec[i] * basis_O[i] for i in range(4))
+    alpha = sum(short_vec[idx] * basis_O[idx] for idx in range(4))
     
     print(f"[+] Исходная норма идеала N(I): {I.norm()}")
     print(f"[+] Норма найденного элемента N(alpha): {alpha.norm()}")
-    
-    # Наш целевой эквивалентный идеал будет J = I * (alpha^-1)
     return alpha
+
 def path_to_ideal(bits, O_0):
-    """
-    Упрощенная трансляция пути в кватернионный идеал.
-    В реальном KLPT здесь вычисляется эндоморфизм theta через действие Галуа.
-    Для базовой редукции мы формируем идеал из нормы пути и базиса.
-    """
     n = len(bits)
     norm_I = 2**n
     
-    # Генератор идеала (упрощенно для LLL)
-    # В полном KLPT theta вычисляется как образ ядра изогении
+    # Генератор идеала (упрощенный вариант)
     theta = O_0.basis()[1] * bits[0] + O_0.basis()[2] * bits[-1] 
     
-    # Формируем левый идеал: I = O_0 * norm_I + O_0 * theta
-    # В SageMath мы можем определить его через Z-модуль
     basis_I = [norm_I * b for b in O_0.basis()] + [b * theta for b in O_0.basis()]
     
-    # Редуцируем базис через HNF (Hermite Normal Form) для получения 4 векторов
     M = matrix(ZZ, 8, 4)
-    for i in range(8):
-        coords = O_0.coordinate_vector(basis_I[i])
-        for j in range(4):
-            M[i, j] = ZZ(coords[j])
+    for row in range(8):
+        coords = O_0.coordinate_vector(basis_I[row])
+        for col in range(4):
+            M[row, col] = ZZ(coords[col])
             
     H = M.hermite_form()
     
-    # Восстанавливаем 4 базисных элемента идеала из HNF
     reduced_basis = []
-    for i in range(4, 8): # Ненулевые строки после HNF обычно внизу
-        elem = sum(H[i, j] * O_0.basis()[j] for j in range(4))
+    for row in range(4, 8):
+        elem = sum(H[row, col] * O_0.basis()[col] for col in range(4))
         if elem != 0:
             reduced_basis.append(elem)
             
-    # Если HNF вернул меньше 4 элементов (упрощение), добиваем нормой
     while len(reduced_basis) < 4:
         reduced_basis.append(O_0.basis()[len(reduced_basis)] * norm_I)
         
     return B.quaternion_ideal(reduced_basis)
 
+# ==========================================
+# 4. Главный пайплайн атаки
+# ==========================================
 def solve_klpt():
     print("[*] Шаг 1: Подготовка целевой кривой j=1728...")
     E_t = EllipticCurve(K, [1, 0])
@@ -998,14 +1000,10 @@ def solve_klpt():
         print("[*] Шаг 3: Запуск LLL для поиска эквивалентного идеала...")
         alpha = find_smooth_alpha(I, O_0)
         
-        # Эквивалентный идеал J = I * (alpha_bar / N(I))
-        alpha_bar = alpha.conjugate()
         norm_I = 2**len(tail_bits)
         
-        print(f"[+] Норма найденного элемента alpha: {alpha.norm()}")
         print(f"[+] Расчетная норма нового идеала J: {alpha.norm() * norm_I / (norm_I**2)}")
-        
-        print("\n[*] LLL-редукция завершена. Ожидаем гладкую норму (степень двойки).")
+        print("\n[*] LLL-редукция завершена. Если норма J - степень двойки, мы готовы генерировать паддинг!")
         
     except Exception as e:
         print(f"[-] Ошибка алгебры: {e}")
