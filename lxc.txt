@@ -912,3 +912,57 @@ def solve_smart():
 
 if __name__ == "__main__":
     solve_smart()
+
+
+
+
+
+def find_E0_for_M1(bits1, target_A, target_alpha):
+    print("[*] Вычисляем E0 обратным проходом M1...")
+    states = [(target_A, target_alpha)]
+    for i, b in enumerate(reversed(bits1[1:])):
+        new_states = []
+        for A, alpha in states:
+            new_states.extend(get_predecessors(A, alpha, b))
+        
+        # Добавляем рандомизацию и расширяем пул
+        states_list = list(set(new_states))
+        random.shuffle(states_list)
+        states = states_list[:150] 
+        
+        if not states:
+            return None
+    
+    b0 = bits1[0]
+    for A, alpha in states:
+        a6 = -(alpha**3 + A*alpha)
+        try:
+            E0 = EllipticCurve(K, [A, a6])
+            if E0.is_supersingular():
+                torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+                selected_alpha = torsion_points[-1] if b0 else torsion_points[1]
+                if selected_alpha == alpha:
+                    return E0
+        except:
+            pass
+    return None
+
+def solve_smart():
+    print("[*] Подготовка целевой кривой...")
+    E_t = EllipticCurve(K, [1, 0])
+    target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
+    
+    # Динамически добавляем от 0 до 5 пробелов в конец для уникальности графа
+    pad = b' ' * random.randint(0, 5)
+    m1 = b'"' + target_hash.encode() + b'"' + pad
+    bits1 = data_to_bits(m1)
+    
+    torsion_points = sorted(E_t.torsion_polynomial(2).roots(multiplicities=False))
+    target_A = E_t.a4()
+    target_alpha = torsion_points[-1]
+    
+    # 1. Находим E0 для M1
+    E0 = find_E0_for_M1(bits1, target_A, target_alpha)
+    if not E0:
+        print("[-] Не удалось найти E0. Запускаем еще раз...")
+        return solve_smart() # Автоматический перезапуск
