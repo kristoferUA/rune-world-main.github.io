@@ -754,3 +754,104 @@ def solve_full():
 
 if __name__ == "__main__":
     solve_full()
+
+
+
+import random
+import string
+
+def solve_full():
+    print("[*] Вычисляем целевой хеш для уязвимой кривой...")
+    E_t = EllipticCurve(K, [1, 0])
+    target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
+    
+    payload1 = b'"' + target_hash.encode() + b'"'
+    base_payload2 = b'print(open("flag.txt").read())#'
+    
+    attempt = 0
+    while True:
+        attempt += 1
+        print(f"\n[*] Попытка {attempt}...")
+        
+        # Генерируем случайный мусор в комментарии для уникальности пути
+        pad_len = len(payload1) - len(base_payload2)
+        if pad_len > 0:
+            padding = ''.join(random.choices(string.ascii_letters + string.digits, k=pad_len)).encode()
+            payload2 = base_payload2 + padding
+        else:
+            payload2 = base_payload2
+            
+        bits1 = data_to_bits(payload1)
+        bits2 = data_to_bits(payload2)
+        
+        A_t = E_t.a4()
+        torsion_points = sorted(E_t.torsion_polynomial(2).roots(multiplicities=False))
+        alpha_t = torsion_points[-1] 
+        
+        states1 = {(A_t, alpha_t)}
+        states2 = {(A_t, alpha_t)}
+        
+        collision_found = False
+        
+        for i in range(len(bits1) - 1, 0, -1):
+            b1 = bits1[i]
+            b2 = bits2[i]
+            
+            new_states1 = set()
+            for A, alpha in states1:
+                new_states1.update(get_predecessors(A, alpha, b1))
+                    
+            new_states2 = set()
+            for A, alpha in states2:
+                new_states2.update(get_predecessors(A, alpha, b2))
+            
+            # Увеличили ширину поиска до 300
+            states1 = set(list(new_states1)[:300]) 
+            states2 = set(list(new_states2)[:300])
+            
+            intersection = states1.intersection(states2)
+            if intersection:
+                print(f"[+] Точка схождения найдена на шаге {i}!")
+                common_state = intersection.pop()
+                
+                current_states = [common_state]
+                path_failed = False
+                
+                for j in range(i - 1, 0, -1):
+                    next_states = []
+                    for A, alpha in current_states:
+                        next_states.extend(get_predecessors(A, alpha, bits1[j]))
+                    current_states = list(set(next_states))[:300]
+                    if not current_states:
+                        print("[-] Путь к оборвался после схождения. Ищем дальше...")
+                        path_failed = True
+                        break
+                        
+                if path_failed:
+                    collision_found = True # Чтобы скипнуть сообщение ниже
+                    break
+                    
+                A_0, alpha_0 = current_states[0]
+                a6_0 = -(alpha_0**3 + A_0*alpha_0)
+                
+                try:
+                    E0 = EllipticCurve(K, [A_0, a6_0])
+                    if E0.is_supersingular():
+                        print("\n[+] УСПЕХ! Стартовые параметры для инстанса:")
+                        print(f"a4.0 > {A_0.list()[0]}")
+                        print(f"a4.1 > {A_0.list()[1]}")
+                        print(f"a6.0 > {a6_0.list()[0]}")
+                        print(f"a6.1 > {a6_0.list()[1]}")
+                        print("\nchoice > 1")
+                        print(f"data (hex) > {payload1.hex()}")
+                        print("\nchoice > 2")
+                        print(f"data (hex) > {payload2.hex()}")
+                        return
+                except Exception as e:
+                    pass
+                
+                collision_found = True
+                break
+                
+        if not collision_found:
+            print("[-] Пути не пересеклись. Генерируем новый паддинг...")
