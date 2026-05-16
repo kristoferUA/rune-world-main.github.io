@@ -227,3 +227,132 @@ B = QuaternionAlgebra(-1, -p)
 i, j, k = B.gens()
 O0 = B.quaternion_order([1, i, (1+j)/2, (i+k)/2])
 ω = i
+
+
+
+
+def keygen(self):
+        """
+        Efficient keygen as described in Appendix D
+        of the SQISign paper
+
+        Input: None
+        Output: None
+
+        Stores to self:
+            self.pk = EA
+            self.sk = (τ_prime, Iτ, Jτ)
+
+            EA: the codomain of the isogeny τ_prime
+            τ_prime: the secret isogeny from E0 → EA
+            Iτ: ideal with prime norm equivalent to Jτ
+            Jτ: ideal with smooth norm, equivalent to Iτ and to
+                τ_prime under the Deuring correspondence
+
+        Note:
+            To send the public key use the function
+            `self.export_public_key()`
+        """
+        # Compute a random prime ≤ Bτ which is inert
+        # in R[ω].
+        # Note: this is the same as picking p ≡ 3 mod 4
+        Nl = l**eτ
+        
+        # Stop infinite loops
+        for _ in range(1000):
+            Nτ = inert_prime(Bτ, -ZZ(ω**2))
+            # We need the product to be large enough for
+            # RepresentIntegerHeuristic.
+            if Nτ * Nl > 2 * p:
+                break
+
+        # Compute an endomorphism γ of norm Nτ l^eτ
+        # Nτ < Bτ
+        γ = None
+
+        # Stop infinite loops
+        for _ in range(1000):
+            γ = RepresentIntegerHeuristic(Nτ * Nl, parity=True)
+            if γ is not None:
+                break
+        
+        if γ is None:
+            exit("Never found an alg element with norm (Nτ * Nl), Exiting...")
+
+        Iτ = O0 * γ + O0 * Nτ
+        Jτ = O0 * γ.conjugate() + O0 * Nl
+
+        # Iτ has prime norm
+        assert Iτ.norm() == Nτ, f"{Iτ.norm() = }, {Nτ = }, {Nl = }"
+        # Jτ has smooth norm l^e
+        assert Jτ.norm() == Nl, f"{Jτ.norm() = }, {Nτ = }, {Nl = }"
+
+        # Iτ is an integral ideal: Iτ ⊂ O0
+        assert is_integral(Iτ), "Iτ is not integral"
+
+        # Jτ is an integral ideal: Iτ ⊂ O0
+        assert is_integral(Jτ), "Jτ is not integral"
+
+        # Jτ is a cyclic isogeny
+        assert is_cyclic(Jτ), "Jτ is not cyclic"
+
+        # Compute the secret isogeny τ
+        I_trivial = O0.unit_ideal()
+        ϕ_trivial = E0.isogeny(E0(0))
+        τ_prime = IdealToIsogenyFromKLPT(
+            Jτ, I_trivial, ϕ_trivial, I_prime=Iτ, end_close_to_E0=True
+        )
+        EA = τ_prime.codomain()
+
+        # The isogeny τ_prime should have degree = n(Jτ)
+        assert (
+            τ_prime.degree() == Jτ.norm()
+        ), f"{factor(τ_prime.degree()) = } {factor(Jτ.norm()) = }"
+
+        self.pk = EA
+        self.sk = (τ_prime, Iτ, Jτ)
+
+        return None
+
+    def export_public_key(self):
+        """
+        Helper function to return the public key
+
+        TODO: this could be compressed, probably.
+        """
+        if self.pk is None:
+            raise ValueError(f"Must first generate a keypair with `self.keygen()`")
+        return self.pk
+
+    def commitment(self):
+        """
+        Compute the challenge isogeny and corresponding ideal
+        of degree / norm T_prime
+
+        Input: None
+        Output: E1: the codomain of the commitment isogeny
+
+        Stores to self:
+        self.commitment_secrets = (ψ_ker, ψ, Iψ))
+            ψ_ker: the kernel of ψ
+            ψ: the secret commitment isogeny ψ : E0 → E1
+            Iψ: the ideal equivalent to ψ.
+        """
+        # Generate a random kernel
+        # of order T_prime
+        P, Q = torsion_basis(E0, T_prime)
+        x = randint(1, T_prime)
+        ψ_ker = P + x * Q
+
+        # Generate the ideal Iψ from ψ_ker
+        Iψ = kernel_to_ideal(ψ_ker, T_prime)
+        assert Iψ.norm() == T_prime, "Iψ has the wrong norm"
+
+        # Generate the ideal ψ and its codomain
+        ψ = EllipticCurveIsogenyFactored(E0, ψ_ker, order=T_prime)
+        E1 = ψ.codomain()
+
+        # Store secret results
+        self.commitment_secrets = (ψ_ker, ψ, Iψ)
+
+        return E1
