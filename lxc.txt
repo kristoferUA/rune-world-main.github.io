@@ -738,16 +738,59 @@ else:
 
 
 
-# Подставь сюда полную hex-строку твоего ПЕРВОГО пейлоада
-first_payload_hex = "22333463653238383035343335622376361616339366266636433313165653261613163306333363646661383536646565386634373338656432323538633134655642" 
+#!/usr/bin/env sage
+from sage.all import GF, EllipticCurve
+
+# Параметры поля из задания
+p = 2**49 * 3**36 - 1
+K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
+
+def deterministic_sqrt(x):
+    return min(x.sqrt(all=True))
+
+def select0(E0, b0):
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    if b0:
+        return torsion_points[-1], torsion_points[1]
+    else:
+        return torsion_points[1], torsion_points[-1]
+
+def select(lambda0, lambda1, b):
+    if b:
+        return max(lambda0, lambda1)
+    else:
+        return min(lambda0, lambda1)
+
+def next_curve(A, alpha, b):
+    xi = alpha**2
+    zeta = 3 * xi + A
+    eta = deterministic_sqrt(zeta)
+    new_A = -(4 * A + 15 * xi)
+    lambda0 = alpha + 2 * eta
+    lambda1 = alpha - 2 * eta
+    new_alpha = select(lambda0, lambda1, b)
+    return new_A, new_alpha
+
+def data_to_bits(data):
+    return [int(b) for c in data for b in "{:08b}".format(c)]
+
+# Данные стартовой кривой из твоей активной сессии
+a4_0 = 3547732504740714029047379324870
+a4_1 = 894485268382189237503319753368
+a6_0 = 1897378638608997265918654817168
+a6_1 = 6593568422778043241787829355407
+
+# Твой первый успешный hex-пейлоад со скриншота
+first_payload_hex = "22333463653238383035343335622376361616339366266636433313165653261613163306333363646661383536646565386634373338656432323538633134655642"
 payload_bytes = bytes.fromhex(first_payload_hex)
 
-# Твоя стартовая кривая E0
+# Инициализация кривой
 a4 = a4_0 + a4_1 * x
 a6 = a6_0 + a6_1 * x
 E0 = EllipticCurve(K, [a4, a6])
 
-# Полностью повторяем шаги CGL_hash, но без финального sha256
+# Прогон через граф изогений для вычисления целевого j-инварианта
 bits = data_to_bits(payload_bytes)
 A = E0.a4()
 alpha, _ = select0(E0, bits[0])
