@@ -882,3 +882,27 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+from sage.all import QuaternionAlgebra
+
+p = 2**49 * 3**36 - 1
+# Проверка условия для выбора базиса
+assert p % 4 == 3
+
+# Инициализация кватернионной алгебры B_{p, \infty}
+B = QuaternionAlgebra(-1, -p)
+i, j, k = B.gens()
+
+# Максимальный порядок O_0, соответствующий кривой j=1728
+# Базис: 1, i, (1+k)/2, (i+j)/2
+basis = [
+    B(1), 
+    i, 
+    (B(1) + k) / 2, 
+    (i + j) / 2
+]
+O_0 = B.quaternion_order(basis)
+
+print("[+] Кватернионная алгебра инициализирована")
+print(f"[+] Базис O_0: {O_0.basis()}")
