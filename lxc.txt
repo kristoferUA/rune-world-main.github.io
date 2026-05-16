@@ -939,3 +939,76 @@ def find_smooth_alpha(I, O_0):
     
     # Наш целевой эквивалентный идеал будет J = I * (alpha^-1)
     return alpha
+def path_to_ideal(bits, O_0):
+    """
+    Упрощенная трансляция пути в кватернионный идеал.
+    В реальном KLPT здесь вычисляется эндоморфизм theta через действие Галуа.
+    Для базовой редукции мы формируем идеал из нормы пути и базиса.
+    """
+    n = len(bits)
+    norm_I = 2**n
+    
+    # Генератор идеала (упрощенно для LLL)
+    # В полном KLPT theta вычисляется как образ ядра изогении
+    theta = O_0.basis()[1] * bits[0] + O_0.basis()[2] * bits[-1] 
+    
+    # Формируем левый идеал: I = O_0 * norm_I + O_0 * theta
+    # В SageMath мы можем определить его через Z-модуль
+    basis_I = [norm_I * b for b in O_0.basis()] + [b * theta for b in O_0.basis()]
+    
+    # Редуцируем базис через HNF (Hermite Normal Form) для получения 4 векторов
+    M = matrix(ZZ, 8, 4)
+    for i in range(8):
+        coords = O_0.coordinate_vector(basis_I[i])
+        for j in range(4):
+            M[i, j] = ZZ(coords[j])
+            
+    H = M.hermite_form()
+    
+    # Восстанавливаем 4 базисных элемента идеала из HNF
+    reduced_basis = []
+    for i in range(4, 8): # Ненулевые строки после HNF обычно внизу
+        elem = sum(H[i, j] * O_0.basis()[j] for j in range(4))
+        if elem != 0:
+            reduced_basis.append(elem)
+            
+    # Если HNF вернул меньше 4 элементов (упрощение), добиваем нормой
+    while len(reduced_basis) < 4:
+        reduced_basis.append(O_0.basis()[len(reduced_basis)] * norm_I)
+        
+    return B.quaternion_ideal(reduced_basis)
+
+def solve_klpt():
+    print("[*] Шаг 1: Подготовка целевой кривой j=1728...")
+    E_t = EllipticCurve(K, [1, 0])
+    target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
+    
+    m1 = b'"' + target_hash.encode() + b'"'
+    rce_tail = b' and __import__("os").system("cat flag.txt") #'
+    m2 = m1 + rce_tail
+    
+    tail_bits = data_to_bits(rce_tail)
+    print(f"[*] Длина боевого хвоста: {len(tail_bits)} бит")
+    
+    print("[*] Шаг 2: Трансляция пути в кватернионный идеал I...")
+    try:
+        I = path_to_ideal(tail_bits, O_0)
+        print("[+] Идеал успешно сформирован!")
+        
+        print("[*] Шаг 3: Запуск LLL для поиска эквивалентного идеала...")
+        alpha = find_smooth_alpha(I, O_0)
+        
+        # Эквивалентный идеал J = I * (alpha_bar / N(I))
+        alpha_bar = alpha.conjugate()
+        norm_I = 2**len(tail_bits)
+        
+        print(f"[+] Норма найденного элемента alpha: {alpha.norm()}")
+        print(f"[+] Расчетная норма нового идеала J: {alpha.norm() * norm_I / (norm_I**2)}")
+        
+        print("\n[*] LLL-редукция завершена. Ожидаем гладкую норму (степень двойки).")
+        
+    except Exception as e:
+        print(f"[-] Ошибка алгебры: {e}")
+
+if __name__ == "__main__":
+    solve_klpt()
