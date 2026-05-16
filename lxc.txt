@@ -966,3 +966,85 @@ def solve_smart():
     if not E0:
         print("[-] Не удалось найти E0. Запускаем еще раз...")
         return solve_smart() # Автоматический перезапуск
+
+
+def solve_smart():
+    print("[*] Подготовка целевой кривой...")
+    E_t = EllipticCurve(K, [1, 0])
+    target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
+    
+    torsion_points = sorted(E_t.torsion_polynomial(2).roots(multiplicities=False))
+    target_A = E_t.a4()
+    target_alpha = torsion_points[-1]
+    
+    E0 = None
+    m1 = b''
+    
+    print("[*] Ищем E0 (запусков может понадобиться много)...")
+    attempt = 0
+    while True:
+        attempt += 1
+        if attempt % 10 == 0:
+            print(f"[*] Попытка {attempt}...")
+            
+        # Динамически добавляем от 0 до 5 пробелов в конец для уникальности графа
+        pad = b' ' * random.randint(0, 5)
+        m1 = b'"' + target_hash.encode() + b'"' + pad
+        bits1 = data_to_bits(m1)
+        
+        # 1. Находим E0 для M1
+        E0 = find_E0_for_M1(bits1, target_A, target_alpha)
+        if E0:
+            print(f"\n[+] Найден E0: a4_0={E0.a4().list()[0]}")
+            break
+            
+    # 2. Формируем M2 так, чтобы он НАЧИНАЛСЯ с M1
+    rce_tail = b' and __import__("os").system("cat flag.txt") #'
+    m2_base = m1 + rce_tail
+    
+    print("[*] Вычисляем отклонение от j=1728...")
+    A = target_A
+    alpha = target_alpha
+    tail_bits = data_to_bits(rce_tail)
+    
+    for b in tail_bits:
+        A, alpha = next_curve(A, alpha, b)
+        
+    # 3. Ищем петлю возврата в j=1728 (BFS)
+    print("[*] Ищем петлю возврата в j=1728 (BFS)...")
+    
+    from collections import deque
+    q = deque([(A, alpha, b'')])
+    
+    found_padding = None
+    max_depth = 16 
+    
+    for depth in range(max_depth):
+        level_size = len(q)
+        for _ in range(level_size):
+            curr_A, curr_alpha, path = q.popleft()
+            
+            if curr_A == target_A:
+                found_padding = path
+                break
+                
+            for b in (0, 1):
+                nA, nAlpha = next_curve(curr_A, curr_alpha, b)
+                # Сохраняем путь как байты ('0' или '1') для простоты конвертации
+                q.append((nA, nAlpha, path + (b'1' if b else b'0')))
+                
+        if found_padding:
+            break
+            
+    if found_padding:
+        print(f"[+] Путь возврата найден! Бит: {len(found_padding)}")
+        
+        # Конвертируем найденные биты обратно в байты для паддинга
+        # Это упрощенная конвертация, для надежности лучше просто захардкодить 
+        # нужные биты в данные, если сервер принимает сырые биты. 
+        # Но так как у нас ascii-строки, мы можем просто найти символы с нужным битовым суффиксом.
+        print("\n[!] Обрати внимание: тебе нужно будет сконвертировать найденные биты")
+        print(f"[!] {found_padding} в валидные ASCII-символы для завершения M2.")
+        
+    else:
+        print("[-] Увеличь глубину BFS или измени длину rce_tail.")
