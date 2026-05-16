@@ -108,3 +108,19 @@ def generate_step2(E0, E_target_j):
     # 4 Собираем финальный payload
     # final_payload = exec_code + bits_to_ascii_padding(path_bits)
     # print(f"data (hex) > {final_payload.hex()}")
+
+
+
+
+p_ctf = {
+    "p": ZZ(2**49 * 3**36 - 1),
+    "q": 1, 
+    "l": 2, # Мы используем 2-изогении
+    "available_torsion": ZZ(2**49 * 3**36), # p + 1
+    "T": ZZ(3**36), # Вся нечетная часть кручения
+    "e": 49, # Степень двойки в доступном кручении
+    "Δ": 10, # Для meet-in-the-middle, можно оставить небольшим
+    "T_prime": ZZ(3**18), # Просто делим нечетное кручение
+    "Dc": ZZ(3**18),
+    "f_step_max": 15
+}
