@@ -906,3 +906,36 @@ O_0 = B.quaternion_order(basis)
 
 print("[+] Кватернионная алгебра инициализирована")
 print(f"[+] Базис O_0: {O_0.basis()}")
+def ideal_to_lattice(I, O_0):
+    """Преобразует левый идеал I в базис решетки над ZZ."""
+    basis_I = I.basis()
+    
+    # Матрица 4x4 для коэффициентов
+    M = matrix(ZZ, 4, 4)
+    for i in range(4):
+        # Получаем координаты элемента идеала относительно базиса порядка O_0
+        coords = O_0.coordinate_vector(basis_I[i])
+        for j in range(4):
+            M[i, j] = ZZ(coords[j])
+    return M
+
+def find_smooth_alpha(I, O_0):
+    """Эвристика KLPT: поиск элемента alpha для формирования гладкого идеала."""
+    M = ideal_to_lattice(I, O_0)
+    
+    print("[*] Запускаем LLL-редукцию решетки идеала...")
+    # LLL найдет базис из кратчайших векторов решетки
+    L = M.LLL()
+    
+    # Берем самый короткий ненулевой вектор
+    short_vec = L[0]
+    
+    # Восстанавливаем кватернион alpha из найденных коэффициентов
+    basis_O = O_0.basis()
+    alpha = sum(short_vec[i] * basis_O[i] for i in range(4))
+    
+    print(f"[+] Исходная норма идеала N(I): {I.norm()}")
+    print(f"[+] Норма найденного элемента N(alpha): {alpha.norm()}")
+    
+    # Наш целевой эквивалентный идеал будет J = I * (alpha^-1)
+    return alpha
