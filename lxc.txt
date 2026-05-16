@@ -55,148 +55,56 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-from sage.all import GF, EllipticCurve
-from hashlib import sha256
-import random
-
-p = 2**49 * 3**36 - 1
-K = GF(p**2, "x", modulus=[1, 0, 1])
-x = K.gen()
-
-def deterministic_sqrt(val):
-    sqrts = val.sqrt(all=True)
-    if not sqrts: return None
-    return min(sqrts)
-
-def select(lambda0, lambda1, b):
-    if b: return max(lambda0, lambda1)
-    else: return min(lambda0, lambda1)
-
-def next_curve(A, alpha, b):
-    xi = alpha**2
-    zeta = 3 * xi + A
-    eta = deterministic_sqrt(zeta)
-    new_A = -(4 * A + 15 * xi)
-    lambda0 = alpha + 2 * eta
-    lambda1 = alpha - 2 * eta
-    new_alpha = select(lambda0, lambda1, b)
-    return new_A, new_alpha
-
-def data_to_bits(data):
-    return [int(b) for c in data for b in "{:08b}".format(c)]
-
-def get_predecessors(new_A, new_alpha, b):
-    preds = []
-    a_c = K(4)
-    b_c = K(-2 * new_alpha)
-    c_c = K(new_alpha**2 + new_A)
-    delta = b_c**2 - 4*a_c*c_c
+def bits_to_ascii_padding(path_bits):
+    # Превращаем биты изогений в валидные ASCII-символы (от 0x20 до 0x7E)
+    # Чтобы не сломать eval, используем только печатные символы
+    padding = bytearray()
     
-    sqrts = delta.sqrt(all=True)
-    for r in sqrts:
-        alpha = (-b_c + r) / (2*a_c)
-        A = (-new_A - 15*alpha**2) / 4
+    # Дополняем биты нулями, чтобы их длина была кратна 8
+    bits = list(path_bits)
+    while len(bits) % 8 != 0:
+        bits.append(0)
         
-        xi = alpha**2
-        zeta = 3 * xi + A
-        eta = deterministic_sqrt(zeta)
-        if eta is None: continue
+    for i in range(0, len(bits), 8):
+        byte_chunk = bits[i:i+8]
+        # Так как нам нужен валидный ASCII, стартовый бит всегда должен быть 0
+        # Если KLPT требует 1 первым битом, придется сделать шаг назад в графе
+        # или использовать пробелы/табы хитрее. 
+        # В простейшем случае:
+        byte_val = int("".join(map(str, byte_chunk)), 2)
         
-        test_new_A = -(4 * A + 15 * xi)
-        lambda0 = alpha + 2 * eta
-        lambda1 = alpha - 2 * eta
-        test_new_alpha = select(lambda0, lambda1, b)
+        # Если значение выходит за рамки ASCII, можно использовать 
+        # эквивалентные битовые последовательности (циклы в графе), 
+        # чтобы перестроить путь под печатные символы.
+        padding.append(byte_val)
         
-        if test_new_A == new_A and test_new_alpha == new_alpha:
-            preds.append((A, alpha))
-    return preds
+    return padding
 
-def get_valid_random_state():
-    # Начинаем с известной кривой и делаем случайные шаги для получения валидного узла
-    E = EllipticCurve(K, [1, 0])
-    A = E.a4()
-    alpha = sorted(E.torsion_polynomial(2).roots(multiplicities=False))[1]
-    for _ in range(50):
-        b = random.randint(0, 1)
-        A, alpha = next_curve(A, alpha, b)
-    return A, alpha
-
-def CGL_hash(E0, data):
-    bits = data_to_bits(data)
-    n = len(bits)
-    A = E0.a4()
+def generate_step2(E0, E_target_j):
+    # Наша боевая нагрузка
+    exec_code = b"__import__('os').system('cat flag.txt') #"
     
+    # 1 Проходим по графу начальную часть пейлоада
+    bits_exec = [int(b) for c in exec_code for b in "{:08b}".format(c)]
+    
+    current_A = E0.a4()
     torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-    if bits[0]: alpha = torsion_points[-1]
-    else: alpha = torsion_points[1]
+    current_alpha = torsion_points[-1] if bits_exec[0] else torsion_points[1]
+    
+    for b in bits_exec[1:]:
+        current_A, current_alpha = next_curve(current_A, current_alpha, b)
         
-    for i in range(n - 1):
-        A, alpha = next_curve(A, alpha, bits[i + 1])
-    xi = alpha**2
-    new_A = -(4 * A + 15 * xi)
-    new_B = -alpha * (8 * A + 22 * xi)
-    E = EllipticCurve(K, [new_A, new_B])
-    return sha256(str(E.j_invariant()).encode()).hexdigest()
-
-def solve_step1():
-    print("[*] Ищем подходящую стартовую кривую (может занять около минуты)...")
-    attempt = 0
-    while True:
-        attempt += 1
-        if attempt % 10 == 0:
-            print(f"[*] Попытка {attempt}...")
-            
-        A_n, alpha_n = get_valid_random_state()
-        xi = alpha_n**2
-        new_A = -(4 * A_n + 15 * xi)
-        new_B = -alpha_n * (8 * A_n + 22 * xi)
-        
-        try:
-            E_t = EllipticCurve(K, [new_A, new_B])
-            target_hash = sha256(str(E_t.j_invariant()).encode()).hexdigest()
-        except:
-            continue
-            
-        payload = b'"' + target_hash.encode() + b'"'
-        bits = data_to_bits(payload)
-        
-        states = [(A_n, alpha_n)]
-        
-        died = False
-        for i, b in enumerate(reversed(bits[1:])):
-            new_states = []
-            for A, alpha in states:
-                new_states.extend(get_predecessors(A, alpha, b))
-            states = list(set(new_states))[:100]
-            if not states:
-                died = True
-                break
-                
-        if died:
-            continue
-            
-        b0 = bits[0]
-        for A, alpha in states:
-            a6 = -(alpha**3 + A*alpha)
-            try:
-                E0 = EllipticCurve(K, [A, a6])
-                if not E0.is_supersingular(): continue
-                
-                torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-                selected_alpha = torsion_points[-1] if b0 else torsion_points[1]
-                
-                if selected_alpha == alpha:
-                    if CGL_hash(E0, payload) == target_hash:
-                        print("\n[+] УСПЕХ! Введи эти данные на сервере:")
-                        print(f"a4.0 > {A.list()[0]}")
-                        print(f"a4.1 > {A.list()[1]}")
-                        print(f"a6.0 > {a6.list()[0]}")
-                        print(f"a6.1 > {a6.list()[1]}")
-                        print("\nchoice > 1")
-                        print(f"data (hex) > {payload.hex()}")
-                        return E0, payload, target_hash
-            except:
-                pass
-
-if __name__ == "__main__":
-    solve_step1()
+    # 2 Здесь текущее состояние E_mid
+    xi = current_alpha**2
+    E_mid = EllipticCurve(K, [-(4*current_A + 15*xi), -current_alpha*(8*current_A + 22*xi)])
+    
+    # 3 Передаем E_mid и E_target_j в твой локальный KLPT solver
+    print(f"[*] Запускай KLPT solver...")
+    print(f"[*] E_mid j-invariant: {E_mid.j_invariant()}")
+    print(f"[*] E_target j-invariant: {E_target_j}")
+    
+    # path_bits = your_klpt_solver(E_mid, E_target_j)
+    
+    # 4 Собираем финальный payload
+    # final_payload = exec_code + bits_to_ascii_padding(path_bits)
+    # print(f"data (hex) > {final_payload.hex()}")
