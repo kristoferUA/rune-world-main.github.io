@@ -112,15 +112,110 @@ def generate_step2(E0, E_target_j):
 
 
 
-p_ctf = {
-    "p": ZZ(2**49 * 3**36 - 1),
-    "q": 1, 
-    "l": 2, # Мы используем 2-изогении
-    "available_torsion": ZZ(2**49 * 3**36), # p + 1
-    "T": ZZ(3**36), # Вся нечетная часть кручения
-    "e": 49, # Степень двойки в доступном кручении
-    "Δ": 10, # Для meet-in-the-middle, можно оставить небольшим
-    "T_prime": ZZ(3**18), # Просто делим нечетное кручение
-    "Dc": ZZ(3**18),
-    "f_step_max": 15
-}
+# exploit_step2.sage
+from sage.all import GF, EllipticCurve, ZZ
+from hashlib import sha256
+
+# Подтягиваем математику SQISign
+from parameters import params
+# Внимание: названия импортов ниже могут немного отличаться 
+# в зависимости от конкретного форка репозитория. 
+# Проверь deuring.py и KLPT.py на точные имена функций.
+from deuring import Ideal # Или функция j_to_ideal / evaluate_deuring
+from KLPT import EquivalentSmoothIdealHeuristic
+from isogenies import IsogenyPath # Или аналогичная для перевода идеала в путь
+
+# --- Параметры поля из таска ---
+p = 2**49 * 3**36 - 1
+K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
+
+def deterministic_sqrt(val):
+    sqrts = val.sqrt(all=True)
+    return min(sqrts) if sqrts else None
+
+def select(lambda0, lambda1, b):
+    return max(lambda0, lambda1) if b else min(lambda0, lambda1)
+
+def next_curve(A, alpha, b):
+    xi = alpha**2
+    zeta = 3 * xi + A
+    eta = deterministic_sqrt(zeta)
+    new_A = -(4 * A + 15 * xi)
+    lambda0 = alpha + 2 * eta
+    lambda1 = alpha - 2 * eta
+    return new_A, select(lambda0, lambda1, b)
+
+def bits_to_utf8_padding(path_bits):
+    # Превращаем биты в байты. 
+    # Python eval() ожидает валидный UTF-8. 
+    # Если KLPT выдает биты, не кратные 8, или байты вне UTF-8,
+    # здесь может потребоваться добавить логику backtracking-а 
+    # (шаг вперед-назад в графе), чтобы скорректировать биты.
+    padding = bytearray()
+    bits = list(path_bits)
+    
+    while len(bits) % 8 != 0:
+        bits.append(0)
+        
+    for i in range(0, len(bits), 8):
+        byte_val = int("".join(map(str, bits[i:i+8])), 2)
+        # Ограничиваем ASCII диапазоном, чтобы не сломать парсер Python
+        # В реальном эксплойте тут нужна тонкая подгонка циклов графа
+        padding.append(byte_val & 0x7F) 
+    return padding
+
+def main():
+    print("[*] Инициализация параметров эксплойта...")
+    
+    # 1. ТВОИ ДАННЫЕ ИЗ ШАГА 1
+    # Подставь сюда сгенерированные a4 и a6
+    a4 = K(0) # Замени на a4_0 + a4_1 * x
+    a6 = K(0) # Замени на a6_0 + a6_1 * x
+    E0 = EllipticCurve(K, [a4, a6])
+    
+    # Целевая кривая (с j=1728 или та, что была в твоем шаге 1)
+    E_target = EllipticCurve(K, [1, 0]) 
+    
+    # Пейлоад, который мы хотим выполнить
+    exec_code = b"__import__('os').system('cat flag.txt')\n#"
+    bits_exec = [int(b) for c in exec_code for b in "{:08b}".format(c)]
+    
+    # 2. ПРОХОДИМ НАЧАЛЬНЫЙ ПУТЬ
+    print("[*] Вычисляем промежуточную кривую (E_mid)...")
+    current_A = E0.a4()
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    current_alpha = torsion_points[-1] if bits_exec[0] else torsion_points[1]
+    
+    for b in bits_exec[1:]:
+        current_A, current_alpha = next_curve(current_A, current_alpha, b)
+        
+    xi = current_alpha**2
+    new_A = -(4 * current_A + 15 * xi)
+    new_B = -current_alpha * (8 * current_A + 22 * xi)
+    E_mid = EllipticCurve(K, [new_A, new_B])
+    
+    print(f"[+] j-invariant E_mid: {E_mid.j_invariant()}")
+    print(f"[+] j-invariant E_target: {E_target.j_invariant()}")
+    
+    # 3. МАГИЯ KLPT
+    print("[*] Транслируем кривые в идеалы Деуринга...")
+    # Названия функций зависят от репозитория (смотри deuring.py)
+    # ideal_mid = j_to_ideal(E_mid.j_invariant())
+    # ideal_target = j_to_ideal(E_target.j_invariant())
+    
+    print("[*] Запускаем алгоритм KLPT (это может занять время)...")
+    # path_ideal = EquivalentSmoothIdealHeuristic(ideal_mid, ideal_target)
+    
+    print("[*] Переводим идеалы в маршрут 2-изогений...")
+    # path_bits = IsogenyPath(path_ideal)
+    
+    # 4. ФОРМИРОВАНИЕ ПЕЙЛОАДА
+    # padding = bits_to_utf8_padding(path_bits)
+    # final_payload = exec_code + padding
+    
+    # print(f"\n[+] ГОТОВО! Отправляй на сервер (choice 2):")
+    # print(f"data (hex) > {final_payload.hex()}")
+
+if __name__ == "__main__":
+    main()
