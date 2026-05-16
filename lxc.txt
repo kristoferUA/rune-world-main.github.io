@@ -55,117 +55,123 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
-#!/usr/bin/env python3
-
-from sage.all import GF, EllipticCurve_from_j, EllipticCurve
-import json
-import os
+from sage.all import GF, EllipticCurve
 from hashlib import sha256
-from ast import literal_eval
-
-FLAG = open("flag.txt").read()
 
 p = 2**49 * 3**36 - 1
 K = GF(p**2, "x", modulus=[1, 0, 1])
 x = K.gen()
 
-
-def deterministic_sqrt(x):
-    return min(x.sqrt(all=True))
-
-
-### Helper Functions ###
-# Algorithm 3 & 4
-# Yoshida, R., Takashima, K., (2009). Simple Algorithms for Computing a Sequence of 2-Isogenies
-# https://doi.org/10.1007/978-3-642-00730-9_4
-def select0(E0, b0):
-    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
-    if b0:
-        return torsion_points[-1], torsion_points[1]
-    else:
-        return torsion_points[1], torsion_points[-1]
-
+def deterministic_sqrt(val):
+    sqrts = val.sqrt(all=True)
+    if not sqrts: return None
+    return min(sqrts)
 
 def select(lambda0, lambda1, b):
-    if b:
-        return max(lambda0, lambda1)
-    else:
-        return min(lambda0, lambda1)
-
+    if b: return max(lambda0, lambda1)
+    else: return min(lambda0, lambda1)
 
 def next_curve(A, alpha, b):
     xi = alpha**2
     zeta = 3 * xi + A
     eta = deterministic_sqrt(zeta)
     new_A = -(4 * A + 15 * xi)
-
     lambda0 = alpha + 2 * eta
     lambda1 = alpha - 2 * eta
     new_alpha = select(lambda0, lambda1, b)
     return new_A, new_alpha
 
+def data_to_bits(data):
+    return [int(b) for c in data for b in "{:08b}".format(c)]
+
+def get_predecessors(new_A, new_alpha, b):
+    preds = []
+    a_c = K(4)
+    b_c = K(-2 * new_alpha)
+    c_c = K(new_alpha**2 + new_A)
+    delta = b_c**2 - 4*a_c*c_c
+    
+    sqrts = delta.sqrt(all=True)
+    for r in sqrts:
+        alpha = (-b_c + r) / (2*a_c)
+        A = (-new_A - 15*alpha**2) / 4
+        
+        xi = alpha**2
+        zeta = 3 * xi + A
+        eta = deterministic_sqrt(zeta)
+        if eta is None: continue
+        
+        test_new_A = -(4 * A + 15 * xi)
+        lambda0 = alpha + 2 * eta
+        lambda1 = alpha - 2 * eta
+        test_new_alpha = select(lambda0, lambda1, b)
+        
+        if test_new_A == new_A and test_new_alpha == new_alpha:
+            preds.append((A, alpha))
+    return preds
 
 def CGL_hash(E0, data):
-    data = data_to_bits(data)
-    n = len(data)
-
+    bits = data_to_bits(data)
+    n = len(bits)
     A = E0.a4()
-    alpha, _ = select0(E0, data[0])
+    
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    if bits[0]: alpha = torsion_points[-1]
+    else: alpha = torsion_points[1]
+        
     for i in range(n - 1):
-        A, alpha = next_curve(A, alpha, data[i + 1])
-
+        A, alpha = next_curve(A, alpha, bits[i + 1])
     xi = alpha**2
     new_A = -(4 * A + 15 * xi)
     new_B = -alpha * (8 * A + 22 * xi)
+    E = EllipticCurve(K, [new_A, new_B])
+    return sha256(str(E.j_invariant()).encode()).hexdigest()
 
-    E = EllipticCurve(E0.base_field(), [new_A, new_B])
-    j = str(E.j_invariant()).encode()
-    return sha256(j).hexdigest()
-
-
-def data_to_bits(data):
-    bits = [int(b) for c in data for b in "{:08b}".format(c)]
-    assert bits and all(b in (0, 1) for b in bits)
-    return bits
-
-
-### Challenge ###
-def main():
-    print("╔══════════════════════════════════════════════════════════╗")
-    print("║      OPERATION FORGED NORMALITY  —  D9 ATTEST NODE      ║")
-    print("║                  [ TASK FORCE NIGHTFALL ]                ║")
-    print("╚══════════════════════════════════════════════════════════╝")
-    print()
-    print("Initialising attestation engine. Define your starting point.")
-
-    a4_0 = int(input("a4.0 > "))
-    a4_1 = int(input("a4.1 > "))
-    a6_0 = int(input("a6.0 > "))
-    a6_1 = int(input("a6.1 > "))
-
-    a4 = a4_0 + a4_1 * x
-    a6 = a6_0 + a6_1 * x
-    E0 = EllipticCurve(K, [a4, a6])
-
-    if not E0.is_supersingular():
-        print("[REJECTED] Protocol violation: curve must be supersingular.")
-        return
-
-    registry = set()
-    print("--- D9 ATTESTATION ENGINE ---")
-    print("1 > register quine credential")
-    print("2 > deploy quine payload")
+def solve_step1():
+    print("[*] Ищем подходящую стартовую кривую...")
     while True:
-        choice = int(input("choice > "))
-        payload = bytes.fromhex(input("data (hex) > "))
-        hsh = CGL_hash(E0, payload)
-        if choice == 1 and hsh == literal_eval(payload.decode("latin-1")):
-            registry.add(hsh)
-        elif choice == 2 and hsh in registry:
-            eval(payload)
-        else:
-            print("[REJECTED] Attestation mismatch. Quines only.")
-
+        # Генерируем случайную конечную точку
+        A_rand, alpha_rand = K.random_element(), K.random_element()
+        xi = alpha_rand**2
+        new_A = -(4 * A_rand + 15 * xi)
+        new_B = -alpha_rand * (8 * A_rand + 22 * xi)
+        try:
+            E_target = EllipticCurve(K, [new_A, new_B])
+            if E_target.is_supersingular(): break
+        except: pass
+        
+    target_hash = sha256(str(E_target.j_invariant()).encode()).hexdigest()
+    payload = b'"' + target_hash.encode() + b'"'
+    bits = data_to_bits(payload)
+    
+    states = [(A_rand, alpha_rand)]
+    # Идем по битам в обратном порядке (кроме первого бита)
+    for i, b in enumerate(reversed(bits[1:])):
+        new_states = []
+        for A, alpha in states:
+            new_states.extend(get_predecessors(A, alpha, b))
+        states = list(set(new_states))[:50] # Защита от разрастания дерева
+        if not states:
+            return solve_step1() # Тупик, перезапускаем
+            
+    # Подбираем a6 для стартовой кривой
+    b0 = bits[0]
+    for A, alpha in states:
+        a6 = -(alpha**3 + A*alpha)
+        try:
+            E0 = EllipticCurve(K, [A, a6])
+            if not E0.is_supersingular(): continue
+            if CGL_hash(E0, payload) == target_hash:
+                print("\n[+] УСПЕХ! Введи эти данные на сервере:")
+                print(f"a4.0 > {A.list()[0]}")
+                print(f"a4.1 > {A.list()[1]}")
+                print(f"a6.0 > {a6.list()[0]}")
+                print(f"a6.1 > {a6.list()[1]}")
+                print("\nchoice > 1")
+                print(f"data (hex) > {payload.hex()}")
+                return E0, payload, target_hash
+        except: pass
+    return solve_step1()
 
 if __name__ == "__main__":
-    main()
+    solve_step1()
