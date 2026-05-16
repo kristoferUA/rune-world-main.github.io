@@ -602,3 +602,134 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+
+#!/usr/bin/env sage
+from sage.all import GF, EllipticCurve
+from hashlib import sha256
+, collections
+
+# Настройки поля
+p = 2**49 * 3**36 - 1
+K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
+
+def deterministic_sqrt(x):
+    return min(x.sqrt(all=True))
+
+def select0(E0, b0):
+    torsion_points = sorted(E0.torsion_polynomial(2).roots(multiplicities=False))
+    if b0:
+        return torsion_points[-1], torsion_points[1]
+    else:
+        return torsion_points[1], torsion_points[-1]
+
+def select(lambda0, lambda1, b):
+    if b:
+        return max(lambda0, lambda1)
+    else:
+        return min(lambda0, lambda1)
+
+def next_curve(A, alpha, b):
+    xi = alpha**2
+    zeta = 3 * xi + A
+    eta = deterministic_sqrt(zeta)
+    new_A = -(4 * A + 15 * xi)
+    lambda0 = alpha + 2 * eta
+    lambda1 = alpha - 2 * eta
+    new_alpha = select(lambda0, lambda1, b)
+    return new_A, new_alpha
+
+def data_to_bits(data):
+    return [int(b) for c in data for b in "{:08b}".format(c)]
+
+def bits_to_bytes(bits):
+    bytes_list = []
+    for i in range(0, len(bits), 8):
+        byte_bits = bits[i:i+8]
+        byte_val = int("".join(map(str, byte_bits)), 2)
+        bytes_list.append(byte_val)
+    return bytes(bytes_list)
+
+def get_j_invariant(A, alpha):
+    xi = alpha**2
+    new_A = -(4 * A + 15 * xi)
+    new_B = -alpha * (8 * A + 22 * xi)
+    E = EllipticCurve(K, [new_A, new_B])
+    return E.j_invariant()
+
+def advance_state_with_bytes(A, alpha, data_bytes):
+    bits = data_to_bits(data_bytes)
+    for b in bits:
+        A, alpha = next_curve(A, alpha, b)
+    return A, alpha
+
+def find_suffix_path(start_A, start_alpha, target_j, max_byte_len=4):
+    # Поиск в ширину (BFS) для поиска пути от промежуточного состояния до целевого j
+    # Очередь хранит (текущий_A, текущий_alpha, накопленные_биты)
+    queue = collections.deque([(start_A, start_alpha, [])])
+    
+    print("[-] Запуск поиска пути...")
+    while queue:
+        A, alpha, bits = queue.popleft()
+        
+        # Проверяем j-инвариант каждые 8 бит (на границе байта)
+        if len(bits) > 0 and len(bits) % 8 == 0:
+            current_j = get_j_invariant(A, alpha)
+            if current_j == target_j:
+                suffix_bytes = bits_to_bytes(bits)
+                # Проверка на опасные байты (перенос строки)
+                if b"\x0a" not in suffix_bytes and b"\x0d" not in suffix_bytes:
+                    return suffix_bytes
+            
+            if len(bits) // 8 >= max_byte_len:
+                continue
+                
+        # Ветвление для бита 0 и бита 1
+        for bit in [0, 1]:
+            next_A, next_alpha = next_curve(A, alpha, bit)
+            queue.append((next_A, next_alpha, bits + [bit]))
+            
+    return None
+
+# --- Настройки твоей сессии ---
+# 2 Введи сюда координаты кривой E0 из твоей активной сессии
+a4_0 = 3547732504740714029047379324870
+a4_1 = 894485268382189237503319753368
+a6_0 = 1897378638608997265918654817168
+a6_1 = 6593568422778043241787829355407
+
+# 3 Введи j-инвариант целевой кривой, которую ты зарегистрировал на шаге 1
+# Если у тебя есть только зарегистрированный хэш, восстанови j через первую строку-куйн
+target_j = K(0) # ПОДСТАВЬ СВОЙ ЦЕЛЕВОЙ J-ИНВАРИАНТ СЮДА
+
+# Инициализация стартовой кривой
+a4 = a4_0 + a4_1 * x
+a6 = a6_0 + a6_1 * x
+E0 = EllipticCurve(K, [a4, a6])
+
+# Пейлоад, который выполнится в eval()
+payload_code = b"print(open('flag.txt').read()) # "
+
+# 4 Шаг A: Считаем начальное ответвление для первого бита (как в функции CGL_hash)
+init_bits = data_to_bits(payload_code)
+start_A = E0.a4()
+start_alpha, _ = select0(E0, init_bits[0])
+
+# Шаг B: Проходим по остальным битам префикса
+for bit in init_bits[1:]:
+    start_A, start_alpha = next_curve(start_A, start_alpha, bit)
+
+# Шаг C: Ищем суффикс, который вернет нас на целевой j-инвариант
+suffix = find_suffix_path(start_A, start_alpha, target_j, max_byte_len=4)
+
+if suffix:
+    final_payload = payload_code + suffix
+    print(f"[+] УСПЕХ! Пейлоад собран.")
+    print(f"data (hex) > {final_payload.hex()}")
+else:
+    print("[-] Путь не найден или содержал перенос строки. Попробуй изменить пробелы в payload_code.")
