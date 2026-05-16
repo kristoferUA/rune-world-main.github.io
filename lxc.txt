@@ -356,3 +356,131 @@ def keygen(self):
         self.commitment_secrets = (ψ_ker, ψ, Iψ)
 
         return E1
+
+
+
+
+
+from sage.all import GF, EllipticCurve, ZZ
+from hashlib import sha256
+
+# Подтягиваем пропатченные параметры и модули SQISign
+from setup import O0
+from deuring import kernel_to_ideal
+from ideals import multiply_ideals
+from KLPT import EquivalentSmoothIdealHeuristic
+from isogenies import IdealToIsogenyFromKLPT
+
+# Параметры поля из таска
+p = 2**49 * 3**36 - 1
+K = GF(p**2, "x", modulus=[1, 0, 1])
+x = K.gen()
+
+def deterministic_sqrt(val):
+    sqrts = val.sqrt(all=True)
+    return min(sqrts) if sqrts else None
+
+def select(lambda0, lambda1, b):
+    return max(lambda0, lambda1) if b else min(lambda0, lambda1)
+
+def next_curve(A, alpha, b):
+    xi = alpha**2
+    zeta = 3 * xi + A
+    eta = deterministic_sqrt(zeta)
+    new_A = -(4 * A + 15 * xi)
+    lambda0 = alpha + 2 * eta
+    lambda1 = alpha - 2 * eta
+    return new_A, select(lambda0, lambda1, b)
+
+def bits_to_utf8_padding(path_bits):
+    padding = bytearray()
+    bits = list(path_bits)
+    while len(bits) % 8 != 0:
+        bits.append(0)
+    for i in range(0, len(bits), 8):
+        byte_val = int("".join(map(str, bits[i:i+8])), 2)
+        padding.append(byte_val & 0x7F) 
+    return padding
+
+def main():
+    print("[*] Инициализация стартовой кривой E0...")
+    # Твои данные из Шага 1
+    a4_0 = 35477392504740714029047379324870
+    a4_1 = 8944852683382189237503319753368
+    a6_0 = 18973786386089972659186548171687
+    a6_1 = 65935684227780432417878293554075
+
+    a4 = K(a4_0 + a4_1 * x)
+    a6 = K(a6_0 + a6_1 * x)
+    E0 = EllipticCurve(K, [a4, a6])
+
+    print("[*] Восстанавливаем целевую кривую E_target и собираем ideal_target...")
+    reg_hex = "2233346365323838303534333562376361616339366266636433313165653261613163306333636466613835366465653866343733338656432323538633134656422"
+    reg_payload = bytes.fromhex(reg_hex)
+    bits_reg = [int(b) for c in reg_payload for b in "{:08b}".format(c)]
+
+    cur_A = E0.a4()
+    cur_E = E0
+    tors_points = sorted(cur_E.torsion_polynomial(2).roots(multiplicities=False))
+    cur_alpha = tors_points[-1] if bits_reg[0] else tors_points[1]
+
+    # Инициализируем стартовый тривиальный идеал
+    ideal_target = O0.unit_ideal()
+
+    for b in bits_reg[1:]:
+        # Строим точку 2-кручения (y всегда 0 для точек порядка 2)
+        kernel_point = cur_E(cur_alpha, 0)
+        step_ideal = kernel_to_ideal(kernel_point, 2)
+        ideal_target = multiply_ideals(ideal_target, step_ideal)
+
+        # Переходим к следующей кривой
+        cur_A, cur_alpha = next_curve(cur_A, cur_alpha, b)
+        xi_t = cur_alpha**2
+        cur_E = EllipticCurve(K, [-(4 * cur_A + 15 * xi_t), -cur_alpha * (8 * cur_A + 22 * xi_t)])
+
+    print(f"[+] Идеал целевой кривой собран. Конечный j: {cur_E.j_invariant()}")
+
+    print("[*] Вычисляем промежуточную кривую E_mid и собираем ideal_mid...")
+    exec_code = b"__import__('os').system('cat flag.txt') #"
+    bits_exec = [int(b) for c in exec_code for b in "{:08b}".format(c)]
+    
+    cur_A = E0.a4()
+    cur_E = E0
+    tors_points = sorted(cur_E.torsion_polynomial(2).roots(multiplicities=False))
+    cur_alpha = tors_points[-1] if bits_exec[0] else tors_points[1]
+
+    ideal_mid = O0.unit_ideal()
+
+    for b in bits_exec[1:]:
+        kernel_point = cur_E(cur_alpha, 0)
+        step_ideal = kernel_to_ideal(kernel_point, 2)
+        ideal_mid = multiply_ideals(ideal_mid, step_ideal)
+
+        cur_A, cur_alpha = next_curve(cur_A, cur_alpha, b)
+        xi_m = cur_alpha**2
+        cur_E = EllipticCurve(K, [-(4 * cur_A + 15 * xi_m), -cur_alpha * (8 * cur_A + 22 * xi_m)])
+
+    print(f"[+] Идеал промежуточной кривой собран. Промежуточный j: {cur_E.j_invariant()}")
+
+    print("\n[*] --- Запуск математического движка KLPT ---")
+    print("[*] Поиск эквивалентного гладкого идеала...")
+    path_ideal = EquivalentSmoothIdealHeuristic(ideal_mid, ideal_target)
+    
+    print("[*] Размотка идеала в цепочку изогений...")
+    isogeny_chain = IdealToIsogenyFromKLPT(path_ideal)
+    
+    # Извлекаем биты маршрута из полученной цепочки изогений
+    # Обычно это делается проходом по цепочке и чтением ядер шагов
+    # Для базового вывода мы сгенерируем паддинг на основе найденного пути
+    # (Здесь структура зависит от того, возвращает ли функция список или объект Isogeny)
+    print("[*] Формируем итоговую hex-строку...")
+    # Предполагаем стандартный вывод цепочки в виде битовой последовательности:
+    # path_bits = [ ... логика извлечения битов из ядер ... ]
+    # padding = bits_to_utf8_padding(path_bits)
+    # final_payload = exec_code + padding
+    # print(f"\n[+] УСПЕХ! Отправляй это на сервер:")
+    # print("choice > 2")
+    # print(f"data (hex) > {final_payload.hex()}")
+
+if __name__ == "__main__":
+    main()
