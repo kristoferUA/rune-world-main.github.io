@@ -217,3 +217,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+# Наш патч для p = 11 mod 12
+B = QuaternionAlgebra(-1, -p)
+i, j, k = B.gens()
+O0 = B.quaternion_order([1, i, (1+j)/2, (i+k)/2])
+ω = i
