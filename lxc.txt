@@ -7,6 +7,11 @@ a6.1 > 65935684227780432417878293554075
 choice > 1
 data (hex) > 223334636532383830353433356237636161633936626663643331316565326161316330633363646661383536646565386634373338656432323538633134656422
 
+
+[patch."https://github.com/facebookexperimental/allocative"]
+allocative = { git = "https://github.com/facebookexperimental/allocative", rev = "301482e" }
+
+
 Твой target_j для финального скрипта: 10643751751038076508390261081265*x + 21937963141134553493701246905332
 
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
