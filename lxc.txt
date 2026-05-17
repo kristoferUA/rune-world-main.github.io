@@ -1,3 +1,26 @@
+# Берем стабильный Debian старой версии, чтобы системные либы не конфликтовали
+FROM rust:1.76-bullseye
+
+# Ставим тот самый компилятор из весны 2024 года, когда писался Jolt
+RUN rustup toolchain install nightly-2024-03-01
+RUN rustup default nightly-2024-03-01
+
+# Настраиваем таргеты для RISC-V (гостевая среда Jolt)
+RUN rustup target add riscv64imac-unknown-none-elf
+RUN rustup component add rust-src
+
+# Ставим базовые зависимости
+RUN apt-get update && apt-get install -y clang pkg-config libssl-dev
+
+# Переносим чистую папку chall внутрь контейнера
+WORKDIR /pwn
+COPY chall ./chall
+WORKDIR /pwn/chall
+
+# Запускаем сборку
+CMD ["cargo", "run", "--bin", "prebuild_guest"]
+
+
 [+] УСПЕХ! Введи эти данные на сервере:
 a4.0 > 35477392504740714029047379324870
 a4.1 > 8944852683382189237503319753368
