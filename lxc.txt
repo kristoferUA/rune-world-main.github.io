@@ -1,3 +1,10 @@
+[patch.crates-io]
+ark-ec = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/Twist-shout" }
+ark-ff = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/Twist-shout" }
+ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/Twist-shout" }
+ark-poly = { git = "https://github.com/a16z/arkworks-algebra", branch = "dev/Twist-shout" }
+
+
 # Берем стабильный Debian старой версии, чтобы системные либы не конфликтовали
 FROM rust:1.76-bullseye
 
