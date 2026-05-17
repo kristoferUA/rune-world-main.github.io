@@ -1065,3 +1065,55 @@ fn main() {
         println!("[-] Что-то пошло не так, гостевая программа вернула false.");
     }
 }
+
+
+
+#[test]
+fn generate_exploit_proof() {
+    use jolt_sdk::{host::Program, Serializable};
+    use std::env;
+
+    println!("[*] Запускаем генерацию фейкового ZK proof...");
+
+    let my_password = b"pwned";
+    let mut password_arr = [0u8; 32];
+    password_arr[..my_password.len()].copy_from_slice(my_password);
+    let password_len = my_password.len() as u8;
+
+    // Заранее посчитанный SHA256 от "pwned"
+    let my_hash: [u8; 32] = [
+        0x6a, 0x7e, 0x02, 0xdf, 0xaa, 0x36, 0xa2, 0x81, 
+        0x89, 0x6a, 0x77, 0xd1, 0x30, 0xa2, 0x10, 0x74, 
+        0xe5, 0x08, 0x82, 0xe5, 0xb7, 0x21, 0x83, 0xe8, 
+        0xfa, 0x29, 0x1d, 0xb7, 0x27, 0xf7, 0x1f, 0x65
+    ];
+
+    let target_dir = env::var("JOLT_GUEST_TARGET_DIR")
+        .unwrap_or_else(|_| "/tmp/jolt-guest-targets".to_string());
+        
+    // Вызываем функцию самого сервера для компиляции гостевой среды
+    ensure_guest_elf_ready(&target_dir).expect("Failed to build guest");
+
+    let mut program = Program::new("guest");
+    let elf_path = format!("{}/guest-impossible/riscv64imac-unknown-none-elf/release/guest", target_dir);
+    program.elf = Some(elf_path.into());
+
+    // Используем макросы guest, которые уже есть в scope lib.rs
+    let prover_preprocessing = guest::preprocess_prover_impossible(&mut program);
+    let prove = guest::build_prover_impossible(prover_preprocessing);
+    
+    let (output, proof) = prove(password_arr, password_len, my_hash);
+    
+    assert!(output, "Гостевая программа вернула false!");
+    
+    let proof_bytes = proof.serialize_to_bytes().unwrap();
+    let mut proof_hex = String::with_capacity(proof_bytes.len() * 2);
+    for b in proof_bytes {
+        proof_hex.push_str(&format!("{:02x}", b));
+    }
+    
+    println!("\n==========================================");
+    println!("[+] ТВОЙ PROOF HEX:");
+    println!("{}", proof_hex);
+    println!("==========================================\n");
+}
