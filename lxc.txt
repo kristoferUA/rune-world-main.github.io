@@ -1014,56 +1014,50 @@ if __name__ == "__main__":
 
 
 use jolt_sdk::host::Program;
-use sha2::{Sha256, Digest};
 use std::env;
 
 // Импортируем функции гостевой программы из основного проекта.
-// В бекенде они генерируются макросом #[jolt::provable]
 use chall::guest; 
 
 fn main() {
     println!("[*] Запускаем генерацию фейкового ZK proof...");
 
-    // Шаг 1: Берем любой пароль
     let my_password = b"pwned";
     let mut password_arr = [0u8; 32];
     password_arr[..my_password.len()].copy_from_slice(my_password);
     let password_len = my_password.len() as u8;
 
-    // Шаг 2: Считаем SHA256 от нашего пароля
-    let mut hasher = Sha256::new();
-    hasher.update(my_password);
-    let my_hash: [u8; 32] = hasher.finalize().into();
+    // Заранее посчитанный SHA256 от "pwned"
+    let my_hash: [u8; 32] = [
+        0x6a, 0x7e, 0x02, 0xdf, 0xaa, 0x36, 0xa2, 0x81, 
+        0x89, 0x6a, 0x77, 0xd1, 0x30, 0xa2, 0x10, 0x74, 
+        0xe5, 0x08, 0x82, 0xe5, 0xb7, 0x21, 0x83, 0xe8, 
+        0xfa, 0x29, 0x1d, 0xb7, 0x27, 0xf7, 0x1f, 0x65
+    ];
 
-    println!("[*] Наш пароль: {}", std::str::from_utf8(my_password).unwrap());
-    println!("[*] Наш хеш: {}", hex::encode(my_hash));
-
-    // Шаг 3: Настраиваем гостевую программу Jolt
     let mut program = Program::new("guest");
     
-    // Указываем путь к скомпилированному ELF гостевой программы.
-    // Jolt складывает их сюда по умолчанию.
     let target_dir = env::var("JOLT_GUEST_TARGET_DIR")
         .unwrap_or_else(|_| "/tmp/jolt-guest-targets".to_string());
     let elf_path = format!("{}/guest-impossible/riscv64imac-unknown-none-elf/release/guest", target_dir);
     program.elf = Some(elf_path.into());
 
-    // Шаг 4: Генерируем доказательство
     println!("[*] Инициализация прувера (может занять пару минут)...");
     let prover_preprocessing = guest::preprocess_prover_impossible(&mut program);
     let prove = guest::build_prover_impossible(prover_preprocessing);
     
     println!("[*] Вычисление доказательства...");
-    // Вызываем функцию prove. Так как Jolt не проверяет саму память по указателю, 
-    // он примет наш my_hash за чистую монету и выдаст валидный пруф!
     let (output, proof) = prove(password_arr, password_len, my_hash);
     
     if output {
         println!("[+] Гостевая программа вернула TRUE!");
         
-        // Сериализуем доказательство в HEX
+        // Ручная конвертация байтов в hex строку, чтобы не использовать библиотеку hex
         let proof_bytes = proof.serialize_to_bytes().expect("Не удалось сериализовать proof");
-        let proof_hex = hex::encode(proof_bytes);
+        let mut proof_hex = String::with_capacity(proof_bytes.len() * 2);
+        for b in proof_bytes {
+            proof_hex.push_str(&format!("{:02x}", b));
+        }
         
         println!("[+] Твой proof_hex для отправки на сервер:\n");
         println!("{}", proof_hex);
