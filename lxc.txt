@@ -1010,3 +1010,39 @@ def solve_klpt():
 
 if __name__ == "__main__":
     solve_klpt()
+
+
+
+// Примерный скрипт генерации доказательства (на основе файлов из chall)
+use jolt_sdk::host::Program;
+use sha2::{Sha256, Digest};
+use std::fs;
+
+fn main() {
+    // 1. Выбираем любой пароль
+    let my_password = b"pwned";
+    let mut password_arr = [0u8; 32];
+    password_arr[..my_password.len()].copy_from_slice(my_password);
+    let password_len = my_password.len() as u8;
+
+    // 2. Считаем НАШ хеш
+    let mut hasher = Sha256::new();
+    hasher.update(my_password);
+    let my_hash: [u8; 32] = hasher.finalize().into();
+
+    // 3. Инициализируем Jolt и генерируем доказательство
+    let mut program = Program::new("guest");
+    // Укажи правильный путь к скомпилированному ELF из таргета
+    program.elf = Some("/tmp/jolt-guest-targets/guest-impossible/riscv64imac-unknown-none-elf/release/guest".into());
+    
+    let prover_preprocessing = guest::preprocess_prover_impossible(&mut program);
+    let prove = guest::build_prover_impossible(prover_preprocessing);
+    
+    // Прувер отработает успешно, так как наш пароль соответствует нашему хешу!
+    let (output, proof) = prove(password_arr, password_len, my_hash);
+    
+    // 4. Сериализуем доказательство в hex для отправки
+    let proof_bytes = proof.serialize_to_bytes().unwrap();
+    let proof_hex = hex::encode(proof_bytes);
+    println!("Proof hex: {}", proof_hex);
+}
