@@ -3,6 +3,13 @@ ark-ec = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
 ark-ff = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
 ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
 ark-poly = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
+ark-std = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
+
+[patch.crates-io]
+ark-ec = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
+ark-ff = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
+ark-serialize = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
+ark-poly = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
 
 
 # Берем стабильный Debian старой версии, чтобы системные либы не конфликтовали
