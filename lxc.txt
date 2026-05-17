@@ -11,6 +11,7 @@ WORKDIR /pwn/chall
 
 CMD ["cargo", "run", "--release", "--bin", "prebuild-guest"]
 
+cargo update -p ark-ec -p ark-ff -p ark-serialize -p ark-poly -p ark-std
 
 [patch.crates-io]
 ark-ec = { git = "https://github.com/a16z/arkworks-algebra", rev = "76bb3a45" }
