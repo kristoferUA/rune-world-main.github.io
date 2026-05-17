@@ -8,7 +8,7 @@ choice > 1
 data (hex) > 223334636532383830353433356237636161633936626663643331316565326161316330633363646661383536646565386634373338656432323538633134656422
 
 
-find ~/.cargo/registry/src/ -name "Cargo.toml" -exec sed -i 's/edition = "2024"/edition = "2021"/g' {} +
+find ~/.cargo/registry/src/ -wholename "*/ruzstd-0.8.2/src/lib.rs" -exec sed -i '1s/^/#![feature(unsigned_is_multiple_of)]\n/' {} +
 
 [patch."https://github.com/facebookexperimental/allocative"]
 allocative = { git = "https://github.com/facebookexperimental/allocative", rev = "301482e" }
