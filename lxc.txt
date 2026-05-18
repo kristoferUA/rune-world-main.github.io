@@ -1,3 +1,6 @@
+[2, "msg-2", "StatusNotification", {"connectorId": 1, "errorCode": "NoError", "status": "SuspendedEVSE"}]
+
+
 
 [+] УСПЕХ! Введи эти данные на сервере:
 a4.0 > 35477392504740714029047379324870
