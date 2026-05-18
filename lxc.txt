@@ -91,11 +91,13 @@ BASE_URL = f"http://{HOST}:{WEB_PORT}"
 
 def get_tv_state():
     try:
-        r = requests.get(f"{BASE_URL}/api/state", timeout=0.1)
+        # Увеличили таймаут до 1.5 секунд для стабильности через интернет
+        r = requests.get(f"{BASE_URL}/api/state", timeout=1.5)
         if r.status_code == 200:
             return r.json()
-    except:
-        pass
+    except Exception as e:
+        # Если будет реальная сетевая ошибка - мы её увидим
+        print(f"[-] Ошибка опроса API: {e}")
     return None
 
 def generate_nec_packet(address, command):
@@ -106,13 +108,13 @@ def generate_nec_packet(address, command):
 def send_packet(payload, send_as_text=False):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.settimeout(0.1)
+            s.settimeout(1.0)  # Даем сокету до 1 секунды на коннект
             s.connect((HOST, IR_PORT))
             if send_as_text:
                 s.sendall(payload.hex().encode() + b'\n')
             else:
                 s.sendall(payload)
-            time.sleep(0.01)  # Даем серверу мгновение на обработку
+            time.sleep(0.05)  # Небольшая пауза, чтобы бэкенд успел переварить байты
     except:
         pass
 
