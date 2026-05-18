@@ -177,50 +177,74 @@ def get_tv_state():
         pass
     return None
 
-def test_formats():
-    # Берем тест-адрес 0x00 и команду 0x02 (часто это кнопка '2' или 'Volume+')
-    # В стандартном NEC формате: 00 + ff + 02 + fd = 00ff02fd
-    formats = {
-        "pure_hex": "00ff02fd\n",
-        "upper_hex": "00FF02FD\n",
-        "prefix_hex": "0x00ff02fd\n",
-        "json_format": '{"address": 0, "command": 2}\n',
-        "json_code": '{"code": "00ff02fd"}\n',
-        "raw_bytes": bytes([0x00, 0xFF, 0x02, 0xFD])
-    }
+def nec_to_raw(address, command, lsb=True):
+    inv_address = (~address) & 0xFF
+    inv_command = (~command) & 0xFF
     
-    print("[*] Запуск прецизионной диагностики форматов...")
+    bytes_list = [address, inv_address, command, inv_command]
+    bits = []
     
-    for name, payload in formats.items():
-        # Запоминаем базовое состояние перед каждым тестом
-        base = get_tv_state()
-        if not base:
-            print("[-] Не удалось получить состояние ТВ. Проверь доступность веб-порта.")
-            return
+    for b in bytes_list:
+        if lsb:
+            # LSB-first (стандарт для большинства ИК-приемников)
+            for i in range(8):
+                bits.append((b >> i) & 1)
+        else:
+            # MSB-first
+            for i in range(7, -1, -1):
+                bits.append((b >> i) & 1)
+                
+    # Стартовый импульс и пауза протокола NEC
+    timings = [9000, 4500]
+    
+    # Кодируем 32 бита данных
+    for bit in bits:
+        timings.append(560)  # Вспышка всегда 560 мкс
+        if bit == 0:
+            timings.append(560)
+        else:
+            timings.append(1690)
             
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.settimeout(1.0)
-                s.connect((HOST, IR_PORT))
-                
-                if isinstance(payload, str):
-                    s.sendall(payload.encode())
-                else:
-                    s.sendall(payload)
+    timings.append(560)  # Финальный стоп-бит
+    return timings
+
+def brute_raw_ir():
+    base = get_tv_state()
+    if not base:
+        print("[-] Веб-порт недоступен. Проверь контейнер.")
+        return
+        
+    print(f"[*] Стартовое состояние ТВ: {base}")
+    print("[*] Запуск эмуляции ИК-бластера (отправка raw timings)...")
+    
+    # Чаще всего используется адрес 0x00
+    addr = 0x00
+    
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, IR_PORT))
+            
+            # Перебираем команды (например, первые 64, где обычно лежат кнопки 0-9, Power, Input)
+            for cmd in range(64):
+                for lsb_mode in [True, False]:
+                    timings = nec_to_raw(addr, cmd, lsb=lsb_mode)
                     
-                # Даем бэкенду время обработать сокет и обновить переменные
-                time.sleep(0.1)
-                
-                # Проверяем, изменилось ли что-то внутри JSON-состояния
-                current = get_tv_state()
-                if current and current != base:
-                    print(f"\n[+] НАЙДЕН РАБОЧИЙ ФОРМАТ: {name}")
-                    print(f"[+] Изменение в состоянии: {current}")
-                    return
-                else:
-                    print(f"[-] {name} - изменений в state нет")
-        except Exception as e:
-            print(f"[-] Ошибка при тесте {name}: {e}")
+                    # Форматируем как строку чисел через пробел с переносом строки
+                    raw_str = " ".join(map(str, timings)) + "\n"
+                    s.sendall(raw_str.encode())
+                    
+                    # Небольшая пауза, чтобы бэкенд успел обновить JSON-state
+                    time.sleep(0.05)
+                    
+                    current = get_tv_state()
+                    if current and current != base:
+                        print(f"\n[+] ЕСТЬ ТРИГГЕР! Состояние изменилось на команде {hex(cmd)} (LSB={lsb_mode})")
+                        print(f"[+] Новое состояние: {current}")
+                        return
+                        
+            print("[-] Пачка базовых команд формата raw не дала изменений. Попробуем поменять разделитель на запятые?")
+    except Exception as e:
+        print(f"[-] Ошибка сети: {e}")
 
 if __name__ == "__main__":
-    test_formats()
+    brute_raw_ir()
