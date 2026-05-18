@@ -78,3 +78,62 @@ python3 -c "from pwn import xor; print(xor(bytes.fromhex('0a1709022f3e2c2619343d
 
 https://pentesterlab.com/exercises/web-for-pentester-II
 
+import socket
+import time
+
+# Настройки подключения (замените на нужные параметры)
+HOST = '127.0.0.1'
+PORT = 12345
+
+def generate_nec_packet(address, command):
+    # Побитовое инвертирование с ограничением до 1 байта (0xFF)
+    inv_address = (~address) & 0xFF
+    inv_command = (~command) & 0xFF
+    # Возвращает структуру из 4 байт: [Addr, ~Addr, Cmd, ~Cmd]
+    return bytes([address, inv_address, command, inv_command])
+
+def send_packet(payload, send_as_text=False):
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.settimeout(0.2)
+            s.connect((HOST, PORT))
+            
+            if send_as_text:
+                # Вариант 1: Отправка как HEX-строки (например, "00ff12ed\n")
+                text_data = payload.hex().encode() + b'\n'
+                s.sendall(text_data)
+            else:
+                # Вариант 2: Отправка как сырых бинарных байт
+                s.sendall(payload)
+            
+            # Чтение ответа, если сервер что-то отправляет обратно
+            response = s.recv(1024)
+            if response:
+                print(f"[+] Получен ответ для пакета {payload.hex()}: {response.decode().strip()}")
+                return True
+    except (socket.timeout, ConnectionResetError):
+        # Быстрое закрытие сокета сервером - стандартное поведение при ошибке
+        return False
+    except Exception as e:
+        print(f"[-] Ошибка подключения: {e}")
+        return False
+    return False
+
+def brute_force():
+    # Часто в технике используется дефолтный адрес 0x00 или 0x01
+    target_address = 0x00
+    print(f"[*] Запуск перебора команд для ИК-адреса: {hex(target_address)}")
+    
+    for cmd in range(256):
+        packet = generate_nec_packet(target_address, cmd)
+        
+        # Поочередно проверяем оба формата отправки
+        # Если один из них заставит сервер ответить или не оборвать связь - это зацепка
+        send_packet(packet, send_as_text=False)
+        send_packet(packet, send_as_text=True)
+        
+        # Небольшая задержка, чтобы не перегружать сетевой поток
+        time.sleep(0.02)
+
+if __name__ == "__main__":
+    brute_force()
