@@ -163,41 +163,31 @@ import time
 HOST = '154.57.164.72'
 PORT = 30241
 
-# Варианты упаковки тестовой NEC-посылки (Addr: 0x00, Cmd: 0x01)
-# Полный HEX с инверсиями: 00 + ff + 01 + fe = 00ff01fe
-payloads = {
-    "pure_hex": "00ff01fe\n",
-    "prefix_hex": "0x00ff01fe\n",
-    "space_dec": "0 1\n",
-    "space_hex": "0x00 0x01\n",
-    "json_addr_cmd": '{"address": 0, "command": 1}\n',
-    "json_code": '{"code": "0x00ff01fe"}\n',
-    "raw_bits": "00000000111111110000000111111110\n"
-}
-
-print("[*] Тестирование форматов входных данных...")
-
-for name, text_line in payloads.items():
+def send_ir_brute():
+    # Для адреса 0x00 инверсия равна 0xFF. Пакет всегда стартует с "00ff"
+    addr = 0x00
+    inv_addr = (~addr) & 0xFF
+    
+    print("[*] Запуск трансляции ИК-команд. Включи симулятор в браузере и наблюдай!")
+    
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.settimeout(1.0)
-        s.connect((HOST, PORT))
-        
-        start_time = time.time()
-        s.sendall(text_line.encode())
-        
-        # Читаем ответ или ловим закрытие сокета
-        data = s.recv(1024)
-        elapsed = time.time() - start_time
-        
-        # Если сокет вернул b'' мгновенно - сервер отбросил строку как синтаксический мусор
-        if data == b'' and elapsed < 0.1:
-            print(f"[-] {name}: Мгновенный сброс соединения (неверный формат)")
-        else:
-            print(f"[+] {name}: Внимание! Сервер ответил: {data} за {elapsed:.2f} сек.")
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((HOST, PORT))
             
-        s.close()
-    except socket.timeout:
-        print(f"[+] {name}: Таймаут! Сервер принял строку, не сбросил её сразу и удерживает сокет.")
+            for cmd in range(256):
+                inv_cmd = (~cmd) & 0xFF
+                
+                # Собираем классический HEX-вид NEC IR кадра
+                hex_str = f"{addr:02x}{inv_addr:02x}{cmd:02x}{inv_cmd:02x}\n"
+                
+                s.sendall(hex_str.encode())
+                print(f"[*] Отправлен ИК-код: {hex_str.strip()} (Команда: {hex(cmd)})")
+                
+                # Небольшая пауза между "нажатиями" кнопок на пульте
+                time.sleep(0.1)
+                
     except Exception as e:
-        print(f"[-] {name}: Ошибка: {e}")
+        print(f"[-] Ошибка подключения: {e}")
+
+if __name__ == "__main__":
+    send_ir_brute()
