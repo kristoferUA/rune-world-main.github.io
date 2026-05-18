@@ -161,6 +161,7 @@ import socket
 import time
 import requests
 
+# Настройки подключения
 HOST = '154.57.164.72'
 IR_PORT = 30241
 WEB_PORT = 32567
@@ -177,55 +178,76 @@ def get_tv_state():
         pass
     return None
 
-def send_cmd(s, payload):
-    s.sendall(payload.encode() + b'\n')
-    time.sleep(0.05)
+def generate_nec_raw(address, command):
+    # Генерация таймингов NEC (Leader + 32 бита данных + Stop)
+    inv_address = (~address) & 0xFF
+    inv_command = (~command) & 0xFF
+    bits = []
+    for b in [address, inv_address, command, inv_command]:
+        for i in range(8):  # LSB-first
+            bits.append((b >> i) & 1)
+            
+    timings = [9000, 4500]
+    for bit in bits:
+        timings.append(560)
+        timings.append(1690 if bit == 1 else 560)
+    timings.append(560)
+    return timings
 
-def brute_vectors():
-    base = get_tv_state()
-    if not base:
-        print("[-] Веб-порт недоступен.")
+def fuzz_ir_dialects():
+    base_state = get_tv_state()
+    if not base_state:
+        print("[-] Веб-сервер недоступен. Проверь порты докера.")
         return
         
-    print(f"[*] Начальное состояние: {base}")
+    print(f"[*] Стартовое состояние ТВ: {base_state}")
+    print("[*] Запуск фуззинга форматов ИК-бластера...")
+    
+    # Будем тестировать команду 1 (обычно кнопка '1') и команду 2 ('2')
+    # Если формат верный, они обязаны отобразиться в 'digit_buffer'
+    test_commands = [1, 2]
     
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, IR_PORT))
             
-            # ТЕСТ 1: Текстовые имена кнопок (обычные команды ИК-пульта)
-            print("[*] Проверка текстовых команд пульта...")
-            buttons = ["POWER", "INPUT", "SOURCE", "MENU", "MUTE", "VOL+", "VOL-", "CH+", "CH-", "ENTER", "1", "2", "01", "02"]
-            for btn in buttons:
-                for case_btn in [btn, btn.lower(), btn.upper()]:
-                    send_cmd(s, case_btn)
-                    curr = get_tv_state()
-                    if curr and curr != base:
-                        print(f"[+] Сработало на текстовой команде: {case_btn} -> {curr}")
-                        return
-
-            # ТЕСТ 2: Перебор стандартных ИК-адресов панелей (от 0x00 до 0x20) с кодами популярных кнопок
-            # Часто кнопка Power = 0x02, Input = 0x06, цифры 0-9 = 0x10-0x19 или 0x00-0x09
-            print("[*] Проверка ИК-кодов для адресов панелей видеостены...")
-            important_cmds = [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x08, 0x12, 0x1e, 0x1f, 0x20]
-            
-            for addr in range(32): # Проверяем первые 32 панели в видеостене
-                inv_addr = (~addr) & 0xFF
-                for cmd in important_cmds:
-                    inv_cmd = (~cmd) & 0xFF
-                    hex_str = f"{addr:02x}{inv_addr:02x}{cmd:02x}{inv_cmd:02x}"
-                    send_cmd(s, hex_str)
+            for cmd in test_commands:
+                inv_cmd = (~cmd) & 0xFF
+                hex_code = f"00ff{cmd:02x}{inv_cmd:02x}"
+                raw_timings = generate_nec_raw(0, cmd)
+                
+                # Семейство возможных форматов, которые часто используются в Android/Ритоне
+                dialects = [
+                    f'{{"key": "{cmd}"}}',
+                    f'{{"button": "{cmd}"}}',
+                    f'{{"command": "{cmd}"}}',
+                    f'{{"digit": "{cmd}"}}',
+                    f'{{"code": "{hex_code}"}}',
+                    f'{{"address": 0, "command": {cmd}}}',
+                    f"[{','.join(map(str, raw_timings))}]",  # JSON-массив сырых микросекунд
+                    f"NEC {hex_code}",
+                    f"NEC:{hex_code}",
+                    f"{cmd}"  # Просто отправка номера клавиши текстом
+                ]
+                
+                for payload in dialects:
+                    # Каждую команду обязательно завершаем переносом строки
+                    full_payload = payload + "\n"
+                    s.sendall(full_payload.encode())
                     
-                    curr = get_tv_state()
-                    if curr and curr != base:
-                        print(f"[+] Сработало на ИК-коде! Панель: {hex(addr)}, Команда: {hex(cmd)} -> {hex_str}")
-                        print(f"[+] Новый статус: {curr}")
+                    # Даем микропаузу бэкенду на обновление стейта
+                    time.sleep(0.05)
+                    
+                    curr_state = get_tv_state()
+                    if curr_state and curr_state != base_state:
+                        print(f"\n[+] УСПЕХ! Бэкенд среагировал на формат: {payload}")
+                        print(f"[+] Новое состояние: {curr_state}")
                         return
-                        
-            print("[-] Базовые векторы не дали явного изменения. Проверь, не поменялась ли картинка на самом сайте.")
+                    
+            print("[-] На базовых кнопках триггер не пойман. Проверь вывод скрипта.")
             
     except Exception as e:
-        print(f"[-] Ошибка: {e}")
+        print(f"[-] Сетевая ошибка: {e}")
 
 if __name__ == "__main__":
-    brute_vectors()
+    fuzz_ir_dialects()
