@@ -158,26 +158,46 @@ if __name__ == "__main__":
 
 
 import socket
+import time
 
-# Базовая часть команды без стартового SOH и без финальной чексумы
-# 30 41 30 41 30 - заголовок панели, 02 - STX, 30 31 44 36 - команда, 03 - ETX
-cmd_body = bytes([0x30, 0x41, 0x30, 0x41, 0x30, 0x02, 0x30, 0x31, 0x44, 0x36, 0x03])
+HOST = '154.57.164.72'
+PORT = 30241
 
-# Считаем контрольную сумму (XOR всех байтов cmd_body)
-checksum = 0
-for b in cmd_body:
-    checksum ^= b
+# Варианты упаковки тестовой NEC-посылки (Addr: 0x00, Cmd: 0x01)
+# Полный HEX с инверсиями: 00 + ff + 01 + fe = 00ff01fe
+payloads = {
+    "pure_hex": "00ff01fe\n",
+    "prefix_hex": "0x00ff01fe\n",
+    "space_dec": "0 1\n",
+    "space_hex": "0x00 0x01\n",
+    "json_addr_cmd": '{"address": 0, "command": 1}\n',
+    "json_code": '{"code": "0x00ff01fe"}\n',
+    "raw_bits": "00000000111111110000000111111110\n"
+}
 
-# Собираем полный пакет: [SOH] + [Тело команды] + [Байт чексумы]
-full_cmd = bytes([0x01]) + cmd_body + bytes([checksum])
+print("[*] Тестирование форматов входных данных...")
 
-s = socket.socket()
-s.settimeout(2.0)
-s.connect(('154.57.164.72', 30241))
-s.send(full_cmd)
-
-try:
-    response = s.recv(1024)
-    print("Ответ сервера:", response)
-except socket.timeout:
-    print("Таймаут - сервер молчит, но соединение не разорвал сразу")
+for name, text_line in payloads.items():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(1.0)
+        s.connect((HOST, PORT))
+        
+        start_time = time.time()
+        s.sendall(text_line.encode())
+        
+        # Читаем ответ или ловим закрытие сокета
+        data = s.recv(1024)
+        elapsed = time.time() - start_time
+        
+        # Если сокет вернул b'' мгновенно - сервер отбросил строку как синтаксический мусор
+        if data == b'' and elapsed < 0.1:
+            print(f"[-] {name}: Мгновенный сброс соединения (неверный формат)")
+        else:
+            print(f"[+] {name}: Внимание! Сервер ответил: {data} за {elapsed:.2f} сек.")
+            
+        s.close()
+    except socket.timeout:
+        print(f"[+] {name}: Таймаут! Сервер принял строку, не сбросил её сразу и удерживает сокет.")
+    except Exception as e:
+        print(f"[-] {name}: Ошибка: {e}")
