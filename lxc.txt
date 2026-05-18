@@ -159,50 +159,68 @@ if __name__ == "__main__":
 
 import socket
 import time
+import requests
 
 HOST = '154.57.164.72'
-PORT = 30241
+IR_PORT = 30241
+WEB_PORT = 32567
 
-def send_line(s, payload):
-    s.sendall(payload.encode() + b'\n')
-    # Микропауза дает серверу гарантированное время прочитать одну строку
-    time.sleep(0.01)
+BASE_URL = f"http://{HOST}:{WEB_PORT}"
+session = requests.Session()
 
-def careful_brute():
-    print("[*] Подключение к ИК-приемнику...")
+def get_tv_state():
     try:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((HOST, PORT))
-            
-            # ФАЗА 1: Построчный перебор стандартного NEC (все 256 адресов)
-            print("[*] Фаза 1: Аккуратный построчный перебор стандартного NEC...")
-            for addr in range(256):
-                inv_addr = (~addr) & 0xFF
-                if addr % 32 == 0:
-                    print(f"[*] Сканируем стандартные адреса в районе {hex(addr)}...")
-                
-                for cmd in range(256):
-                    inv_cmd = (~cmd) & 0xFF
-                    hex_str = f"{addr:02x}{inv_addr:02x}{cmd:02x}{inv_cmd:02x}"
-                    send_line(s, hex_str)
+        r = session.get(f"{BASE_URL}/api/state", timeout=1.0)
+        if r.status_code == 200:
+            return r.json()
+    except:
+        pass
+    return None
 
-            # ФАЗА 2: Проверка Extended NEC для популярных вендорских адресов
-            print("[*] Фаза 2: Проверка Extended NEC для частых адресов...")
-            # 0x20df - LG/NEC, 0x04fb - универсальные панели, 0x807f - китайские модули
-            extended_addresses = [(0x20, 0xDF), (0x04, 0xFB), (0x80, 0x7F), (0x00, 0x00)]
+def test_formats():
+    # Берем тест-адрес 0x00 и команду 0x02 (часто это кнопка '2' или 'Volume+')
+    # В стандартном NEC формате: 00 + ff + 02 + fd = 00ff02fd
+    formats = {
+        "pure_hex": "00ff02fd\n",
+        "upper_hex": "00FF02FD\n",
+        "prefix_hex": "0x00ff02fd\n",
+        "json_format": '{"address": 0, "command": 2}\n',
+        "json_code": '{"code": "00ff02fd"}\n',
+        "raw_bytes": bytes([0x00, 0xFF, 0x02, 0xFD])
+    }
+    
+    print("[*] Запуск прецизионной диагностики форматов...")
+    
+    for name, payload in formats.items():
+        # Запоминаем базовое состояние перед каждым тестом
+        base = get_tv_state()
+        if not base:
+            print("[-] Не удалось получить состояние ТВ. Проверь доступность веб-порта.")
+            return
             
-            for addr_low, addr_high in extended_addresses:
-                print(f"[*] Проверяем Extended NEC адрес: {addr_low:02x}{addr_high:02x}...")
-                for cmd in range(256):
-                    inv_cmd = (~cmd) & 0xFF
-                    # В Extended NEC первые 4 символа - чистый адрес, инверсия только в конце
-                    hex_str = f"{addr_low:02x}{addr_high:02x}{cmd:02x}{inv_cmd:02x}"
-                    send_line(s, hex_str)
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1.0)
+                s.connect((HOST, IR_PORT))
+                
+                if isinstance(payload, str):
+                    s.sendall(payload.encode())
+                else:
+                    s.sendall(payload)
                     
-            print("[*] Сканирование завершено. Внимательно проверь экран ТВ!")
-            
-    except Exception as e:
-        print(f"[-] Сетевая ошибка: {e}")
+                # Даем бэкенду время обработать сокет и обновить переменные
+                time.sleep(0.1)
+                
+                # Проверяем, изменилось ли что-то внутри JSON-состояния
+                current = get_tv_state()
+                if current and current != base:
+                    print(f"\n[+] НАЙДЕН РАБОЧИЙ ФОРМАТ: {name}")
+                    print(f"[+] Изменение в состоянии: {current}")
+                    return
+                else:
+                    print(f"[-] {name} - изменений в state нет")
+        except Exception as e:
+            print(f"[-] Ошибка при тесте {name}: {e}")
 
 if __name__ == "__main__":
-    careful_brute()
+    test_formats()
