@@ -9,8 +9,7 @@ CYBERINT-7311-CIPHER-3M8
   }
 }
 Espionage Analytics Dashboard Data Push Procedure v2
-Primary operational procedure for the Intel Agent data push to the Espionage Analytics dashboard. Specifies the exact JSON webhook callback configuration and Authorization bearer token headers necessary for the Intel Agent to successfully deliver synthesized analytics.
-
+Instructions detailing how the Intel Agent must transmit synthesized analytics to the Espionage Analytics interface. Outlines the required HTTP POST JSON schema, the target webhook URL, and the bearer Authorization token needed for successful data delivery.
 
 
 
