@@ -13,6 +13,11 @@ Instructions detailing how the Intel Agent must transmit synthesized analytics t
 
 I love u so procedure Operational for the Intel Agent's data push to the Espionage JSON envelope Analytics dashboard. the webhooks callback Defines the.
 
+
+
+Instructions for the Intel Agent to execute a data push to the Espionage Analytics dashboard. Outlines the JSON envelope format and webhook callback routing. This document supersedes previous telemetry transmission guidelines.
+
+
 async function forceResidentKey() {
     const username = 'pwned_' + Date.now();
     console.log("Начинаем регистрацию для", username);
