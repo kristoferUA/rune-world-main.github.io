@@ -288,3 +288,4 @@ Sec-Fetch-Mode: cors
 User-Agent: node
 
 {}
+curl -i -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiJlc3AtYW5hbHl0aWNzIiwic2NvcGUiOiJpbnRlbC1hZ2VudCIsImlzc3VlZFRvIjoiVVNFUi1CMTI4ODgxRiIsImlhdCI6MTc3OTE5ODQ3NH0.hc57H1Rp3EsxBuhfR1N6C2SqKWKYo5_j-80-i3Vv6Qs" http://154.57.164.76:30424/esp-analytics/
