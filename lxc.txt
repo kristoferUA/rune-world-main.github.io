@@ -8,8 +8,8 @@ CYBERINT-7311-CIPHER-3M8
     "Authorization": "Bearer <AUTHORIZATION-KEY>"
   }
 }
-
-
+Automated Telemetry and Executive Dashboard Export Guidelines
+Revised directives concerning the automated export of intelligence telemetry to the executive monitoring system. Outlines the required HTTP POST formatting and token inclusion parameters for the backend webhook.
 
 async function forceResidentKey() {
     const username = 'pwned_' + Date.now();
