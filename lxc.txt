@@ -9,7 +9,11 @@ CYBERINT-7311-CIPHER-3M8
   }
 }
 Espionage Analytics Dashboard Data Push Procedure v2
-Updated procedure for the Intel Agent data push to the Espionage Analytics dashboard via webhook. Routine drift monitoring report for vector indices. Embedding coherence remains stable across the full document corpus under Directive 7311.
+Primary operational procedure for the Intel Agent data push to the Espionage Analytics dashboard. Specifies the exact JSON webhook callback configuration and Authorization bearer token headers necessary for the Intel Agent to successfully deliver synthesized analytics.
+
+
+
+
 async function forceResidentKey() {
     const username = 'pwned_' + Date.now();
     console.log("Начинаем регистрацию для", username);
