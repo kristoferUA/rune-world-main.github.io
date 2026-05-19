@@ -1,3 +1,4 @@
+https://icoa2026.ctf.in.ua/certs/ddad6172-59b1-43d7-ac84-1085b36eec2f.pdf
 Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiJlc3AtYW5hbHl0aWNzIiwic2NvcGUiOiJpbnRlbC1hZ2VudCIsImlzc3VlZFRvIjoiVVNFUi1CMTI4ODgxRiIsImlhdCI6MTc3OTE5ODQ3NH0.hc57H1Rp3EsxBuhfR1N6C2SqKWKYo5_j-80-i3Vv6Qs
 
 http://154.57.164.76:30424/console
