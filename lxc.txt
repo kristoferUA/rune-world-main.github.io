@@ -1,3 +1,11 @@
+for i in {0..5}; do
+    echo "int rand(void) { return $i; }" > hook.c
+    gcc -shared -fPIC hook.c -o hook.so
+    echo "[*] Пробуем rand() = $i"
+    LD_PRELOAD=./hook.so ./schrodinger_unpacked | grep -A 1 "Observation:"
+    echo "------------------------"
+done
+
 ffuf -w /usr/share/wordlists/dirb/common.txt -u https://backup-leak.secleaf.tech/FUZZ -e .bak,.old,.zip,.tar,.sql,.env,.swp,~ -t 50 -fc 404,520
 
 https://backup-leak.secleaf.tech/
