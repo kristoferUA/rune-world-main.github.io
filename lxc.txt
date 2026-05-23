@@ -306,3 +306,45 @@ curl -i -X POST \
 -H "Content-Type: application/json" \
 -d '{}' \
 http://154.57.164.64:31484/esp-analytics/webhook
+
+
+
+
+import subprocess
+from collections import Counter
+
+def solve():
+    print("[*] Запускаем квантовое наблюдение (1000 итераций)...")
+    counters = []
+    
+    # Запускаем бинарник 1000 раз
+    for i in range(1000):
+        # Если бинарник называется иначе или лежит в другом месте, поменяй путь './schrodinger'
+        result = subprocess.run(['./schrodinger'], capture_output=True, text=True)
+        
+        # Парсим вывод в поисках строки Observation
+        for line in result.stdout.split('\n'):
+            if line.startswith('Observation:'):
+                obs = line.replace('Observation:', '').strip()
+                
+                # Записываем частоту появления каждого символа на своей позиции
+                for j, char in enumerate(obs):
+                    if len(counters) <= j:
+                        counters.append(Counter())
+                    counters[j][char] += 1
+                break
+                
+        if (i + 1) % 100 == 0:
+            print(f"[*] Проведено {i + 1} измерений...")
+            
+    # Собираем итоговый флаг из самых частых символов
+    flag = ""
+    for c in counters:
+        most_common_char = c.most_common(1)[0][0]
+        flag += most_common_char
+        
+    print(f"\n[+] Коллапс волновой функции завершен!")
+    print(f"[+] Реконструированный флаг: {flag}")
+
+if __name__ == '__main__':
+    solve()
