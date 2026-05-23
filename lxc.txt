@@ -1,4 +1,4 @@
-curl -I -H "User-Agent: Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" https://backup-leak.secleaf.tech/
+ffuf -w /usr/share/wordlists/dirb/common.txt -u https://backup-leak.secleaf.tech/FUZZ -e .bak,.old,.zip,.tar,.sql,.env,.swp,~ -t 50 -fc 404,520
 
 https://backup-leak.secleaf.tech/
 
