@@ -311,40 +311,39 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 import subprocess
+import time
 from collections import Counter
 
 def solve():
-    print("[*] Запускаем квантовое наблюдение (1000 итераций)...")
+    print("[*] Запускаем квантовое наблюдение (30 итераций с уникальным сидом)...")
     counters = []
     
-    for i in range(1000):
+    for i in range(30):
         result = subprocess.run(['./schrodinger'], capture_output=True, text=True)
         lines = result.stdout.split('\n')
         
         for j, line in enumerate(lines):
             if line.strip() == 'Observation:':
-                # Берем строку, которая идет СРАЗУ после заголовка
                 if j + 1 < len(lines):
                     obs = lines[j+1].strip()
                     
                     for k, char in enumerate(obs):
-                        # Расширяем массив счетчиков, если нужно
                         if len(counters) <= k:
                             counters.append(Counter())
                             
-                        # Игнорируем квантовый шум
                         if char != '?':
                             counters[k][char] += 1
                 break
                 
-        if (i + 1) % 100 == 0:
-            # Используем \r чтобы обновлять одну и ту же строку без спама
+        # Вот сюда мы пихаем слип - внутри основного цикла, перед следующей итерацией
+        time.sleep(1.1)
+                
+        if (i + 1) % 5 == 0:
             print(f"[*] Проведено {i + 1} измерений...", end='\r')
             
-    # Собираем итоговый флаг
     flag = ""
     for c in counters:
-        if c: # Проверяем, что счетчик не пустой
+        if c: 
             most_common_char = c.most_common(1)[0][0]
             flag += most_common_char
         
