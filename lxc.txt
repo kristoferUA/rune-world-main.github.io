@@ -319,45 +319,33 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-import subprocess
-import time
 from collections import Counter
 
-def solve():
-    print("[*] Запускаем квантовое наблюдение (30 итераций с уникальным сидом)...")
-    counters = []
-    
-    for i in range(30):
-        result = subprocess.run(['./schrodinger'], capture_output=True, text=True)
-        lines = result.stdout.split('\n')
-        
-        for j, line in enumerate(lines):
-            if line.strip() == 'Observation:':
-                if j + 1 < len(lines):
-                    obs = lines[j+1].strip()
-                    
-                    for k, char in enumerate(obs):
-                        if len(counters) <= k:
-                            counters.append(Counter())
-                            
-                        if char != '?':
-                            counters[k][char] += 1
-                break
-                
-        # Вот сюда мы пихаем слип - внутри основного цикла, перед следующей итерацией
-        time.sleep(1.1)
-                
-        if (i + 1) % 5 == 0:
-            print(f"[*] Проведено {i + 1} измерений...", end='\r')
-            
-    flag = ""
-    for c in counters:
-        if c: 
-            most_common_char = c.most_common(1)[0][0]
-            flag += most_common_char
-        
-    print(f"\n\n[+] Коллапс волновой функции завершен!")
-    print(f"[+] Реконструированный флаг: {flag}")
+lines = []
 
-if __name__ == '__main__':
-    solve()
+with open("out.txt", "r", encoding="utf-8", errors="ignore") as f:
+    data = f.readlines()
+
+for i, line in enumerate(data):
+    if "Observation:" in line and i + 1 < len(data):
+        lines.append(data[i + 1].strip())
+
+maxlen = max(len(x) for x in lines)
+
+result = ""
+
+for pos in range(maxlen):
+    chars = []
+
+    for line in lines:
+        if pos < len(line):
+            c = line[pos]
+            if c != '?':
+                chars.append(c)
+
+    if chars:
+        result += Counter(chars).most_common(1)[0][0]
+    else:
+        result += '?'
+
+print(result)
