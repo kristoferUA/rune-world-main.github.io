@@ -323,7 +323,6 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-from sage.all import *
 from collections import deque
 import sys
 
@@ -347,119 +346,90 @@ def solve():
 
         c_str, val = line.split(":")
         coords = tuple(map(int, c_str.split(",")))
-        val = val.strip()
 
-        if mode == "levers": levers[coords] = val
-        elif mode == "lamps": lamps[coords] = val
-        elif mode == "obs": observers[coords] = val
+        if mode == "levers": levers[coords] = val.strip()
+        elif mode == "lamps": lamps[coords] = val.strip()
+        elif mode == "obs": observers[coords] = val.strip()
 
-    print("[*] Строим топологию (отвязываемся от блоков)...")
+    print("[*] Сортируем панели (Y-убывание, X/Z-возрастание)...")
+    # Правильная развертка 2D-стен: сверху вниз (-Y), слева направо (X и Z)
+    sorted_levers = sorted(levers.keys(), key=lambda c: (-c[1], c[0], c[2]))
+    sorted_lamps = sorted(lamps.keys(), key=lambda c: (-c[1], c[0], c[2]))
+    lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
+
+    print("[*] Собираем точные оптические связи наблюдателей...")
     vecs = {
         "north": (0, 0, -1), "south": (0, 0, 1),
         "west": (-1, 0, 0), "east": (1, 0, 0),
         "up": (0, 1, 0), "down": (0, -1, 0)
     }
 
-    all_obs = set(observers.keys())
     obs_by_watched = {}
-    starts = []
-    ends = []
-
     for o_c, facing in observers.items():
         dx, dy, dz = vecs.get(facing.lower(), (0,0,0))
-        # watched - координаты, куда смотрит лицо
         watched = (o_c[0] + dx, o_c[1] + dy, o_c[2] + dz)
-        # out_c - координаты, куда бьет сигнал сзади
         out_c = (o_c[0] - dx, o_c[1] - dy, o_c[2] - dz)
-
-        # Если он смотрит НЕ на другого наблюдателя - это вход схемы
-        if watched not in all_obs:
-            starts.append(o_c)
-        # Если бьет сигналом НЕ в другого наблюдателя - это выход
-        if out_c not in all_obs:
-            ends.append(o_c)
 
         if watched not in obs_by_watched:
             obs_by_watched[watched] = []
-        obs_by_watched[watched].append(o_c)
+        obs_by_watched[watched].append({
+            "obs": o_c,
+            "out": out_c
+        })
 
-    print(f"[*] Найдено входов: {len(starts)}, выходов: {len(ends)}")
-
-    print("[*] Привязываем входы/выходы к координатам (Proximity Match)...")
-    sorted_levers = sorted(levers.keys(), key=lambda c: (c[1], c[2], c[0]))
-    sorted_lamps = sorted(lamps.keys(), key=lambda c: (c[1], c[2], c[0]))
-
-    def dist(c1, c2):
-        return (c1[0]-c2[0])**2 + (c1[1]-c2[1])**2 + (c1[2]-c2[2])**2
-
-    entry_nodes = []
-    for l_c in sorted_levers:
-        # Ищем ближайший ко входу наблюдатель (игнорируя любые блоки между ними)
-        best = min(starts, key=lambda s: dist(l_c, s))
-        entry_nodes.append(best)
-
-    exit_nodes = []
-    for lamp_c in sorted_lamps:
-        # Ищем ближайший к лампе наблюдатель
-        best = min(ends, key=lambda e: dist(lamp_c, e))
-        exit_nodes.append(best)
-
-    exit_to_idx = {e: i for i, e in enumerate(exit_nodes)}
-
-    print("[*] Трассируем сигналы внутри цепи...")
+    print("[*] Запускаем сигналы и рендерим матрицу 256x256...")
     matrix_data = [[0]*256 for _ in range(256)]
 
-    for j, start_obs in enumerate(entry_nodes):
+    for j, start_lever in enumerate(sorted_levers):
         if j % 16 == 0:
-            sys.stdout.write(f"\r[*] Просчитано путей: {j}/256")
+            sys.stdout.write(f"\r[*] Обработано входов: {j}/256")
             sys.stdout.flush()
 
-        queue = deque([start_obs])
-        visited = set([start_obs])
+        # Ищем наблюдателей, смотрящих точно на рычаг
+        start_points = []
+        if start_lever in obs_by_watched:
+            start_points = [x["obs"] for x in obs_by_watched[start_lever]]
+
+        # Резервный вариант: если автор крепил рычаги к блокам
+        if not start_points:
+            lx, ly, lz = start_lever
+            for dx in [-1,0,1]:
+                for dy in [-1,0,1]:
+                    for dz in [-1,0,1]:
+                        if abs(dx)+abs(dy)+abs(dz) == 1:
+                            test_c = (lx+dx, ly+dy, lz+dz)
+                            if test_c in obs_by_watched:
+                                start_points.extend([x["obs"] for x in obs_by_watched[test_c]])
+
+        queue = deque(set(start_points))
+        visited = set(queue)
 
         while queue:
             curr = queue.popleft()
-
-            # Если сигнал дошел до выхода, записываем в матрицу
-            if curr in exit_to_idx:
-                i = exit_to_idx[curr]
-                matrix_data[i][j] ^= 1
-
             if curr in obs_by_watched:
-                for next_obs in obs_by_watched[curr]:
-                    if next_obs not in visited:
-                        visited.add(next_obs)
-                        queue.append(next_obs)
+                for obs_data in obs_by_watched[curr]:
+                    o_c = obs_data["obs"]
+                    out_c = obs_data["out"]
+                    
+                    if o_c not in visited:
+                        visited.add(o_c)
+                        queue.append(o_c)
 
-    print("\n[*] Матрица готова! Решаем M * X = 1 ...")
-    M = Matrix(GF(2), matrix_data)
+                        # Если импульс бьет прямо в координаты лампы
+                        if out_c in lamp_to_idx:
+                            i = lamp_to_idx[out_c]
+                            matrix_data[i][j] ^= 1 # XOR для правильного переключения
+
+    print("\n[*] Матрица связей собрана. Рисуем картинку...")
     
-    # Пытаемся решить матрицу для "Все лампы включены"
-    S = vector(GF(2), [1] * 256)
+    with open("flag.pbm", "w") as f:
+        f.write("P1\n256 256\n")
+        for i in range(256):
+            # 1 = черный пиксель (есть связь), 0 = белый пиксель
+            row_str = " ".join("1" if matrix_data[i][j] else "0" for j in range(256))
+            f.write(row_str + "\n")
 
-    try:
-        X = M.solve_right(S)
-        print("\n[+] УСПЕХ! Штрихкод (DataMatrix):")
-        print("+" + "-"*32 + "+")
-        for i in range(16):
-            row_str = "|"
-            for j in range(16):
-                row_str += "██" if X[i*16 + j] == 1 else "  "
-            print(row_str + "|")
-        print("+" + "-"*32 + "+")
-    except ValueError:
-        print("[!] Матрица сингулярна.")
-        K = M.right_kernel()
-        if K.dimension() > 0:
-            print(f"[*] Найдено ядро (слепое пятно). Размерность: {K.dimension()}. Вывожу базис:")
-            basis_vec = K.basis()[0]
-            print("+" + "-"*32 + "+")
-            for i in range(16):
-                row_str = "|"
-                for j in range(16):
-                    row_str += "██" if basis_vec[i*16 + j] == 1 else "  "
-                print(row_str + "|")
-            print("+" + "-"*32 + "+")
+    print("[+] Готово! Открой файл flag.pbm. Если связи считались верно, ты увидишь текст или QR-код.")
 
 if __name__ == '__main__':
     solve()
