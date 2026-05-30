@@ -328,7 +328,6 @@ from nbt.region import RegionFile
 
 def get_blocks_from_section(section, global_cx, global_cz, sy):
     found = []
-    # В новых версиях Minecraft (1.16+) состояния лежат в block_states
     if "block_states" not in section:
         return found
         
@@ -338,7 +337,6 @@ def get_blocks_from_section(section, global_cx, global_cz, sy):
         
     palette = block_states["palette"]
     
-    # Сначала проверяем, есть ли вообще в этой секции нужные нам блоки
     interesting = False
     for p in palette:
         name = p["Name"].value if "Name" in p else p["name"].value
@@ -346,11 +344,9 @@ def get_blocks_from_section(section, global_cx, global_cz, sy):
             interesting = True
             break
             
-    # Если блоков нет или секция пустая - скипаем (экономит 99% времени)
     if not interesting or "data" not in block_states:
         return found
         
-    # Распаковка битового массива 
     data_array = block_states["data"]
     palette_len = len(palette)
     bits_per_block = max(4, math.ceil(math.log2(palette_len)))
@@ -361,7 +357,10 @@ def get_blocks_from_section(section, global_cx, global_cz, sy):
         long_index = i // blocks_per_long
         if long_index >= len(data_array):
             break
-        long_val = data_array[long_index].value
+            
+        # БЕЗОПАСНОЕ ИЗВЛЕЧЕНИЕ (исправление ошибки)
+        raw_val = data_array[long_index]
+        long_val = raw_val.value if hasattr(raw_val, 'value') else raw_val
         
         # Java longs знаковые, переводим в беззнаковые
         if long_val < 0:
@@ -375,21 +374,18 @@ def get_blocks_from_section(section, global_cx, global_cz, sy):
             name = block_prop["Name"].value if "Name" in block_prop else block_prop["name"].value
             
             if name in ["minecraft:lever", "minecraft:observer", "minecraft:redstone_lamp"]:
-                # Вычисляем локальные координаты внутри 16x16x16
                 y = (i >> 8) & 0xF
                 z = (i >> 4) & 0xF
                 x = i & 0xF
                 
-                # Переводим в глобальные координаты мира
                 gx = global_cx * 16 + x
                 gy = sy * 16 + y
                 gz = global_cz * 16 + z
                 
-                # Вытягиваем свойства (powered, lit, facing)
                 props = {}
                 if "Properties" in block_prop:
                     for k, v in block_prop["Properties"].items():
-                        props[k] = v.value
+                        props[k] = v.value if hasattr(v, 'value') else v
                         
                 found.append((name, (gx, gy, gz), props))
                 
@@ -409,7 +405,6 @@ def main():
         except Exception:
             continue
             
-        # Узнаем смещение региона из названия файла r.X.Z.mca
         filename = filepath.split('/')[-1]
         rx = int(filename.split('.')[1])
         rz = int(filename.split('.')[2])
@@ -432,8 +427,10 @@ def main():
                     continue
                     
                 for section in sections:
-                    # Читаем координату Y (высоту) самой секции
-                    sy = section["Y"].value
+                    # Извлекаем Y безопасно
+                    sy_tag = section["Y"]
+                    sy = sy_tag.value if hasattr(sy_tag, 'value') else sy_tag
+                    
                     blocks = get_blocks_from_section(section, global_cx, global_cz, sy)
                     
                     for name, coords, props in blocks:
