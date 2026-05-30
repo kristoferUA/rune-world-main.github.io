@@ -325,9 +325,8 @@ http://154.57.164.64:31484/esp-analytics/webhook
 from sage.all import *
 from collections import deque
 
-def solve_lights_out_v4():
+def solve_lights_out_v5():
     levers = []
-    lamps = []
     copper_bulbs = []
     observers = {}
     
@@ -346,9 +345,9 @@ def solve_lights_out_v4():
             if not line: continue
             
             if '--- LEVERS ---' in line: current_section = 'levers'; continue
-            if '--- LAMPS ---' in line: current_section = 'lamps'; continue
             if '--- COPPER_BULBS ---' in line: current_section = 'copper_bulbs'; continue
             if '--- OBSERVERS ---' in line: current_section = 'observers'; continue
+            if '--- LAMPS ---' in line: current_section = None; continue # Игнорируем обычные лампы
             
             if ':' not in line: continue
             
@@ -358,24 +357,24 @@ def solve_lights_out_v4():
             
             if current_section == 'levers':
                 levers.append((pos, val == 'true'))
-            elif current_section == 'lamps':
-                lamps.append((pos, val == 'true'))
             elif current_section == 'copper_bulbs':
                 copper_bulbs.append((pos, val == 'true'))
             elif current_section == 'observers':
                 observers[pos] = val.lower()
 
-    print("[*] Сортируем координаты...")
-    levers.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
-    lamps.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
-    copper_bulbs.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
+    print("[*] Линейная сортировка координат...")
+    # Сортируем прямо по осям X и Z. 
+    # Для линии это даст идеальный порядок от начала до конца.
+    sort_key = lambda item: (item[0], item[2], item[1])
+    
+    levers.sort(key=lambda item: sort_key(item[0]))
+    copper_bulbs.sort(key=lambda item: sort_key(item[0]))
     
     lever_positions = [item[0] for item in levers]
-    lamp_positions = [item[0] for item in lamps]
     copper_positions = [item[0] for item in copper_bulbs]
 
-    print("[*] Строим граф передачи сигналов внутри куба...")
-    graph = {p: [] for p in lever_positions + lamp_positions + copper_positions + list(observers.keys())}
+    print("[*] Ищем входы и выходы куба...")
+    graph = {p: [] for p in lever_positions + copper_positions + list(observers.keys())}
     
     observer_inputs = []
     observer_outputs = []
@@ -385,60 +384,24 @@ def solve_lights_out_v4():
         front = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
         back = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
         
-        # Если перед лицом есть другой наблюдатель - берем сигнал от него
         if front in observers:
             graph[front].append(pos)
         else:
-            observer_inputs.append(pos) # Иначе это входной пин куба
+            observer_inputs.append(pos)
             
-        # Если сзади нет наблюдателя - это выходной пин куба
         if back not in observers:
             observer_outputs.append(pos)
 
-    print("[*] Подключаем рычаги к кубу (геометрический поиск пар)...")
-    connected_levers = 0
-    used_inputs = set()
-    for lever in lever_positions:
-        available = [obs for obs in observer_inputs if obs not in used_inputs]
-        if not available: break
-        
-        closest = min(available, key=lambda p: abs(p[0]-lever[0]) + abs(p[1]-lever[1]) + abs(p[2]-lever[2]))
-        dist = abs(closest[0]-lever[0]) + abs(closest[1]-lever[1]) + abs(closest[2]-lever[2])
-        
-        if dist <= 10: # Запас на строительные блоки и провода
-            graph[lever].append(closest)
-            used_inputs.add(closest)
-            connected_levers += 1
-            
-    print(f"[+] Успешно подключено рычагов: {connected_levers} из {len(lever_positions)}")
+    print("[*] Сортируем контакты куба и спаиваем 1-к-1...")
+    observer_inputs.sort(key=sort_key)
+    observer_outputs.sort(key=sort_key)
 
-    print("[*] Подключаем выходы куба к медным лампам...")
-    connected_copper = 0
-    used_outputs_copper = set()
-    for bulb in copper_positions:
-        available = [obs for obs in observer_outputs if obs not in used_outputs_copper]
-        if not available: break
+    # Идеальное прямое подключение без пересечений
+    for lever, obs_in in zip(lever_positions, observer_inputs):
+        graph[lever].append(obs_in)
         
-        closest = min(available, key=lambda p: abs(p[0]-bulb[0]) + abs(p[1]-bulb[1]) + abs(p[2]-bulb[2]))
-        dist = abs(closest[0]-bulb[0]) + abs(closest[1]-bulb[1]) + abs(closest[2]-bulb[2])
-        
-        if dist <= 10:
-            graph[closest].append(bulb)
-            used_outputs_copper.add(closest)
-            connected_copper += 1
-            
-    print(f"[+] Успешно подключено медных ламп: {connected_copper} из {len(copper_positions)}")
-
-    print("[*] Подключаем выходы куба к обычным лампам...")
-    connected_lamps = 0
-    for lamp in lamp_positions:
-        closest = min(observer_outputs, key=lambda p: abs(p[0]-lamp[0]) + abs(p[1]-lamp[1]) + abs(p[2]-lamp[2]))
-        dist = abs(closest[0]-lamp[0]) + abs(closest[1]-lamp[1]) + abs(closest[2]-lamp[2])
-        if dist <= 10:
-            graph[closest].append(lamp)
-            connected_lamps += 1
-            
-    print(f"[+] Успешно подключено обычных ламп: {connected_lamps} из {len(lamp_positions)}")
+    for obs_out, bulb in zip(observer_outputs, copper_positions):
+        graph[obs_out].append(bulb)
 
     print("[*] Поиск активных путей (BFS)...")
     reachable = set(lever_positions)
@@ -493,28 +456,13 @@ def solve_lights_out_v4():
                 if (val >> j) & 1:
                     M_copper[i, j] = 1
 
-    print(f"[*] Ранг матрицы медных ламп: {M_copper.rank()}")
+    print(f"[*] Ранг матрицы: {M_copper.rank()}")
     
-    if M_copper.rank() == 0:
-        print("[-] Матрица все еще нулевая. Сигнал обрывается.")
-        return
-        
     Y_copper = vector(GF(2), [1 if item[1] else 0 for item in copper_bulbs])
     
     try:
         X = M_copper.solve_right(Y_copper)
         print("[+] Решение найдено! Комбинация вычислена.")
-        
-        M_lamps = Matrix(GF(2), matrix_size, matrix_size)
-        for i, pos in enumerate(lamp_positions):
-            if pos in state:
-                val = state[pos]
-                for j in range(matrix_size):
-                    if (val >> j) & 1:
-                        M_lamps[i, j] = 1
-        
-        Y_lamps_initial = vector(GF(2), [1 if item[1] else 0 for item in lamps])
-        Y_lamps_final = M_lamps * X + Y_lamps_initial
         
         def bits_to_ascii(bit_vector):
             chars = []
@@ -532,12 +480,12 @@ def solve_lights_out_v4():
                 chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
             return "".join(chars)
 
-        print("\n--- РЕЗУЛЬТАТЫ ---")
-        print(f"[Флаг из состояний рычагов (Вектор X)]\nПрямой: {bits_to_ascii(list(X))}\nРеверс: {bits_to_ascii_le(list(X))}\n")
-        print(f"[Флаг из состояний обычных ламп]\nПрямой: {bits_to_ascii(list(Y_lamps_final))}\nРеверс: {bits_to_ascii_le(list(Y_lamps_final))}")
+        print("\n--- ФЛАГ (Положения рычагов) ---")
+        print(f"Прямой порядок: {bits_to_ascii(list(X))}")
+        print(f"Обратный порядок (LE): {bits_to_ascii_le(list(X))}")
 
     except ValueError:
-        print("[-] Решение не найдено. Уравнение не сходится.")
+        print("[-] Уравнение не сходится. Проверьте направления сортировки осей X и Z.")
 
 if __name__ == '__main__':
-    solve_lights_out_v4()
+    solve_lights_out_v5()
