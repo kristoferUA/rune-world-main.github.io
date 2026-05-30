@@ -350,12 +350,10 @@ def solve():
         elif mode == "lamps": lamps[coords] = val.strip()
         elif mode == "obs": observers.append((coords, val.strip()))
 
-    print(f"[*] Сортируем координаты 16x16...")
     sorted_levers = sorted(levers.keys(), key=lambda c: (c[1], c[2], c[0]))
     sorted_lamps = sorted(lamps.keys(), key=lambda c: (c[1], c[2], c[0]))
     lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
 
-    print("[*] Строим граф наблюдателей...")
     vecs = {
         "north": (0, 0, -1), "south": (0, 0, 1),
         "west": (-1, 0, 0), "east": (1, 0, 0),
@@ -388,29 +386,30 @@ def solve():
                         queue.append(out_c)
                         if out_c in lamp_to_idx:
                             i = lamp_to_idx[out_c]
-                            # XOR - два сигнала в одну лампу гасят друг друга
                             matrix_data[i][j] ^= 1 
 
-    print("[*] Решаем систему GF(2) для таргета 'ВСЕ ЛАМПЫ ГОРЯТ'...")
+    print("[*] Ищем слепое пятно схемы (Null Space)...")
     M = Matrix(GF(2), matrix_data)
     
-    # Задаем вектор, в котором все 256 ламп должны быть включены (1)
-    S = vector(GF(2), [1] * 256)
+    # Вычисляем ядро матрицы
+    K = M.right_kernel()
+    dim = K.dimension()
+    print(f"[*] Размерность ядра: {dim}")
 
-    try:
-        X = M.solve_right(S)
-    except ValueError:
-        print("[!] ОШИБКА: Матрица сингулярна. Решения для 'всех включенных' не существует.")
+    if dim == 0:
+        print("[!] Ядро пустое. Матрица идеальна, гипотеза неверна.")
         return
 
-    print("\n[+] УСПЕХ! Штрихкод (DataMatrix) для включения ВСЕХ ламп:")
-    print("+" + "-"*32 + "+")
-    for i in range(16):
-        row_str = "|"
-        for j in range(16):
-            row_str += "██" if X[i*16 + j] == 1 else "  "
-        print(row_str + "|")
-    print("+" + "-"*32 + "+")
+    # Выводим все базисные векторы ядра
+    for idx, basis_vec in enumerate(K.basis()):
+        print(f"\n[+] Базисный вектор #{idx + 1} (Возможный флаг):")
+        print("+" + "-"*32 + "+")
+        for i in range(16):
+            row_str = "|"
+            for j in range(16):
+                row_str += "██" if basis_vec[i*16 + j] == 1 else "  "
+            print(row_str + "|")
+        print("+" + "-"*32 + "+")
 
 if __name__ == '__main__':
     solve()
