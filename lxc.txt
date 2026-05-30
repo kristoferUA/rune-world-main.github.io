@@ -322,102 +322,59 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-from sage.all import *
-import itertools
-import sys
+import glob
+from nbt.region import RegionFile
 
-# Модуль системы (база 29, длина 16)
-M = 29**16
-
-# Функция перевода строки в число base-29
-def s2int(s):
-    return sum((ord(c) - ord('a')) * (29**(15 - i)) for i, c in enumerate(s))
-
-H0 = s2int("greyctfisawesome")
-C  = s2int("cryptoisverycool")
-F  = s2int("{|}helloworld{|}")
-TARGET = s2int("gimmeflagthankuu")
-
-# F - 1 взаимно просто с M, поэтому инверсия существует
-invF_minus_1 = inverse_mod(F - 1, M)
-
-# Длина пароля >= 24, проверяем варианты длины блоками по 2 символа
-for N in range(12, 16):
-    print(f"[*] Анализируем длину N = {N} (строка {N*2} символов)...")
+def extract_commands(region_path):
+    region = RegionFile(region_path)
+    commands = []
     
-    # Вычисляем константные части уравнения
-    C_term = (C * F * (pow(F, N, M) - 1) * invF_minus_1) % M
-    TARGET_ADJ = (TARGET - H0 * pow(F, N, M) - C_term) % M
-
-    # Настройки решетки
-    dim = N + 2
-    W = 2**100
-    U = 100
-
-    # Строим матрицу
-    mat = matrix(ZZ, dim, dim)
-    for i in range(N):
-        mat[i, i] = 1
-        mat[i, dim-1] = pow(F, N-1-i, M) * W
-        
-    mat[N, N] = U
-    mat[N, dim-1] = -TARGET_ADJ * W
-    mat[N+1, dim-1] = M * W
-
-    # Магия LLL
-    red = mat.LLL()
-
-    target_vecs = []
-    kernel_vecs = []
-    
-    for row in red:
-        if row[N] == U:
-            target_vecs.append(row)
-        elif row[N] == -U:
-            target_vecs.append(-row)
-        elif row[N] == 0 and row[dim-1] == 0:
-            kernel_vecs.append(row)
-
-    # Функция валидации дельт через машину состояний
-    def check_D(D_seq):
-        s_res = ""
-        H = H0
-        for i in range(N):
-            H_tmp2 = ((H + C) * F) % M
-            y1 = H_tmp2 % 29
-            y0 = (H_tmp2 // 29) % 29
-            D = D_seq[i]
-            
-            found = False
-            # Первый символ строки не может быть 'a' (0)
-            start_x0 = 1 if i == 0 else 0
-            
-            for x0 in range(start_x0, 26):
-                for x1 in range(0, 26):
-                    v0 = (y0 ^ x0) % 29
-                    v1 = (y1 ^ x1) % 29
-                    # Проверяем, дает ли этот XOR требуемую дельту
-                    if D == (v0 - y0) * 29 + (v1 - y1):
-                        s_res += chr(x0 + ord('a')) + chr(x1 + ord('a'))
-                        H = (H_tmp2 + D) % M
-                        found = True
-                        break
-                if found: break
-            if not found: return None
-        return s_res
-
-    # Перебираем короткие векторы решетки вокруг таргета
-    for t_vec in target_vecs:
-        k_subset = kernel_vecs[:8] # Берем 8 кратчайших векторов ядра
-        for coeffs in itertools.product(range(-1, 2), repeat=len(k_subset)):
-            cand = t_vec
-            for c, k_vec in zip(coeffs, k_subset):
-                cand += c * k_vec
+    # В одном регионе 32x32 чанка
+    for z in range(32):
+        for x in range(32):
+            try:
+                # Пытаемся прочитать чанк
+                chunk = region.get_chunk(x, z)
+            except Exception:
+                continue # Чанк пустой или не сгенерирован
                 
-            D_seq = list(cand[:N])
-            # Если дельты в допустимых пределах, симулируем стейт-машину
-            if max(map(abs, D_seq)) <= 840:
-                ans = check_D(D_seq)
-                if ans:
-                    print(f"\n[+] УСПЕХ! Найден preimage: {ans}")
-                    sys.exit(0)
+            entities = []
+            
+            # Поддержка разных версий Minecraft (старый формат Level/TileEntities и новый block_entities)
+            if "Level" in chunk and "TileEntities" in chunk["Level"]:
+                entities = chunk["Level"]["TileEntities"]
+            elif "block_entities" in chunk:
+                entities = chunk["block_entities"]
+                
+            for entity in entities:
+                # Ищем ID командных блоков
+                ent_id = entity["id"].value.replace("minecraft:", "")
+                if ent_id in ["command_block", "chain_command_block", "repeating_command_block"]:
+                    cmd = entity["Command"].value
+                    coords = (entity["x"].value, entity["y"].value, entity["z"].value)
+                    commands.append((coords, cmd))
+                    
+    return commands
+
+def main():
+    print("[*] Поиск командных блоков в файлах региона...")
+    mca_files = glob.glob("lights_out_map/region/*.mca")
+    
+    if not mca_files:
+        print("[!] Файлы .mca не найдены! Проверь пути.")
+        return
+        
+    for mca_file in mca_files:
+        print(f"\n[*] Анализируем: {mca_file}")
+        cmds = extract_commands(mca_file)
+        
+        if not cmds:
+            print("  -> Командных блоков нет. Похоже, это чистый редстоун.")
+            continue
+            
+        for coords, cmd in cmds:
+            # Выводим координаты и саму команду
+            print(f"[{coords[0]}, {coords[1]}, {coords[2]}] -> {cmd}")
+
+if __name__ == '__main__':
+    main()
