@@ -323,113 +323,150 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
+from sage.all import *
 from collections import deque
-import sys
 
-def solve():
-    print("[*] Читаем дамп графа ...")
-    with open("graph_dump.txt", "r") as f:
-        lines = f.read().splitlines()
-
-    levers = {}
-    lamps = {}
+def solve_minecraft_lights_out(filename='graph_dump.txt'):
+    levers = []
+    lamps = []
     observers = {}
 
-    mode = None
-    for line in lines:
-        if not line: continue
-        if line.startswith("---"):
-            if "LEVERS" in line: mode = "levers"
-            elif "LAMPS" in line: mode = "lamps"
-            elif "OBSERVERS" in line: mode = "obs"
-            continue
-
-        c_str, val = line.split(":")
-        coords = tuple(map(int, c_str.split(",")))
-
-        if mode == "levers": levers[coords] = val.strip()
-        elif mode == "lamps": lamps[coords] = val.strip()
-        elif mode == "obs": observers[coords] = val.strip()
-
-    print("[*] Сортируем панели (Y-убывание, X/Z-возрастание)...")
-    # Правильная развертка 2D-стен: сверху вниз (-Y), слева направо (X и Z)
-    sorted_levers = sorted(levers.keys(), key=lambda c: (-c[1], c[0], c[2]))
-    sorted_lamps = sorted(lamps.keys(), key=lambda c: (-c[1], c[0], c[2]))
-    lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
-
-    print("[*] Собираем точные оптические связи наблюдателей...")
-    vecs = {
-        "north": (0, 0, -1), "south": (0, 0, 1),
-        "west": (-1, 0, 0), "east": (1, 0, 0),
-        "up": (0, 1, 0), "down": (0, -1, 0)
-    }
-
-    obs_by_watched = {}
-    for o_c, facing in observers.items():
-        dx, dy, dz = vecs.get(facing.lower(), (0,0,0))
-        watched = (o_c[0] + dx, o_c[1] + dy, o_c[2] + dz)
-        out_c = (o_c[0] - dx, o_c[1] - dy, o_c[2] - dz)
-
-        if watched not in obs_by_watched:
-            obs_by_watched[watched] = []
-        obs_by_watched[watched].append({
-            "obs": o_c,
-            "out": out_c
-        })
-
-    print("[*] Запускаем сигналы и рендерим матрицу 256x256...")
-    matrix_data = [[0]*256 for _ in range(256)]
-
-    for j, start_lever in enumerate(sorted_levers):
-        if j % 16 == 0:
-            sys.stdout.write(f"\r[*] Обработано входов: {j}/256")
-            sys.stdout.flush()
-
-        # Ищем наблюдателей, смотрящих точно на рычаг
-        start_points = []
-        if start_lever in obs_by_watched:
-            start_points = [x["obs"] for x in obs_by_watched[start_lever]]
-
-        # Резервный вариант: если автор крепил рычаги к блокам
-        if not start_points:
-            lx, ly, lz = start_lever
-            for dx in [-1,0,1]:
-                for dy in [-1,0,1]:
-                    for dz in [-1,0,1]:
-                        if abs(dx)+abs(dy)+abs(dz) == 1:
-                            test_c = (lx+dx, ly+dy, lz+dz)
-                            if test_c in obs_by_watched:
-                                start_points.extend([x["obs"] for x in obs_by_watched[test_c]])
-
-        queue = deque(set(start_points))
-        visited = set(queue)
-
-        while queue:
-            curr = queue.popleft()
-            if curr in obs_by_watched:
-                for obs_data in obs_by_watched[curr]:
-                    o_c = obs_data["obs"]
-                    out_c = obs_data["out"]
-                    
-                    if o_c not in visited:
-                        visited.add(o_c)
-                        queue.append(o_c)
-
-                        # Если импульс бьет прямо в координаты лампы
-                        if out_c in lamp_to_idx:
-                            i = lamp_to_idx[out_c]
-                            matrix_data[i][j] ^= 1 # XOR для правильного переключения
-
-    print("\n[*] Матрица связей собрана. Рисуем картинку...")
+    print("[*] Читаем дамп...")
     
-    with open("flag.pbm", "w") as f:
-        f.write("P1\n256 256\n")
-        for i in range(256):
-            # 1 = черный пиксель (есть связь), 0 = белый пиксель
-            row_str = " ".join("1" if matrix_data[i][j] else "0" for j in range(256))
-            f.write(row_str + "\n")
+    current_section = None
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line: continue
+            
+            # Определяем текущую секцию по заголовкам
+            if 'LEVERS' in line:
+                current_section = 'levers'
+                continue
+            elif 'LAMPS' in line:
+                current_section = 'lamps'
+                continue
+            elif 'OBSERVERS' in line:
+                current_section = 'observers'
+                continue
+                
+            if ':' not in line: continue
+            
+            # Извлекаем координаты и значение (направление или статус)
+            parts = line.split()
+            data = parts[-1]
+            try:
+                pos_str, val = data.split(':')
+                x, y, z = map(int, pos_str.split(','))
+                pos = (x, y, z)
+                
+                if current_section == 'levers':
+                    levers.append(pos)
+                elif current_section == 'lamps':
+                    lamps.append(pos)
+                elif current_section == 'observers':
+                    observers[pos] = val.lower()
+            except Exception:
+                continue
 
-    print("[+] Готово! Открой файл flag.pbm. Если связи считались верно, ты увидишь текст или QR-код.")
+    print(f"[+] Найдено: рычагов - {len(levers)}, ламп - {len(lamps)}, наблюдателей - {len(observers)}")
+    
+    if len(levers) == 0 or len(lamps) == 0:
+        print("[-] Ошибка: рычаги или лампы не найдены. Проверьте заголовки секций в файле.")
+        return
+
+    print("[*] Строим граф передачи сигналов...")
+    DIR_MAP = {
+        'up': (0, 1, 0), 'down': (0, -1, 0),
+        'north': (0, 0, -1), 'south': (0, 0, 1),
+        'west': (-1, 0, 0), 'east': (1, 0, 0)
+    }
+    
+    graph = {p: [] for p in levers + lamps + list(observers.keys())}
+    lamps_set = set(lamps)
+    
+    for pos, dir_str in observers.items():
+        if dir_str not in DIR_MAP: continue
+        vec = DIR_MAP[dir_str]
+        
+        # Лицевая часть наблюдателя (откуда считываем)
+        front = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
+        # Задняя часть наблюдателя (куда подаем сигнал)
+        back = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
+        
+        if front in graph:
+            graph[front].append(pos)
+            
+        if back in lamps_set:
+            graph[pos].append(back)
+            
+    print("[*] Выполняем топологическую сортировку...")
+    in_degree = {n: 0 for n in graph}
+    for u in graph:
+        for v in graph[u]:
+            in_degree[v] += 1
+            
+    queue = deque([n for n in in_degree if in_degree[n] == 0])
+    topo_order = []
+    
+    while queue:
+        u = queue.popleft()
+        topo_order.append(u)
+        for v in graph[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+                
+    if len(topo_order) != len(graph):
+        print("[-] Внимание: В графе есть циклы. Это нетипично для таких задач.")
+        
+    print("[*] Расчет влияния рычагов (побитовое распространение)...")
+    state = {n: 0 for n in graph}
+    for i, pos in enumerate(levers):
+        state[pos] = 1 << i
+        
+    for u in topo_order:
+        val = state[u]
+        if val == 0: continue
+        for v in graph[u]:
+            state[v] ^= val # XOR идеально работает для проверки четности
+
+    print("[*] Формируем систему уравнений и решаем...")
+    matrix_size = len(levers)
+    M = Matrix(GF(2), matrix_size, matrix_size)
+    
+    for i, lamp_pos in enumerate(lamps):
+        lamp_val = state[lamp_pos]
+        for j in range(matrix_size):
+            if (lamp_val >> j) & 1:
+                M[i, j] = 1
+                
+    Y = vector(GF(2), [1] * matrix_size)
+    
+    try:
+        X = M.solve_right(Y)
+        print("[+] Решение найдено!")
+        
+        flag_bits = list(X)
+        flag_chars = []
+        flag_chars_le = []
+        
+        for i in range(0, matrix_size, 8):
+            byte_bits = flag_bits[i:i+8]
+            
+            # Обычный порядок бит
+            byte_val = int("".join(str(b) for b in byte_bits), 2)
+            flag_chars.append(chr(byte_val))
+            
+            # Обратный порядок бит (часто бывает в CTF)
+            byte_val_le = int("".join(str(b) for b in byte_bits[::-1]), 2)
+            flag_chars_le.append(chr(byte_val_le))
+            
+        print(f"[+] Возможный флаг: {''.join(flag_chars)}")
+        print(f"[+] Альтернативный флаг (Reverse Bits): {''.join(flag_chars_le)}")
+        
+    except ValueError:
+        print("[-] Система не имеет решения.")
 
 if __name__ == '__main__':
-    solve()
+    solve_minecraft_lights_out('graph_dump.txt')
