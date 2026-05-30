@@ -326,84 +326,69 @@ http://154.57.164.64:31484/esp-analytics/webhook
 from sage.all import *
 from collections import deque
 
-def solve_minecraft_lights_out(filename='graph_dump.txt'):
-    levers = []
-    lamps = []
+def solve_dropped_cube(filename='graph_dump.txt'):
     observers = {}
-
-    print("[*] Читаем дамп...")
-    
-    current_section = None
-    with open(filename, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line: continue
-            
-            if 'LEVERS' in line:
-                current_section = 'levers'
-                continue
-            elif 'LAMPS' in line:
-                current_section = 'lamps'
-                continue
-            elif 'OBSERVERS' in line:
-                current_section = 'observers'
-                continue
-                
-            if ':' not in line: continue
-            
-            parts = line.split()
-            data = parts[-1]
-            try:
-                pos_str, val = data.split(':')
-                x, y, z = map(int, pos_str.split(','))
-                pos = (x, y, z)
-                
-                if current_section == 'levers':
-                    levers.append(pos)
-                elif current_section == 'lamps':
-                    lamps.append(pos)
-                elif current_section == 'observers':
-                    observers[pos] = val.lower()
-            except Exception:
-                continue
-
-    print("[*] Сортируем координаты для сохранения порядка бит...")
-    # Порядок осей может зависеть от того, как дисплей построен в мире
-    levers.sort(key=lambda p: (p[1], p[2], p[0]))
-    lamps.sort(key=lambda p: (p[1], p[2], p[0]))
-
-    print(f"[+] Найдено: рычагов - {len(levers)}, ламп - {len(lamps)}, наблюдателей - {len(observers)}")
-    
-    if len(levers) == 0 or len(lamps) == 0:
-        print("[-] Ошибка: рычаги или лампы не найдены.")
-        return
-
-    print("[*] Строим граф передачи сигналов...")
     DIR_MAP = {
         'up': (0, 1, 0), 'down': (0, -1, 0),
         'north': (0, 0, -1), 'south': (0, 0, 1),
         'west': (-1, 0, 0), 'east': (1, 0, 0)
     }
+
+    print("[*] Читаем дамп (ищем только упавший куб наблюдателей)...")
+    with open(filename, 'r') as f:
+        for line in f:
+            line = line.strip()
+            if not line or ':' not in line: continue
+            
+            parts = line.split()
+            data = parts[-1]
+            try:
+                pos_str, val = data.split(':')
+                dir_str = val.lower()
+                # Берем только наблюдателей (у них есть направление)
+                if dir_str in DIR_MAP:
+                    x, y, z = map(int, pos_str.split(','))
+                    observers[(x, y, z)] = dir_str
+            except Exception:
+                continue
+
+    print(f"[+] Найдено наблюдателей: {len(observers)}")
     
-    graph = {p: [] for p in levers + lamps + list(observers.keys())}
-    lamps_set = set(lamps)
+    graph = {p: [] for p in observers}
+    observers_set = set(observers.keys())
     
+    inputs = []
+    outputs = []
+
+    print("[*] Ищем оторванные входы и выходы куба...")
     for pos, dir_str in observers.items():
-        if dir_str not in DIR_MAP: continue
         vec = DIR_MAP[dir_str]
-        
-        # Правильное направление: front считывает, back выдает
         front = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
         back = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
         
-        if front in graph:
+        # Если перед наблюдателем пустота — это входной пин
+        if front not in observers_set:
+            inputs.append(pos)
+        else:
             graph[front].append(pos)
             
-        if back in lamps_set:
-            graph[pos].append(back)
-            
-    print("[*] Выполняем топологическую сортировку...")
-    in_degree = {n: 0 for n in graph}
+        # Если за наблюдателем пустота — это выходной пин
+        if back not in observers_set:
+            outputs.append(pos)
+
+    print(f"[+] Найдено потенциальных входов: {len(inputs)}")
+    print(f"[+] Найдено потенциальных выходов: {len(outputs)}")
+
+    print("[*] Сортируем контакты (Y-убывание, X-возрастание, Z-возрастание)...")
+    inputs.sort(key=lambda p: (-p[1], p[0], p[2]))
+    outputs.sort(key=lambda p: (-p[1], p[0], p[2]))
+    
+    # Берем ровно 256 контактов, на случай если есть лишний мусор
+    inputs = inputs[:256]
+    outputs = outputs[:256]
+
+    print("[*] Выполняем топологическую сортировку графа...")
+    in_degree = {n: 0 for n in observers}
     for u in graph:
         for v in graph[u]:
             in_degree[v] += 1
@@ -419,9 +404,9 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
             if in_degree[v] == 0:
                 queue.append(v)
                 
-    print("[*] Расчет влияния рычагов (побитовое распространение)...")
-    state = {n: 0 for n in graph}
-    for i, pos in enumerate(levers):
+    print("[*] Расчет влияния (побитовое распространение XOR)...")
+    state = {n: 0 for n in observers}
+    for i, pos in enumerate(inputs):
         state[pos] = 1 << i
         
     for u in topo_order:
@@ -431,42 +416,60 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
             state[v] ^= val
 
     print("[*] Формируем матрицу...")
-    matrix_size = len(levers)
+    matrix_size = len(inputs)
     M = Matrix(GF(2), matrix_size, matrix_size)
     
-    for i, lamp_pos in enumerate(lamps):
-        lamp_val = state[lamp_pos]
+    for i, out_pos in enumerate(outputs):
+        out_val = state[out_pos]
         for j in range(matrix_size):
-            if (lamp_val >> j) & 1:
+            if (out_val >> j) & 1:
                 M[i, j] = 1
                 
     print(f"[*] Ранг матрицы M: {M.rank()}")
     
-    kernel = M.right_kernel()
-    print(f"[*] Размерность ядра (Null space): {kernel.dimension()}")
+    if M.rank() == 0:
+        print("[-] Матрица все еще нулевая. Логика направлений не совпала с игрой.")
+        return
 
-    if kernel.dimension() > 0:
-        print("[+] Ищем флаг в базисных векторах ядра...")
-        for idx, basis_vec in enumerate(kernel.basis()):
-            flag_bits = list(basis_vec)
-            flag_chars = []
-            flag_chars_le = []
+    # Целевой вектор - все включено (единицы)
+    Y = vector(GF(2), [1] * matrix_size)
+    
+    print("[*] Ищем решение...")
+    try:
+        X = M.solve_right(Y)
+        print("[+] Решение M * X = Y найдено! Конвертируем флаг...")
+        
+        flag_bits = list(X)
+        flag_chars = []
+        flag_chars_le = []
+        
+        for i in range(0, matrix_size, 8):
+            byte_bits = flag_bits[i:i+8]
             
-            for i in range(0, matrix_size, 8):
-                byte_bits = flag_bits[i:i+8]
-                
-                # Прямой порядок бит
-                byte_val = int("".join(str(b) for b in byte_bits), 2)
-                flag_chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
-                
-                # Обратный порядок бит
-                byte_val_le = int("".join(str(b) for b in byte_bits[::-1]), 2)
-                flag_chars_le.append(chr(byte_val_le) if 32 <= byte_val_le <= 126 else '.')
-                
-            print(f"[+] Базис {idx}: {''.join(flag_chars)}")
-            print(f"[+] Базис {idx} (Rev Bits): {''.join(flag_chars_le)}")
-    else:
-        print("[-] Ядро состоит только из нулевого вектора.")
+            # Прямой порядок бит
+            byte_val = int("".join(str(b) for b in byte_bits), 2)
+            flag_chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
+            
+            # Обратный порядок бит
+            byte_val_le = int("".join(str(b) for b in byte_bits[::-1]), 2)
+            flag_chars_le.append(chr(byte_val_le) if 32 <= byte_val_le <= 126 else '.')
+            
+        print(f"\n[+] Возможный флаг: {''.join(flag_chars)}")
+        print(f"[+] Альтернативный флаг (Rev Bits): {''.join(flag_chars_le)}")
+        
+    except ValueError:
+        print("[-] Прямого решения нет. Проверяем ядро (Null space)...")
+        kernel = M.right_kernel()
+        print(f"[*] Размерность ядра: {kernel.dimension()}")
+        if kernel.dimension() > 0:
+            for idx, basis_vec in enumerate(kernel.basis()[:5]):
+                flag_bits = list(basis_vec)
+                flag_chars = []
+                for i in range(0, matrix_size, 8):
+                    byte_bits = flag_bits[i:i+8]
+                    byte_val = int("".join(str(b) for b in byte_bits), 2)
+                    flag_chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
+                print(f"[+] Базис {idx}: {''.join(flag_chars)}")
 
 if __name__ == '__main__':
-    solve_minecraft_lights_out('graph_dump.txt')
+    solve_dropped_cube('graph_dump.txt')
