@@ -447,4 +447,26 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
 
     if kernel.dimension() > 0:
         print("[+] Ищем флаг в базисных векторах ядра...")
-        for idx, basis_vec
+        for idx, basis_vec in enumerate(kernel.basis()):
+            flag_bits = list(basis_vec)
+            flag_chars = []
+            flag_chars_le = []
+            
+            for i in range(0, matrix_size, 8):
+                byte_bits = flag_bits[i:i+8]
+                
+                # Прямой порядок бит
+                byte_val = int("".join(str(b) for b in byte_bits), 2)
+                flag_chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
+                
+                # Обратный порядок бит
+                byte_val_le = int("".join(str(b) for b in byte_bits[::-1]), 2)
+                flag_chars_le.append(chr(byte_val_le) if 32 <= byte_val_le <= 126 else '.')
+                
+            print(f"[+] Базис {idx}: {''.join(flag_chars)}")
+            print(f"[+] Базис {idx} (Rev Bits): {''.join(flag_chars_le)}")
+    else:
+        print("[-] Ядро состоит только из нулевого вектора.")
+
+if __name__ == '__main__':
+    solve_minecraft_lights_out('graph_dump.txt')
