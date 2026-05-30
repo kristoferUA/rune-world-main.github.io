@@ -355,17 +355,6 @@ def solve():
     sorted_lamps = sorted(lamps.keys(), key=lambda c: (c[1], c[2], c[0]))
     lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
 
-    # Бронебойная проверка состояния NBT-тегов
-    def is_active(val):
-        return str(val).lower() in ["true", "1", "t", "on"]
-
-    lit_lamps_count = sum(1 for c in sorted_lamps if is_active(lamps[c]))
-    print(f"[*] Горящих ламп найдено: {lit_lamps_count} из {len(lamps)}")
-    
-    if lit_lamps_count == 0:
-        print("[!] Скрипт по-прежнему видит 0 горящих ламп. Проверь graph_dump.txt!")
-        return
-
     print("[*] Строим граф наблюдателей...")
     vecs = {
         "north": (0, 0, -1), "south": (0, 0, 1),
@@ -376,16 +365,14 @@ def solve():
     obs_by_watched = {}
     for obs_coord, facing in observers:
         dx, dy, dz = vecs.get(facing.lower(), (0,0,0))
-        # watched - блок, на который смотрит "лицо"
         watched = (obs_coord[0] + dx, obs_coord[1] + dy, obs_coord[2] + dz)
-        # output - блок, в который бьет импульс со "спины"
         output = (obs_coord[0] - dx, obs_coord[1] - dy, obs_coord[2] - dz)
 
         if watched not in obs_by_watched:
             obs_by_watched[watched] = []
         obs_by_watched[watched].append(output)
 
-    print("[*] Вычисляем влияние рычагов на лампы (BFS)...")
+    print("[*] Вычисляем матрицу смежности (BFS)...")
     matrix_data = [[0]*256 for _ in range(256)]
 
     for j, start_lever in enumerate(sorted_levers):
@@ -401,24 +388,22 @@ def solve():
                         queue.append(out_c)
                         if out_c in lamp_to_idx:
                             i = lamp_to_idx[out_c]
-                            # XOR - так как два сигнала в одну лампу гасят друг друга
+                            # XOR - два сигнала в одну лампу гасят друг друга
                             matrix_data[i][j] ^= 1 
 
-    print("[*] Решаем систему GF(2)...")
+    print("[*] Решаем систему GF(2) для таргета 'ВСЕ ЛАМПЫ ГОРЯТ'...")
     M = Matrix(GF(2), matrix_data)
-    S = vector(GF(2), 256)
-
-    for i, lamp in enumerate(sorted_lamps):
-        if is_active(lamps[lamp]):
-            S[i] = 1
+    
+    # Задаем вектор, в котором все 256 ламп должны быть включены (1)
+    S = vector(GF(2), [1] * 256)
 
     try:
         X = M.solve_right(S)
     except ValueError:
-        print("[!] ОШИБКА: Матрица сингулярна и не имеет точного решения.")
+        print("[!] ОШИБКА: Матрица сингулярна. Решения для 'всех включенных' не существует.")
         return
 
-    print("\n[+] УСПЕХ! Штрихкод (DataMatrix):")
+    print("\n[+] УСПЕХ! Штрихкод (DataMatrix) для включения ВСЕХ ламп:")
     print("+" + "-"*32 + "+")
     for i in range(16):
         row_str = "|"
