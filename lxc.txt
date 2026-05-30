@@ -1,3 +1,6 @@
+https://ctfd.nusgreyhats.org
+
+
 ltrace -C -s 120 ./schrodinger_unpacked 2>&1 | grep "SecLeaf"
 for i in {0..5}; do
     echo "int rand(void) { return $i; }" > hook.c
