@@ -324,85 +324,77 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 from z3 import *
 
-# Вспомогательная функция перевода строки в массив чисел (0-28)
-def to_data(s):
-    return [ord(c) - ord('a') for c in s]
+# Функция для перевода строки в огромное число по основанию 29
+def to_int(s):
+    val = 0
+    for c in s:
+        val = val * 29 + (ord(c) - ord('a'))
+    return val
 
-# Сложение массивов "в столбик" с переносом разряда
-def add_words(A, B):
-    res = [None] * 16
-    carry = BitVecVal(0, 16)
-    for i in range(15, -1, -1):
-        s_val = A[i] + B[i] + carry
-        res[i] = URem(s_val, 29)
-        carry = UDiv(s_val, 29)
-    return res
+# Константы в виде больших целых чисел
+MOD = 29**16
+H_START = to_int("greyctfisawesome")
+C_VAL = to_int("cryptoisverycool")
+F_VAL = to_int("{|}helloworld{|}")
+TARGET = to_int("gimmeflagthankuu")
 
-# Оптимизированное умножение на константу без глубоких ветвлений Z3
-def mul_word_const_fast(A, f_data):
-    res_raw = [BitVecVal(0, 16)] * 16
+solver = Solver()
+
+# Состояния хеша на каждом шаге (тип Int для быстродействия)
+H = [Int(f'h_{i}') for i in range(13)]
+
+solver.add(H[0] == H_START)
+solver.add(H[12] == TARGET)
+
+# Список для сбора переменных ввода, чтобы потом прочитать из них ответ
+M_vars = []
+
+for i in range(12):
+    solver.add(H[i] >= 0, H[i] < MOD)
     
-    # Моделируем логику оригинального скрипта: сдвиг и умножение
-    for i in range(16): 
-        multiplier = f_data[-1-i]
-        if multiplier == 0: continue
-        for j in range(16 - i):
-            res_raw[j] += A[i+j] * multiplier
+    # Полностью алгебраический шаг без логических вентилей
+    V_i = (H[i] + C_VAL) * F_VAL % MOD
     
-    # Просчитываем переносы разрядов один раз в самом конце
-    res = [None] * 16
-    carry = BitVecVal(0, 16)
-    for i in range(15, -1, -1):
-        s_val = res_raw[i] + carry
-        res[i] = URem(s_val, 29)
-        carry = UDiv(s_val, 29)
-    return res
-
-# Побитовый XOR поэлементно
-def xor_words(A, B):
-    res = [None] * 16
-    for i in range(16):
-        res[i] = URem(A[i] ^ B[i], 29)
-    return res
-
-def solve():
-    solver = Solver()
-    N = 24
+    # Отщепляем два младших разряда (29^2 = 841)
+    d14_int = (V_i % 841) / 29
+    d15_int = V_i % 29
     
-    # Создаем 24 переменных по 16 бит для искомой строки
-    S = [BitVec(f"s_{i}", 16) for i in range(N)]
+    # Переводим их в крошечные 5-битные векторы для XOR
+    d14_bv = Int2BV(d14_int, 5)
+    d15_bv = Int2BV(d15_int, 5)
     
-    for i in range(N):
-        solver.add(S[i] >= 0, S[i] <= 25) # Только буквы 'a'-'z'
-    solver.add(S[0] != 0) # Не начинается с 'a'
-
-    # Инициализация констант как массивов
-    H = [BitVecVal(x, 16) for x in to_data("greyctfisawesome")]
-    C = [BitVecVal(x, 16) for x in to_data("cryptoisverycool")]
-    F_data = to_data("{|}helloworld{|}")
-
-    # Воспроизводим цикл caexor
-    for i in range(0, N, 2):
-        H = add_words(H, C)
-        H = mul_word_const_fast(H, F_data)
+    # Переменные для двух символов ввода на текущей итерации
+    m14_bv = BitVec(f'm14_{i}', 5)
+    m15_bv = BitVec(f'm15_{i}', 5)
+    
+    M_vars.append(m14_bv)
+    M_vars.append(m15_bv)
+    
+    # Ограничения алфавита: a-z (0-25)
+    solver.add(BV2Int(m14_bv) >= 0, BV2Int(m14_bv) <= 25)
+    solver.add(BV2Int(m15_bv) >= 0, BV2Int(m15_bv) <= 25)
+    
+    # Итоговая строка не должна начинаться с 'a' (0)
+    if i == 0:
+        solver.add(BV2Int(m14_bv) != 0)
         
-        # Массив для XOR: 14 нулей и 2 символа из ввода
-        M = [BitVecVal(0, 16)] * 14 + [S[i], S[i+1]]
-        H = xor_words(H, M)
-
-    Target_data = to_data("gimmeflagthankuu")
+    # Применяем XOR и переводим обратно в Int
+    n14_int = BV2Int(d14_bv ^ m14_bv) % 29
+    n15_int = BV2Int(d15_bv ^ m15_bv) % 29
     
-    # Задаем условия совпадения каждого из 16 элементов
-    for i in range(16):
-        solver.add(H[i] == Target_data[i])
+    # Собираем новое состояние: 
+    # (V_i / 841) * 841 оставляет верхние 14 разрядов нетронутыми
+    solver.add(H[i+1] == (V_i / 841) * 841 + n14_int * 29 + n15_int)
 
-    print("[*] Запуск оптимизированного Z3...")
-    if solver.check() == sat:
-        m = solver.model()
-        ans = "".join(chr(m[S[i]].as_long() + ord('a')) for i in range(N))
-        print(f"[+] Прообраз найден! Отправляй на сервер: {ans}")
-    else:
-        print("[-] Решение не найдено")
+solver.add(H[12] >= 0, H[12] < MOD)
 
-if __name__ == "__main__":
-    solve()
+print("[*] Запуск алгебраической модели Z3...")
+if solver.check() == sat:
+    m = solver.model()
+    ans = ""
+    for bv in M_vars:
+        val = m.evaluate(BV2Int(bv)).as_long()
+        ans += chr(val + ord('a'))
+    print(f"[+] Прообраз успешно найден: {ans}")
+else:
+    print("[-] Математическое решение не найдено")
