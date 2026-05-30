@@ -339,33 +339,35 @@ def dump_region(filepath, output_txt):
     copper_bulbs = []
     observers = []
     
-    print("[*] Начинаем сканирование блоков... Это может занять 2-3 минуты.")
+    print("[*] Начинаем сканирование блоков... Это может занять пару минут.")
     
-    # В регионе 32x32 чанка
     for chunk_x in range(32):
         for chunk_z in range(32):
             try:
                 chunk = anvil.Chunk.from_region(region, chunk_x, chunk_z)
             except Exception:
-                continue # Чанк не сгенерирован
+                continue
                 
             if not chunk: continue
             
-            # Сканируем координаты внутри чанка
-            # Высота мира в новых версиях от -64 до 319
             for block_x in range(16):
                 for block_z in range(16):
                     for block_y in range(-64, 320):
                         try:
                             block = chunk.get_block(block_x, block_y, block_z)
-                            if not block or block.id == 'air': continue
+                            if not block or block.id in ('minecraft:air', 'air'): 
+                                continue
                             
-                            # Вычисляем глобальные координаты
+                            # Убираем префикс minecraft: если он есть
+                            b_id = block.id.split(':')[-1]
+                            
+                            # Быстрый фильтр, чтобы не обрабатывать лишнее
+                            if b_id not in ('lever', 'redstone_lamp', 'observer') and 'copper_bulb' not in b_id:
+                                continue
+
                             gx = chunk_x * 16 + block_x
                             gy = block_y
                             gz = chunk_z * 16 + block_z
-                            
-                            b_id = block.id
                             
                             if b_id == 'lever':
                                 powered = str(block.properties.get('powered', 'false')).lower()
@@ -401,5 +403,4 @@ def dump_region(filepath, output_txt):
     print(f"[+] Дамп успешно сохранен в {output_txt}")
 
 if __name__ == '__main__':
-    # Путь к файлу с учетом твоей структуры папок
     dump_region('region/r.0.0.mca', 'graph_dump.txt')
