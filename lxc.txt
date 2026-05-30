@@ -325,7 +325,7 @@ http://154.57.164.64:31484/esp-analytics/webhook
 from sage.all import *
 from collections import deque
 
-def solve_lights_out_v3():
+def solve_lights_out_v4():
     levers = []
     lamps = []
     copper_bulbs = []
@@ -374,51 +374,72 @@ def solve_lights_out_v3():
     lamp_positions = [item[0] for item in lamps]
     copper_positions = [item[0] for item in copper_bulbs]
 
-    print("[*] Строим граф передачи сигналов...")
+    print("[*] Строим граф передачи сигналов внутри куба...")
     graph = {p: [] for p in lever_positions + lamp_positions + copper_positions + list(observers.keys())}
-    target_set = set(lamp_positions + copper_positions)
     
-    observer_inputs = {}
+    observer_inputs = []
+    observer_outputs = []
     
     for pos, dir_str in observers.items():
-        if dir_str not in DIR_MAP: continue
         vec = DIR_MAP[dir_str]
-        
-        # Исправление 1: Строгая физика Minecraft (лицо сзади вектора facing)
         front = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
         back = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
         
+        # Если перед лицом есть другой наблюдатель - берем сигнал от него
         if front in observers:
             graph[front].append(pos)
         else:
-            observer_inputs[pos] = front
+            observer_inputs.append(pos) # Иначе это входной пин куба
             
-        if back in target_set:
-            graph[pos].append(back)
+        # Если сзади нет наблюдателя - это выходной пин куба
+        if back not in observers:
+            observer_outputs.append(pos)
 
-    print("[*] Подключаем рычаги к кубу...")
+    print("[*] Подключаем рычаги к кубу (геометрический поиск пар)...")
     connected_levers = 0
+    used_inputs = set()
     for lever in lever_positions:
-        connected = False
-        # Прямое подключение
-        for obs_pos, obs_front in observer_inputs.items():
-            if obs_front == lever:
-                graph[lever].append(obs_pos)
-                connected = True
+        available = [obs for obs in observer_inputs if obs not in used_inputs]
+        if not available: break
         
-        # Исправление 2: Подключение через 1 блок (дистанция Манхэттена = 1)
-        if not connected:
-            for obs_pos, obs_front in observer_inputs.items():
-                dist = abs(obs_front[0] - lever[0]) + abs(obs_front[1] - lever[1]) + abs(obs_front[2] - lever[2])
-                if dist == 1:
-                    graph[lever].append(obs_pos)
-                    connected = True
-        if connected:
+        closest = min(available, key=lambda p: abs(p[0]-lever[0]) + abs(p[1]-lever[1]) + abs(p[2]-lever[2]))
+        dist = abs(closest[0]-lever[0]) + abs(closest[1]-lever[1]) + abs(closest[2]-lever[2])
+        
+        if dist <= 10: # Запас на строительные блоки и провода
+            graph[lever].append(closest)
+            used_inputs.add(closest)
             connected_levers += 1
             
     print(f"[+] Успешно подключено рычагов: {connected_levers} из {len(lever_positions)}")
 
-    # Исправление 3: Изоляция активной цепи от мусорных циклов
+    print("[*] Подключаем выходы куба к медным лампам...")
+    connected_copper = 0
+    used_outputs_copper = set()
+    for bulb in copper_positions:
+        available = [obs for obs in observer_outputs if obs not in used_outputs_copper]
+        if not available: break
+        
+        closest = min(available, key=lambda p: abs(p[0]-bulb[0]) + abs(p[1]-bulb[1]) + abs(p[2]-bulb[2]))
+        dist = abs(closest[0]-bulb[0]) + abs(closest[1]-bulb[1]) + abs(closest[2]-bulb[2])
+        
+        if dist <= 10:
+            graph[closest].append(bulb)
+            used_outputs_copper.add(closest)
+            connected_copper += 1
+            
+    print(f"[+] Успешно подключено медных ламп: {connected_copper} из {len(copper_positions)}")
+
+    print("[*] Подключаем выходы куба к обычным лампам...")
+    connected_lamps = 0
+    for lamp in lamp_positions:
+        closest = min(observer_outputs, key=lambda p: abs(p[0]-lamp[0]) + abs(p[1]-lamp[1]) + abs(p[2]-lamp[2]))
+        dist = abs(closest[0]-lamp[0]) + abs(closest[1]-lamp[1]) + abs(closest[2]-lamp[2])
+        if dist <= 10:
+            graph[closest].append(lamp)
+            connected_lamps += 1
+            
+    print(f"[+] Успешно подключено обычных ламп: {connected_lamps} из {len(lamp_positions)}")
+
     print("[*] Поиск активных путей (BFS)...")
     reachable = set(lever_positions)
     queue = deque(lever_positions)
@@ -449,9 +470,6 @@ def solve_lights_out_v3():
                 in_degree[v] -= 1
                 if in_degree[v] == 0:
                     queue.append(v)
-                    
-    if len(topo_order) != len(reachable):
-        print("[-] ВНИМАНИЕ: В активной цепи есть петли. Вычисления могут быть неполными.")
 
     print("[*] Расчет влияния рычагов...")
     state = {n: 0 for n in reachable}
@@ -519,7 +537,7 @@ def solve_lights_out_v3():
         print(f"[Флаг из состояний обычных ламп]\nПрямой: {bits_to_ascii(list(Y_lamps_final))}\nРеверс: {bits_to_ascii_le(list(Y_lamps_final))}")
 
     except ValueError:
-        print("[-] Решение не найдено. Проверьте вектор состояний или ядро.")
+        print("[-] Решение не найдено. Уравнение не сходится.")
 
 if __name__ == '__main__':
-    solve_lights_out_v3()
+    solve_lights_out_v4()
