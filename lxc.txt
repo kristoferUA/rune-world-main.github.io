@@ -339,7 +339,6 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
             line = line.strip()
             if not line: continue
             
-            # Определяем текущую секцию по заголовкам
             if 'LEVERS' in line:
                 current_section = 'levers'
                 continue
@@ -352,7 +351,6 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
                 
             if ':' not in line: continue
             
-            # Извлекаем координаты и значение (направление или статус)
             parts = line.split()
             data = parts[-1]
             try:
@@ -369,10 +367,15 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
             except Exception:
                 continue
 
+    print("[*] Сортируем координаты для сохранения порядка бит...")
+    # Порядок осей может зависеть от того, как дисплей построен в мире
+    levers.sort(key=lambda p: (p[1], p[2], p[0]))
+    lamps.sort(key=lambda p: (p[1], p[2], p[0]))
+
     print(f"[+] Найдено: рычагов - {len(levers)}, ламп - {len(lamps)}, наблюдателей - {len(observers)}")
     
     if len(levers) == 0 or len(lamps) == 0:
-        print("[-] Ошибка: рычаги или лампы не найдены. Проверьте заголовки секций в файле.")
+        print("[-] Ошибка: рычаги или лампы не найдены.")
         return
 
     print("[*] Строим граф передачи сигналов...")
@@ -389,9 +392,8 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
         if dir_str not in DIR_MAP: continue
         vec = DIR_MAP[dir_str]
         
-        # Лицевая часть наблюдателя (откуда считываем)
+        # Правильное направление: front считывает, back выдает
         front = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
-        # Задняя часть наблюдателя (куда подаем сигнал)
         back = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
         
         if front in graph:
@@ -417,9 +419,6 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
             if in_degree[v] == 0:
                 queue.append(v)
                 
-    if len(topo_order) != len(graph):
-        print("[-] Внимание: В графе есть циклы. Это нетипично для таких задач.")
-        
     print("[*] Расчет влияния рычагов (побитовое распространение)...")
     state = {n: 0 for n in graph}
     for i, pos in enumerate(levers):
@@ -429,9 +428,9 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
         val = state[u]
         if val == 0: continue
         for v in graph[u]:
-            state[v] ^= val # XOR идеально работает для проверки четности
+            state[v] ^= val
 
-    print("[*] Формируем систему уравнений и решаем...")
+    print("[*] Формируем матрицу...")
     matrix_size = len(levers)
     M = Matrix(GF(2), matrix_size, matrix_size)
     
@@ -441,32 +440,11 @@ def solve_minecraft_lights_out(filename='graph_dump.txt'):
             if (lamp_val >> j) & 1:
                 M[i, j] = 1
                 
-    Y = vector(GF(2), [1] * matrix_size)
+    print(f"[*] Ранг матрицы M: {M.rank()}")
     
-    try:
-        X = M.solve_right(Y)
-        print("[+] Решение найдено!")
-        
-        flag_bits = list(X)
-        flag_chars = []
-        flag_chars_le = []
-        
-        for i in range(0, matrix_size, 8):
-            byte_bits = flag_bits[i:i+8]
-            
-            # Обычный порядок бит
-            byte_val = int("".join(str(b) for b in byte_bits), 2)
-            flag_chars.append(chr(byte_val))
-            
-            # Обратный порядок бит (часто бывает в CTF)
-            byte_val_le = int("".join(str(b) for b in byte_bits[::-1]), 2)
-            flag_chars_le.append(chr(byte_val_le))
-            
-        print(f"[+] Возможный флаг: {''.join(flag_chars)}")
-        print(f"[+] Альтернативный флаг (Reverse Bits): {''.join(flag_chars_le)}")
-        
-    except ValueError:
-        print("[-] Система не имеет решения.")
+    kernel = M.right_kernel()
+    print(f"[*] Размерность ядра (Null space): {kernel.dimension()}")
 
-if __name__ == '__main__':
-    solve_minecraft_lights_out('graph_dump.txt')
+    if kernel.dimension() > 0:
+        print("[+] Ищем флаг в базисных векторах ядра...")
+        for idx, basis_vec
