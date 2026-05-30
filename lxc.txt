@@ -322,79 +322,102 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-from z3 import *
+from sage.all import *
+import itertools
+import sys
 
-# Функция для перевода строки в огромное число по основанию 29
-def to_int(s):
-    val = 0
-    for c in s:
-        val = val * 29 + (ord(c) - ord('a'))
-    return val
+# Модуль системы (база 29, длина 16)
+M = 29**16
 
-# Константы в виде больших целых чисел
-MOD = 29**16
-H_START = to_int("greyctfisawesome")
-C_VAL = to_int("cryptoisverycool")
-F_VAL = to_int("{|}helloworld{|}")
-TARGET = to_int("gimmeflagthankuu")
+# Функция перевода строки в число base-29
+def s2int(s):
+    return sum((ord(c) - ord('a')) * (29**(15 - i)) for i, c in enumerate(s))
 
-solver = Solver()
+H0 = s2int("greyctfisawesome")
+C  = s2int("cryptoisverycool")
+F  = s2int("{|}helloworld{|}")
+TARGET = s2int("gimmeflagthankuu")
 
-# Состояния хеша на каждом шаге (тип Int для быстродействия)
-H = [Int(f'h_{i}') for i in range(13)]
+# F - 1 взаимно просто с M, поэтому инверсия существует
+invF_minus_1 = inverse_mod(F - 1, M)
 
-solver.add(H[0] == H_START)
-solver.add(H[12] == TARGET)
+# Длина пароля >= 24, проверяем варианты длины блоками по 2 символа
+for N in range(12, 16):
+    print(f"[*] Анализируем длину N = {N} (строка {N*2} символов)...")
+    
+    # Вычисляем константные части уравнения
+    C_term = (C * F * (pow(F, N, M) - 1) * invF_minus_1) % M
+    TARGET_ADJ = (TARGET - H0 * pow(F, N, M) - C_term) % M
 
-# Список для сбора переменных ввода, чтобы потом прочитать из них ответ
-M_vars = []
+    # Настройки решетки
+    dim = N + 2
+    W = 2**100
+    U = 100
 
-for i in range(12):
-    solver.add(H[i] >= 0, H[i] < MOD)
-    
-    # Полностью алгебраический шаг без логических вентилей
-    V_i = (H[i] + C_VAL) * F_VAL % MOD
-    
-    # Отщепляем два младших разряда (29^2 = 841)
-    d14_int = (V_i % 841) / 29
-    d15_int = V_i % 29
-    
-    # Переводим их в крошечные 5-битные векторы для XOR
-    d14_bv = Int2BV(d14_int, 5)
-    d15_bv = Int2BV(d15_int, 5)
-    
-    # Переменные для двух символов ввода на текущей итерации
-    m14_bv = BitVec(f'm14_{i}', 5)
-    m15_bv = BitVec(f'm15_{i}', 5)
-    
-    M_vars.append(m14_bv)
-    M_vars.append(m15_bv)
-    
-    # Ограничения алфавита: a-z (0-25)
-    solver.add(BV2Int(m14_bv) >= 0, BV2Int(m14_bv) <= 25)
-    solver.add(BV2Int(m15_bv) >= 0, BV2Int(m15_bv) <= 25)
-    
-    # Итоговая строка не должна начинаться с 'a' (0)
-    if i == 0:
-        solver.add(BV2Int(m14_bv) != 0)
+    # Строим матрицу
+    mat = matrix(ZZ, dim, dim)
+    for i in range(N):
+        mat[i, i] = 1
+        mat[i, dim-1] = pow(F, N-1-i, M) * W
         
-    # Применяем XOR и переводим обратно в Int
-    n14_int = BV2Int(d14_bv ^ m14_bv) % 29
-    n15_int = BV2Int(d15_bv ^ m15_bv) % 29
+    mat[N, N] = U
+    mat[N, dim-1] = -TARGET_ADJ * W
+    mat[N+1, dim-1] = M * W
+
+    # Магия LLL
+    red = mat.LLL()
+
+    target_vecs = []
+    kernel_vecs = []
     
-    # Собираем новое состояние: 
-    # (V_i / 841) * 841 оставляет верхние 14 разрядов нетронутыми
-    solver.add(H[i+1] == (V_i / 841) * 841 + n14_int * 29 + n15_int)
+    for row in red:
+        if row[N] == U:
+            target_vecs.append(row)
+        elif row[N] == -U:
+            target_vecs.append(-row)
+        elif row[N] == 0 and row[dim-1] == 0:
+            kernel_vecs.append(row)
 
-solver.add(H[12] >= 0, H[12] < MOD)
+    # Функция валидации дельт через машину состояний
+    def check_D(D_seq):
+        s_res = ""
+        H = H0
+        for i in range(N):
+            H_tmp2 = ((H + C) * F) % M
+            y1 = H_tmp2 % 29
+            y0 = (H_tmp2 // 29) % 29
+            D = D_seq[i]
+            
+            found = False
+            # Первый символ строки не может быть 'a' (0)
+            start_x0 = 1 if i == 0 else 0
+            
+            for x0 in range(start_x0, 26):
+                for x1 in range(0, 26):
+                    v0 = (y0 ^ x0) % 29
+                    v1 = (y1 ^ x1) % 29
+                    # Проверяем, дает ли этот XOR требуемую дельту
+                    if D == (v0 - y0) * 29 + (v1 - y1):
+                        s_res += chr(x0 + ord('a')) + chr(x1 + ord('a'))
+                        H = (H_tmp2 + D) % M
+                        found = True
+                        break
+                if found: break
+            if not found: return None
+        return s_res
 
-print("[*] Запуск алгебраической модели Z3...")
-if solver.check() == sat:
-    m = solver.model()
-    ans = ""
-    for bv in M_vars:
-        val = m.evaluate(BV2Int(bv)).as_long()
-        ans += chr(val + ord('a'))
-    print(f"[+] Прообраз успешно найден: {ans}")
-else:
-    print("[-] Математическое решение не найдено")
+    # Перебираем короткие векторы решетки вокруг таргета
+    for t_vec in target_vecs:
+        k_subset = kernel_vecs[:8] # Берем 8 кратчайших векторов ядра
+        for coeffs in itertools.product(range(-1, 2), repeat=len(k_subset)):
+            cand = t_vec
+            for c, k_vec in zip(coeffs, k_subset):
+                cand += c * k_vec
+                
+            D_seq = list(cand[:N])
+            # Если дельты в допустимых пределах, симулируем стейт-машину
+            if max(map(abs, D_seq)) <= 840:
+                ans = check_D(D_seq)
+                if ans:
+                    print(f"\n[+] УСПЕХ! Найден preimage: {ans}")
+                    sys.exit(0)
