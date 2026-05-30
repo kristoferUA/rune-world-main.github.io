@@ -324,6 +324,7 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 from sage.all import *
 from collections import deque
+import sys
 
 def solve():
     print("[*] Читаем дамп графа ...")
@@ -354,6 +355,7 @@ def solve():
     sorted_lamps = sorted(lamps.keys(), key=lambda c: (c[1], c[2], c[0]))
     lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
 
+    print("[*] Собираем механику наблюдателей...")
     vecs = {
         "north": (0, 0, -1), "south": (0, 0, 1),
         "west": (-1, 0, 0), "east": (1, 0, 0),
@@ -361,55 +363,87 @@ def solve():
     }
 
     obs_by_watched = {}
-    for obs_coord, facing in observers:
+    for o_c, facing in observers:
         dx, dy, dz = vecs.get(facing.lower(), (0,0,0))
-        watched = (obs_coord[0] + dx, obs_coord[1] + dy, obs_coord[2] + dz)
-        output = (obs_coord[0] - dx, obs_coord[1] - dy, obs_coord[2] - dz)
+        # watched - блок, за которым следим
+        watched = (o_c[0] + dx, o_c[1] + dy, o_c[2] + dz)
+        # out_c - блок, в который бьет импульс
+        out_c = (o_c[0] - dx, o_c[1] - dy, o_c[2] - dz)
 
         if watched not in obs_by_watched:
             obs_by_watched[watched] = []
-        obs_by_watched[watched].append(output)
+        obs_by_watched[watched].append({
+            "obs": o_c,
+            "out": out_c
+        })
 
-    print("[*] Вычисляем матрицу смежности (BFS)...")
+    print("[*] Трассируем сигналы (может занять до минуты)...")
     matrix_data = [[0]*256 for _ in range(256)]
 
     for j, start_lever in enumerate(sorted_levers):
+        # Простой прогресс-бар, чтобы не казалось, что всё зависло
+        if j % 16 == 0:
+            sys.stdout.write(f"\r[*] Обработано рычагов: {j}/256")
+            sys.stdout.flush()
+            
         queue = deque([start_lever])
-        visited = set()
+        visited_edges = set()
 
         while queue:
             curr = queue.popleft()
             if curr in obs_by_watched:
-                for out_c in obs_by_watched[curr]:
-                    if out_c not in visited:
-                        visited.add(out_c)
+                for obs_data in obs_by_watched[curr]:
+                    o_c = obs_data["obs"]
+                    out_c = obs_data["out"]
+                    
+                    # Уникальное ребро графа: "блок curr триггерит наблюдатель o_c"
+                    edge = (curr, o_c)
+                    if edge not in visited_edges:
+                        visited_edges.add(edge)
+                        
+                        # Наблюдатель обновляет сам себя (его текстура меняется)
+                        queue.append(o_c)
+                        # Наблюдатель дает импульс в блок позади себя
                         queue.append(out_c)
+
+                        # Если импульс ударил прямо в лампу, переключаем её
                         if out_c in lamp_to_idx:
                             i = lamp_to_idx[out_c]
-                            matrix_data[i][j] ^= 1 
-
-    print("[*] Ищем слепое пятно схемы (Null Space)...")
+                            matrix_data[i][j] ^= 1
+                            
+    print("\n[*] Матрица готова! Решаем M * X = 1 ...")
     M = Matrix(GF(2), matrix_data)
     
-    # Вычисляем ядро матрицы
-    K = M.right_kernel()
-    dim = K.dimension()
-    print(f"[*] Размерность ядра: {dim}")
+    # Целевой вектор - все лампы включены
+    S = vector(GF(2), [1] * 256)
 
-    if dim == 0:
-        print("[!] Ядро пустое. Матрица идеальна, гипотеза неверна.")
-        return
-
-    # Выводим все базисные векторы ядра
-    for idx, basis_vec in enumerate(K.basis()):
-        print(f"\n[+] Базисный вектор #{idx + 1} (Возможный флаг):")
+    try:
+        X = M.solve_right(S)
+        print("\n[+] УСПЕХ! Штрихкод (DataMatrix) для включения ВСЕХ ламп:")
         print("+" + "-"*32 + "+")
         for i in range(16):
             row_str = "|"
             for j in range(16):
-                row_str += "██" if basis_vec[i*16 + j] == 1 else "  "
+                row_str += "██" if X[i*16 + j] == 1 else "  "
             print(row_str + "|")
         print("+" + "-"*32 + "+")
+    except ValueError:
+        print("[!] ОШИБКА: Матрица сингулярна. Решения для S=1 не существует.")
+        
+        # На всякий случай проверяем ядро, если всё-таки это был трюк
+        K = M.right_kernel()
+        dim = K.dimension()
+        if dim > 0 and dim < 10:
+            print(f"[*] Найдено малое ядро (размерность {dim}). Возможный флаг:")
+            for idx, basis_vec in enumerate(K.basis()):
+                print(f"\n[+] Базисный вектор #{idx + 1}:")
+                print("+" + "-"*32 + "+")
+                for i in range(16):
+                    row_str = "|"
+                    for j in range(16):
+                        row_str += "██" if basis_vec[i*16 + j] == 1 else "  "
+                    print(row_str + "|")
+                print("+" + "-"*32 + "+")
 
 if __name__ == '__main__':
     solve()
