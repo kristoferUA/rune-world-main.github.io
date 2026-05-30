@@ -358,7 +358,8 @@ def extract_commands(region_path):
 
 def main():
     print("[*] Поиск командных блоков в файлах региона...")
-    mca_files = glob.glob("lights_out_map/region/*.mca")
+    # Обновленный путь к твоему файлу
+    mca_files = glob.glob("dist-lights-out/region/*.mca")
     
     if not mca_files:
         print("[!] Файлы .mca не найдены! Проверь пути.")
