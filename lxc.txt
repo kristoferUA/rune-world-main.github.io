@@ -322,152 +322,202 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
+python
 from sage.all import *
 from collections import deque
 
-def solve_lights_out_final():
-    levers = []
-    lamps = []
-    copper_bulbs = []
-    observers = {}
-    
-    DIR_MAP = {
-        'up': (0, 1, 0), 'down': (0, -1, 0),
-        'north': (0, 0, -1), 'south': (0, 0, 1),
-        'west': (-1, 0, 0), 'east': (1, 0, 0)
-    }
+def solve_lights_out_v3():
+levers = []
+lamps = []
+copper_bulbs = []
+observers = {}
 
-    print("[*] Читаем graph_dump.txt...")
-    current_section = None
-    
-    with open('graph_dump.txt', 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line: continue
-            
-            if '--- LEVERS ---' in line: current_section = 'levers'; continue
-            if '--- LAMPS ---' in line: current_section = 'lamps'; continue
-            if '--- COPPER_BULBS ---' in line: current_section = 'copper_bulbs'; continue
-            if '--- OBSERVERS ---' in line: current_section = 'observers'; continue
-            
-            if ':' not in line: continue
-            
-            pos_str, val = line.split(':')
-            x, y, z = map(int, pos_str.split(','))
-            pos = (x, y, z)
-            
-            if current_section == 'levers':
-                levers.append((pos, val == 'true'))
-            elif current_section == 'lamps':
-                lamps.append((pos, val == 'true'))
-            elif current_section == 'copper_bulbs':
-                copper_bulbs.append((pos, val == 'true'))
-            elif current_section == 'observers':
-                observers[pos] = val.lower()
+DIR_MAP = {
+    'up': (0, 1, 0), 'down': (0, -1, 0),
+    'north': (0, 0, -1), 'south': (0, 0, 1),
+    'west': (-1, 0, 0), 'east': (1, 0, 0)
+}
 
-    print("[*] Сортируем координаты...")
-    # Сортировка по убыванию Y, затем возрастанию X и Z
-    levers.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
-    lamps.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
-    copper_bulbs.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
-    
-    lever_positions = [item[0] for item in levers]
-    lamp_positions = [item[0] for item in lamps]
-    copper_positions = [item[0] for item in copper_bulbs]
+print("[*] Читаем graph_dump.txt...")
+current_section = None
 
-    print("[*] Строим граф передачи сигналов...")
-    graph = {p: [] for p in lever_positions + lamp_positions + copper_positions + list(observers.keys())}
-    target_set = set(lamp_positions + copper_positions)
-    
-    for pos, dir_str in observers.items():
-        if dir_str not in DIR_MAP: continue
-        vec = DIR_MAP[dir_str]
-        front = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
-        back = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
+with open('graph_dump.txt', 'r') as f:
+    for line in f:
+        line = line.strip()
+        if not line: continue
         
-        if front in graph:
-            graph[front].append(pos)
-        if back in target_set:
-            graph[pos].append(back)
+        if '--- LEVERS ---' in line: current_section = 'levers'; continue
+        if '--- LAMPS ---' in line: current_section = 'lamps'; continue
+        if '--- COPPER_BULBS ---' in line: current_section = 'copper_bulbs'; continue
+        if '--- OBSERVERS ---' in line: current_section = 'observers'; continue
+        
+        if ':' not in line: continue
+        
+        pos_str, val = line.split(':')
+        x, y, z = map(int, pos_str.split(','))
+        pos = (x, y, z)
+        
+        if current_section == 'levers':
+            levers.append((pos, val == 'true'))
+        elif current_section == 'lamps':
+            lamps.append((pos, val == 'true'))
+        elif current_section == 'copper_bulbs':
+            copper_bulbs.append((pos, val == 'true'))
+        elif current_section == 'observers':
+            observers[pos] = val.lower()
 
-    print("[*] Топологическая сортировка...")
-    in_degree = {n: 0 for n in graph}
-    for u in graph:
-        for v in graph[u]:
+print("[*] Сортируем координаты...")
+levers.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
+lamps.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
+copper_bulbs.sort(key=lambda item: (-item[0][1], item[0][0], item[0][2]))
+
+lever_positions = [item[0] for item in levers]
+lamp_positions = [item[0] for item in lamps]
+copper_positions = [item[0] for item in copper_bulbs]
+
+print("[*] Строим граф передачи сигналов...")
+graph = {p: [] for p in lever_positions + lamp_positions + copper_positions + list(observers.keys())}
+target_set = set(lamp_positions + copper_positions)
+
+observer_inputs = {}
+
+for pos, dir_str in observers.items():
+    if dir_str not in DIR_MAP: continue
+    vec = DIR_MAP[dir_str]
+    
+    # Исправление 1: Строгая физика Minecraft (лицо сзади вектора facing)
+    front = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
+    back = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
+    
+    if front in observers:
+        graph[front].append(pos)
+    else:
+        observer_inputs[pos] = front
+        
+    if back in target_set:
+        graph[pos].append(back)
+
+print("[*] Подключаем рычаги к кубу...")
+connected_levers = 0
+for lever in lever_positions:
+    connected = False
+    # Прямое подключение
+    for obs_pos, obs_front in observer_inputs.items():
+        if obs_front == lever:
+            graph[lever].append(obs_pos)
+            connected = True
+    
+    # Исправление 2: Подключение через 1 блок (дистанция Манхэттена = 1)
+    if not connected:
+        for obs_pos, obs_front in observer_inputs.items():
+            dist = abs(obs_front[0] - lever[0]) + abs(obs_front[1] - lever[1]) + abs(obs_front[2] - lever[2])
+            if dist == 1:
+                graph[lever].append(obs_pos)
+                connected = True
+    if connected:
+        connected_levers += 1
+        
+print(f"[+] Успешно подключено рычагов: {connected_levers} из {len(lever_positions)}")
+
+# Исправление 3: Изоляция активной цепи от мусорных циклов
+print("[*] Поиск активных путей (BFS)...")
+reachable = set(lever_positions)
+queue = deque(lever_positions)
+
+while queue:
+    curr = queue.popleft()
+    for neighbor in graph.get(curr, []):
+        if neighbor not in reachable:
+            reachable.add(neighbor)
+            queue.append(neighbor)
+            
+print(f"[+] Найдено блоков в активной цепи: {len(reachable)}")
+
+print("[*] Топологическая сортировка активной цепи...")
+in_degree = {n: 0 for n in reachable}
+for u in reachable:
+    for v in graph.get(u, []):
+        if v in reachable:
             in_degree[v] += 1
             
-    queue = deque([n for n in in_degree if in_degree[n] == 0])
-    topo_order = []
-    while queue:
-        u = queue.popleft()
-        topo_order.append(u)
-        for v in graph[u]:
+queue = deque([n for n in reachable if in_degree[n] == 0])
+topo_order = []
+while queue:
+    u = queue.popleft()
+    topo_order.append(u)
+    for v in graph.get(u, []):
+        if v in reachable:
             in_degree[v] -= 1
             if in_degree[v] == 0:
                 queue.append(v)
                 
-    print("[*] Расчет влияния рычагов...")
-    state = {n: 0 for n in graph}
-    for i, pos in enumerate(lever_positions):
-        state[pos] = 1 << i
-        
-    for u in topo_order:
-        val = state[u]
-        if val == 0: continue
-        for v in graph[u]:
-            state[v] ^= val
-            
-    matrix_size = len(lever_positions)
-    M_copper = Matrix(GF(2), matrix_size, matrix_size)
+if len(topo_order) != len(reachable):
+    print("[-] ВНИМАНИЕ: В активной цепи есть петли. Вычисления могут быть неполными.")
+
+print("[*] Расчет влияния рычагов...")
+state = {n: 0 for n in reachable}
+for i, pos in enumerate(lever_positions):
+    state[pos] = 1 << i
     
-    for i, pos in enumerate(copper_positions):
+for u in topo_order:
+    val = state[u]
+    if val == 0: continue
+    for v in graph.get(u, []):
+        if v in reachable:
+            state[v] ^= val
+        
+matrix_size = len(lever_positions)
+M_copper = Matrix(GF(2), matrix_size, matrix_size)
+
+for i, pos in enumerate(copper_positions):
+    if pos in state:
         val = state[pos]
         for j in range(matrix_size):
             if (val >> j) & 1:
                 M_copper[i, j] = 1
 
-    print(f"[*] Ранг матрицы медных ламп: {M_copper.rank()}")
+print(f"[*] Ранг матрицы медных ламп: {M_copper.rank()}")
+
+if M_copper.rank() == 0:
+    print("[-] Матрица все еще нулевая. Сигнал обрывается.")
+    return
     
-    # Целевой вектор - начальное состояние медных ламп
-    Y_copper = vector(GF(2), [1 if item[1] else 0 for item in copper_bulbs])
+Y_copper = vector(GF(2), [1 if item[1] else 0 for item in copper_bulbs])
+
+try:
+    X = M_copper.solve_right(Y_copper)
+    print("[+] Решение найдено! Комбинация вычислена.")
     
-    try:
-        X = M_copper.solve_right(Y_copper)
-        print("[+] Решение найдено! Комбинация рычагов вычислена.")
-        
-        # Расчет влияния на обычные лампы
-        M_lamps = Matrix(GF(2), matrix_size, matrix_size)
-        for i, pos in enumerate(lamp_positions):
+    M_lamps = Matrix(GF(2), matrix_size, matrix_size)
+    for i, pos in enumerate(lamp_positions):
+        if pos in state:
             val = state[pos]
             for j in range(matrix_size):
                 if (val >> j) & 1:
                     M_lamps[i, j] = 1
+    
+    Y_lamps_initial = vector(GF(2), [1 if item[1] else 0 for item in lamps])
+    Y_lamps_final = M_lamps * X + Y_lamps_initial
+    
+    def bits_to_ascii(bit_vector):
+        chars = []
+        for i in range(0, len(bit_vector), 8):
+            byte_bits = list(bit_vector[i:i+8])
+            byte_val = int("".join(str(b) for b in byte_bits), 2)
+            chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
+        return "".join(chars)
         
-        Y_lamps_initial = vector(GF(2), [1 if item[1] else 0 for item in lamps])
-        Y_lamps_final = M_lamps * X + Y_lamps_initial
-        
-        def bits_to_ascii(bit_vector):
-            chars = []
-            for i in range(0, len(bit_vector), 8):
-                byte_bits = list(bit_vector[i:i+8])
-                byte_val = int("".join(str(b) for b in byte_bits), 2)
-                chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
-            return "".join(chars)
-            
-        def bits_to_ascii_le(bit_vector):
-            chars = []
-            for i in range(0, len(bit_vector), 8):
-                byte_bits = list(bit_vector[i:i+8])
-                byte_val = int("".join(str(b) for b in byte_bits[::-1]), 2)
-                chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
-            return "".join(chars)
+    def bits_to_ascii_le(bit_vector):
+        chars = []
+        for i in range(0, len(bit_vector), 8):
+            byte_bits = list(bit_vector[i:i+8])
+            byte_val = int("".join(str(b) for b in byte_bits[::-1]), 2)
+            chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
+        return "".join(chars)
 
-        print("\n--- РЕЗУЛЬТАТЫ ---")
-        print(f"[Флаг из состояний рычагов (Вектор X)]\nПрямой: {bits_to_ascii(list(X))}\nРеверс: {bits_to_ascii_le(list(X))}\n")
-        print(f"[Флаг из состояний обычных ламп]\nПрямой: {bits_to_ascii(list(Y_lamps_final))}\nРеверс: {bits_to_ascii_le(list(Y_lamps_final))}")
+    print("\n--- РЕЗУЛЬТАТЫ ---")
+    print(f"[Флаг из состояний рычагов (Вектор X)]\nПрямой: {bits_to_ascii(list(X))}\nРеверс: {bits_to_ascii_le(list(X))}\n")
+    print(f"[Флаг из состояний обычных ламп]\nПрямой: {bits_to_ascii(list(Y_lamps_final))}\nРеверс: {bits_to_ascii_le(list(Y_lamps_final))}")
 
-    except ValueError:
-        print("[-] Решение не найдено. Уравнение не имеет смысла при текущей сортировке.")
-
-if __name__ == '__main__':
-    solve_lights_out_final()
+except ValueError:
+    print("[-] Решение не найдено. Проверьте вектор состояний или ядро.")
