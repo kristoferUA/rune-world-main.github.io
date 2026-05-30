@@ -325,11 +325,11 @@ http://154.57.164.64:31484/esp-analytics/webhook
 from sage.all import *
 from collections import deque
 
-def solve_lights_out_v5():
+def solve_lights_out_v6():
     levers = []
     copper_bulbs = []
     observers = {}
-    
+
     DIR_MAP = {
         'up': (0, 1, 0), 'down': (0, -1, 0),
         'north': (0, 0, -1), 'south': (0, 0, 1),
@@ -338,23 +338,23 @@ def solve_lights_out_v5():
 
     print("[*] Читаем graph_dump.txt...")
     current_section = None
-    
+
     with open('graph_dump.txt', 'r') as f:
         for line in f:
             line = line.strip()
             if not line: continue
-            
+
             if '--- LEVERS ---' in line: current_section = 'levers'; continue
             if '--- COPPER_BULBS ---' in line: current_section = 'copper_bulbs'; continue
             if '--- OBSERVERS ---' in line: current_section = 'observers'; continue
-            if '--- LAMPS ---' in line: current_section = None; continue # Игнорируем обычные лампы
-            
+            if '--- LAMPS ---' in line: current_section = None; continue
+
             if ':' not in line: continue
-            
+
             pos_str, val = line.split(':')
             x, y, z = map(int, pos_str.split(','))
             pos = (x, y, z)
-            
+
             if current_section == 'levers':
                 levers.append((pos, val == 'true'))
             elif current_section == 'copper_bulbs':
@@ -362,108 +362,117 @@ def solve_lights_out_v5():
             elif current_section == 'observers':
                 observers[pos] = val.lower()
 
-    print("[*] Линейная сортировка координат...")
-    # Сортируем прямо по осям X и Z. 
-    # Для линии это даст идеальный порядок от начала до конца.
-    sort_key = lambda item: (item[0], item[2], item[1])
-    
-    levers.sort(key=lambda item: sort_key(item[0]))
-    copper_bulbs.sort(key=lambda item: sort_key(item[0]))
-    
     lever_positions = [item[0] for item in levers]
     copper_positions = [item[0] for item in copper_bulbs]
 
-    print("[*] Ищем входы и выходы куба...")
+    print("[*] Строим граф наблюдателей...")
     graph = {p: [] for p in lever_positions + copper_positions + list(observers.keys())}
-    
-    observer_inputs = []
-    observer_outputs = []
-    
+    in_degree = {p: 0 for p in graph}
+
+    # Исправленная физика: Observer смотрит на front, выдает сигнал в back.
     for pos, dir_str in observers.items():
         vec = DIR_MAP[dir_str]
-        front = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
-        back = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
-        
-        if front in observers:
-            graph[front].append(pos)
-        else:
-            observer_inputs.append(pos)
-            
-        if back not in observers:
-            observer_outputs.append(pos)
+        front = (pos[0] + vec[0], pos[1] + vec[1], pos[2] + vec[2])
+        back = (pos[0] - vec[0], pos[1] - vec[1], pos[2] - vec[2])
 
-    print("[*] Сортируем контакты куба и спаиваем 1-к-1...")
-    observer_inputs.sort(key=sort_key)
-    observer_outputs.sort(key=sort_key)
+        # Сигнал передается в блок позади наблюдателя
+        if back in observers:
+            graph[pos].append(back)
+            in_degree[back] += 1
 
-    # Идеальное прямое подключение без пересечений
-    for lever, obs_in in zip(lever_positions, observer_inputs):
-        graph[lever].append(obs_in)
-        
-    for obs_out, bulb in zip(observer_outputs, copper_positions):
-        graph[obs_out].append(bulb)
+    print("[*] Подключаем периферию (геометрический поиск)...")
+    roots = [pos for pos in observers if in_degree[pos] == 0]
+    leaves = [pos for pos in observers if len(graph[pos]) == 0]
+
+    used_roots = set()
+    for lever in lever_positions:
+        avail = [r for r in roots if r not in used_roots]
+        if not avail: break
+        closest = min(avail, key=lambda r: abs(r[0]-lever[0]) + abs(r[1]-lever[1]) + abs(r[2]-lever[2]))
+        graph[lever].append(closest)
+        in_degree[closest] += 1
+        used_roots.add(closest)
+
+    used_leaves = set()
+    for bulb in copper_positions:
+        avail = [l for l in leaves if l not in used_leaves]
+        if not avail: break
+        closest = min(avail, key=lambda l: abs(l[0]-bulb[0]) + abs(l[1]-bulb[1]) + abs(l[2]-bulb[2]))
+        graph[closest].append(bulb)
+        in_degree[bulb] += 1
+        used_leaves.add(closest)
 
     print("[*] Поиск активных путей (BFS)...")
     reachable = set(lever_positions)
     queue = deque(lever_positions)
-    
+
     while queue:
         curr = queue.popleft()
-        for neighbor in graph.get(curr, []):
+        for neighbor in graph[curr]:
             if neighbor not in reachable:
                 reachable.add(neighbor)
                 queue.append(neighbor)
-                
-    print(f"[+] Найдено блоков в активной цепи: {len(reachable)}")
 
-    print("[*] Топологическая сортировка активной цепи...")
-    in_degree = {n: 0 for n in reachable}
-    for u in reachable:
-        for v in graph.get(u, []):
-            if v in reachable:
-                in_degree[v] += 1
-                
-    queue = deque([n for n in reachable if in_degree[n] == 0])
+    print(f"[+] Блоков в активной цепи: {len(reachable)}")
+
+    print("[*] Топологическая сортировка...")
     topo_order = []
+    queue = deque(lever_positions)
+
+    local_in = {n: 0 for n in reachable}
+    for u in reachable:
+        for v in graph[u]:
+            if v in reachable:
+                local_in[v] += 1
+
+    queue = deque([n for n in reachable if local_in[n] == 0])
+
     while queue:
         u = queue.popleft()
         topo_order.append(u)
-        for v in graph.get(u, []):
+        for v in graph[u]:
             if v in reachable:
-                in_degree[v] -= 1
-                if in_degree[v] == 0:
+                local_in[v] -= 1
+                if local_in[v] == 0:
                     queue.append(v)
 
-    print("[*] Расчет влияния рычагов...")
+    if len(topo_order) != len(reachable):
+        print(f"[-] ВНИМАНИЕ: Обнаружен цикл! Отсортировано {len(topo_order)} из {len(reachable)}.")
+
+    print("[*] Расчет матрицы состояний (XOR)...")
     state = {n: 0 for n in reachable}
     for i, pos in enumerate(lever_positions):
         state[pos] = 1 << i
-        
+
     for u in topo_order:
         val = state[u]
         if val == 0: continue
-        for v in graph.get(u, []):
+        for v in graph[u]:
             if v in reachable:
                 state[v] ^= val
-            
+
     matrix_size = len(lever_positions)
-    M_copper = Matrix(GF(2), matrix_size, matrix_size)
-    
+    M = Matrix(GF(2), matrix_size, matrix_size)
+
     for i, pos in enumerate(copper_positions):
         if pos in state:
             val = state[pos]
             for j in range(matrix_size):
                 if (val >> j) & 1:
-                    M_copper[i, j] = 1
+                    M[i, j] = 1
 
-    print(f"[*] Ранг матрицы: {M_copper.rank()}")
-    
-    Y_copper = vector(GF(2), [1 if item[1] else 0 for item in copper_bulbs])
-    
+    print(f"[*] Ранг матрицы: {M.rank()}")
+
+    if M.rank() == 0:
+        print("[-] Матрица пустая. Физического соединения нет.")
+        return
+
+    Y = vector(GF(2), [1 if item[1] else 0 for item in copper_bulbs])
+
     try:
-        X = M_copper.solve_right(Y_copper)
-        print("[+] Решение найдено! Комбинация вычислена.")
-        
+        X = M.solve_right(Y)
+        print("[+] Решение найдено!")
+
         def bits_to_ascii(bit_vector):
             chars = []
             for i in range(0, len(bit_vector), 8):
@@ -471,7 +480,7 @@ def solve_lights_out_v5():
                 byte_val = int("".join(str(b) for b in byte_bits), 2)
                 chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
             return "".join(chars)
-            
+
         def bits_to_ascii_le(bit_vector):
             chars = []
             for i in range(0, len(bit_vector), 8):
@@ -480,12 +489,12 @@ def solve_lights_out_v5():
                 chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
             return "".join(chars)
 
-        print("\n--- ФЛАГ (Положения рычагов) ---")
+        print("\n--- ФЛАГ ---")
         print(f"Прямой порядок: {bits_to_ascii(list(X))}")
-        print(f"Обратный порядок (LE): {bits_to_ascii_le(list(X))}")
+        print(f"Обратный (LE):  {bits_to_ascii_le(list(X))}")
 
     except ValueError:
-        print("[-] Уравнение не сходится. Проверьте направления сортировки осей X и Z.")
+        print("[-] Уравнение не сходится.")
 
 if __name__ == '__main__':
-    solve_lights_out_v5()
+    solve_lights_out_v6()
