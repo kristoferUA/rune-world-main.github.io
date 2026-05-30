@@ -323,153 +323,83 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-from sage.all import *
-from collections import deque
+import anvil
+import sys
 
-def solve_dropped_cube(filename='graph_dump.txt'):
-    observers = {}
-    DIR_MAP = {
-        'up': (0, 1, 0), 'down': (0, -1, 0),
-        'north': (0, 0, -1), 'south': (0, 0, 1),
-        'west': (-1, 0, 0), 'east': (1, 0, 0)
-    }
-
-    print("[*] Читаем дамп (ищем только упавший куб наблюдателей)...")
-    with open(filename, 'r') as f:
-        for line in f:
-            line = line.strip()
-            if not line or ':' not in line: continue
-            
-            parts = line.split()
-            data = parts[-1]
-            try:
-                pos_str, val = data.split(':')
-                dir_str = val.lower()
-                # Берем только наблюдателей (у них есть направление)
-                if dir_str in DIR_MAP:
-                    x, y, z = map(int, pos_str.split(','))
-                    observers[(x, y, z)] = dir_str
-            except Exception:
-                continue
-
-    print(f"[+] Найдено наблюдателей: {len(observers)}")
-    
-    graph = {p: [] for p in observers}
-    observers_set = set(observers.keys())
-    
-    inputs = []
-    outputs = []
-
-    print("[*] Ищем оторванные входы и выходы куба...")
-    for pos, dir_str in observers.items():
-        vec = DIR_MAP[dir_str]
-        front = (pos[0]+vec[0], pos[1]+vec[1], pos[2]+vec[2])
-        back = (pos[0]-vec[0], pos[1]-vec[1], pos[2]-vec[2])
-        
-        # Если перед наблюдателем пустота — это входной пин
-        if front not in observers_set:
-            inputs.append(pos)
-        else:
-            graph[front].append(pos)
-            
-        # Если за наблюдателем пустота — это выходной пин
-        if back not in observers_set:
-            outputs.append(pos)
-
-    print(f"[+] Найдено потенциальных входов: {len(inputs)}")
-    print(f"[+] Найдено потенциальных выходов: {len(outputs)}")
-
-    print("[*] Сортируем контакты (Y-убывание, X-возрастание, Z-возрастание)...")
-    inputs.sort(key=lambda p: (-p[1], p[0], p[2]))
-    outputs.sort(key=lambda p: (-p[1], p[0], p[2]))
-    
-    # Берем ровно 256 контактов, на случай если есть лишний мусор
-    inputs = inputs[:256]
-    outputs = outputs[:256]
-
-    print("[*] Выполняем топологическую сортировку графа...")
-    in_degree = {n: 0 for n in observers}
-    for u in graph:
-        for v in graph[u]:
-            in_degree[v] += 1
-            
-    queue = deque([n for n in in_degree if in_degree[n] == 0])
-    topo_order = []
-    
-    while queue:
-        u = queue.popleft()
-        topo_order.append(u)
-        for v in graph[u]:
-            in_degree[v] -= 1
-            if in_degree[v] == 0:
-                queue.append(v)
-                
-    print("[*] Расчет влияния (побитовое распространение XOR)...")
-    state = {n: 0 for n in observers}
-    for i, pos in enumerate(inputs):
-        state[pos] = 1 << i
-        
-    for u in topo_order:
-        val = state[u]
-        if val == 0: continue
-        for v in graph[u]:
-            state[v] ^= val
-
-    print("[*] Формируем матрицу...")
-    matrix_size = len(inputs)
-    M = Matrix(GF(2), matrix_size, matrix_size)
-    
-    for i, out_pos in enumerate(outputs):
-        out_val = state[out_pos]
-        for j in range(matrix_size):
-            if (out_val >> j) & 1:
-                M[i, j] = 1
-                
-    print(f"[*] Ранг матрицы M: {M.rank()}")
-    
-    if M.rank() == 0:
-        print("[-] Матрица все еще нулевая. Логика направлений не совпала с игрой.")
-        return
-
-    # Целевой вектор - все включено (единицы)
-    Y = vector(GF(2), [1] * matrix_size)
-    
-    print("[*] Ищем решение...")
+def dump_region(filepath, output_txt):
+    print(f"[*] Читаем файл региона: {filepath}")
     try:
-        X = M.solve_right(Y)
-        print("[+] Решение M * X = Y найдено! Конвертируем флаг...")
+        region = anvil.Region.from_file(filepath)
+    except Exception as e:
+        print(f"[-] Ошибка чтения файла: {e}")
+        sys.exit(1)
         
-        flag_bits = list(X)
-        flag_chars = []
-        flag_chars_le = []
+    levers = []
+    lamps = []
+    copper_bulbs = []
+    observers = []
+    
+    print("[*] Начинаем сканирование блоков... Это может занять 2-3 минуты.")
+    
+    # В регионе 32x32 чанка
+    for chunk_x in range(32):
+        for chunk_z in range(32):
+            try:
+                chunk = anvil.Chunk.from_region(region, chunk_x, chunk_z)
+            except Exception:
+                continue # Чанк не сгенерирован
+                
+            if not chunk: continue
+            
+            # Сканируем координаты внутри чанка
+            # Высота мира в новых версиях от -64 до 319
+            for block_x in range(16):
+                for block_z in range(16):
+                    for block_y in range(-64, 320):
+                        try:
+                            block = chunk.get_block(block_x, block_y, block_z)
+                            if not block or block.id == 'air': continue
+                            
+                            # Вычисляем глобальные координаты
+                            gx = chunk_x * 16 + block_x
+                            gy = block_y
+                            gz = chunk_z * 16 + block_z
+                            
+                            b_id = block.id
+                            
+                            if b_id == 'lever':
+                                powered = str(block.properties.get('powered', 'false')).lower()
+                                levers.append(f"{gx},{gy},{gz}:{powered}")
+                            elif b_id == 'redstone_lamp':
+                                lit = str(block.properties.get('lit', 'false')).lower()
+                                lamps.append(f"{gx},{gy},{gz}:{lit}")
+                            elif 'copper_bulb' in b_id:
+                                lit = str(block.properties.get('lit', 'false')).lower()
+                                copper_bulbs.append(f"{gx},{gy},{gz}:{lit}")
+                            elif b_id == 'observer':
+                                facing = str(block.properties.get('facing', 'none')).lower()
+                                observers.append(f"{gx},{gy},{gz}:{facing}")
+                        except Exception:
+                            pass
+
+    print(f"[+] Извлечено:")
+    print(f"    - Рычагов: {len(levers)}")
+    print(f"    - Редстоун ламп: {len(lamps)}")
+    print(f"    - Медных ламп: {len(copper_bulbs)}")
+    print(f"    - Наблюдателей: {len(observers)}")
+    
+    with open(output_txt, 'w') as f:
+        f.write("--- LEVERS ---\n")
+        f.write("\n".join(levers) + "\n\n")
+        f.write("--- LAMPS ---\n")
+        f.write("\n".join(lamps) + "\n\n")
+        f.write("--- COPPER_BULBS ---\n")
+        f.write("\n".join(copper_bulbs) + "\n\n")
+        f.write("--- OBSERVERS ---\n")
+        f.write("\n".join(observers) + "\n")
         
-        for i in range(0, matrix_size, 8):
-            byte_bits = flag_bits[i:i+8]
-            
-            # Прямой порядок бит
-            byte_val = int("".join(str(b) for b in byte_bits), 2)
-            flag_chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
-            
-            # Обратный порядок бит
-            byte_val_le = int("".join(str(b) for b in byte_bits[::-1]), 2)
-            flag_chars_le.append(chr(byte_val_le) if 32 <= byte_val_le <= 126 else '.')
-            
-        print(f"\n[+] Возможный флаг: {''.join(flag_chars)}")
-        print(f"[+] Альтернативный флаг (Rev Bits): {''.join(flag_chars_le)}")
-        
-    except ValueError:
-        print("[-] Прямого решения нет. Проверяем ядро (Null space)...")
-        kernel = M.right_kernel()
-        print(f"[*] Размерность ядра: {kernel.dimension()}")
-        if kernel.dimension() > 0:
-            for idx, basis_vec in enumerate(kernel.basis()[:5]):
-                flag_bits = list(basis_vec)
-                flag_chars = []
-                for i in range(0, matrix_size, 8):
-                    byte_bits = flag_bits[i:i+8]
-                    byte_val = int("".join(str(b) for b in byte_bits), 2)
-                    flag_chars.append(chr(byte_val) if 32 <= byte_val <= 126 else '.')
-                print(f"[+] Базис {idx}: {''.join(flag_chars)}")
+    print(f"[+] Дамп успешно сохранен в {output_txt}")
 
 if __name__ == '__main__':
-    solve_dropped_cube('graph_dump.txt')
+    # Путь к файлу с учетом твоей структуры папок
+    dump_region('region/r.0.0.mca', 'graph_dump.txt')
