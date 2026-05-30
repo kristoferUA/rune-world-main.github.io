@@ -325,57 +325,56 @@ http://154.57.164.64:31484/esp-analytics/webhook
 import glob
 from nbt.region import RegionFile
 
-def extract_commands(region_path):
+def scan_palettes(region_path):
     region = RegionFile(region_path)
-    commands = []
+    blocks = set()
     
-    # В одном регионе 32x32 чанка
     for z in range(32):
         for x in range(32):
             try:
                 # Пытаемся прочитать чанк
                 chunk = region.get_chunk(x, z)
             except Exception:
-                continue # Чанк пустой или не сгенерирован
+                continue
                 
-            entities = []
-            
-            # Поддержка разных версий Minecraft (старый формат Level/TileEntities и новый block_entities)
-            if "Level" in chunk and "TileEntities" in chunk["Level"]:
-                entities = chunk["Level"]["TileEntities"]
-            elif "block_entities" in chunk:
-                entities = chunk["block_entities"]
+            # Minecraft 1.18+ формат
+            if "sections" in chunk:
+                sections = chunk["sections"]
+            # Старый формат
+            elif "Level" in chunk and "Sections" in chunk["Level"]:
+                sections = chunk["Level"]["Sections"]
+            else:
+                continue
                 
-            for entity in entities:
-                # Ищем ID командных блоков
-                ent_id = entity["id"].value.replace("minecraft:", "")
-                if ent_id in ["command_block", "chain_command_block", "repeating_command_block"]:
-                    cmd = entity["Command"].value
-                    coords = (entity["x"].value, entity["y"].value, entity["z"].value)
-                    commands.append((coords, cmd))
+            for section in sections:
+                palette = None
+                # Ищем палитру блоков в секции
+                if "block_states" in section and "palette" in section["block_states"]:
+                    palette = section["block_states"]["palette"]
+                elif "Palette" in section:
+                    palette = section["Palette"]
                     
-    return commands
+                if palette:
+                    for item in palette:
+                        # Извлекаем строковый ID блока
+                        name = item["Name"].value if "Name" in item else item["name"].value
+                        blocks.add(name)
+    return blocks
 
 def main():
-    print("[*] Поиск командных блоков в файлах региона...")
-    # Обновленный путь к твоему файлу
+    print("[*] Анализируем чанки на наличие редстоун-компонентов...")
     mca_files = glob.glob("dist-lights-out/region/*.mca")
     
-    if not mca_files:
-        print("[!] Файлы .mca не найдены! Проверь пути.")
-        return
+    all_blocks = set()
+    for f in mca_files:
+        all_blocks.update(scan_palettes(f))
         
-    for mca_file in mca_files:
-        print(f"\n[*] Анализируем: {mca_file}")
-        cmds = extract_commands(mca_file)
-        
-        if not cmds:
-            print("  -> Командных блоков нет. Похоже, это чистый редстоун.")
-            continue
+    print("\n[+] Найдены следующие интересные блоки:")
+    for b in sorted(all_blocks):
+        # Фильтруем только то, что относится к логике
+        keywords = ["redstone", "lamp", "button", "repeater", "comparator", "observer", "lever", "piston", "target"]
+        if any(kw in b for kw in keywords):
+            print(f" ---> {b}")
             
-        for coords, cmd in cmds:
-            # Выводим координаты и саму команду
-            print(f"[{coords[0]}, {coords[1]}, {coords[2]}] -> {cmd}")
-
 if __name__ == '__main__':
     main()
