@@ -322,33 +322,62 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-from collections import Counter
+from z3 import *
 
-lines = []
+# Инициализация солвера
+solver = Solver()
+N = 24
+s = [BitVec(f"s_{i}", 256) for i in range(N)]
 
-with open("out.txt", "r", encoding="utf-8", errors="ignore") as f:
-    data = f.readlines()
+# Ограничения на алфавит (только 'a'-'z', что соответствует 0-25)
+for i in range(N):
+    solver.add(s[i] >= 0, s[i] <= 25)
 
-for i, line in enumerate(data):
-    if "Observation:" in line and i + 1 < len(data):
-        lines.append(data[i + 1].strip())
+# Строка не должна начинаться с 'a'
+solver.add(s[0] != 0)
 
-maxlen = max(len(x) for x in lines)
+# Вспомогательная функция для перевода строк в числа по базе 29
+def to_int(s_str):
+    val = 0
+    for c in s_str:
+        val = val * 29 + (ord(c) - ord('a'))
+    return val
 
-result = ""
+# Константы из chal.py
+MOD = 29**16
+h_expr = BitVecVal(to_int("greyctfisawesome"), 256)
+c_expr = BitVecVal(to_int("cryptoisverycool"), 256)
+f_expr = BitVecVal(to_int("{|}helloworld{|}"), 256)
+target = BitVecVal(to_int("gimmeflagthankuu"), 256)
 
-for pos in range(maxlen):
-    chars = []
+# Моделирование алгоритма caexor
+for i in range(0, N, 2):
+    # Линейные операции
+    h_expr = URem(h_expr + c_expr, MOD)
+    h_expr = URem(h_expr * f_expr, MOD)
+    
+    # Извлекаем два младших разряда (h0 соответствует s[i+1], h1 соответствует s[i])
+    h0 = URem(h_expr, 29)
+    h1 = URem(UDiv(h_expr, 29), 29)
+    
+    # Оставшаяся старшая часть числа
+    h_high = UDiv(h_expr, 29*29) * (29*29)
+    
+    # Применяем побитовый XOR к младшим разрядам
+    h0_new = URem(h0 ^ s[i+1], 29)
+    h1_new = URem(h1 ^ s[i], 29)
+    
+    # Собираем 256-битное число обратно
+    h_expr = h_high + 29 * h1_new + h0_new
 
-    for line in lines:
-        if pos < len(line):
-            c = line[pos]
-            if c != '?':
-                chars.append(c)
+# Устанавливаем цель
+solver.add(h_expr == target)
 
-    if chars:
-        result += Counter(chars).most_common(1)[0][0]
-    else:
-        result += '?'
-
-print(result)
+print("[*] Запуск Z3...")
+if solver.check() == sat:
+    m = solver.model()
+    # Восстанавливаем строку из решенных переменных
+    ans = "".join(chr(m[s[i]].as_long() + ord('a')) for i in range(N))
+    print(f"[+] Прообраз найден: {ans}")
+else:
+    print("[-] Решение не найдено")
