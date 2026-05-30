@@ -325,7 +325,7 @@ http://154.57.164.64:31484/esp-analytics/webhook
 from sage.all import *
 from collections import deque
 
-def solve_lights_out_v6():
+def solve_lights_out_v7():
     levers = []
     copper_bulbs = []
     observers = {}
@@ -362,45 +362,66 @@ def solve_lights_out_v6():
             elif current_section == 'observers':
                 observers[pos] = val.lower()
 
+    # Линейная сортировка, так как элементы стоят в ряд
+    sort_key = lambda pos: (pos[0], pos[2], pos[1])
+    
     lever_positions = [item[0] for item in levers]
     copper_positions = [item[0] for item in copper_bulbs]
+    
+    lever_positions.sort(key=sort_key)
+    copper_positions.sort(key=sort_key)
 
-    print("[*] Строим граф наблюдателей...")
+    print("[*] Вычисляем точки обновления блоков...")
     graph = {p: [] for p in lever_positions + copper_positions + list(observers.keys())}
-    in_degree = {p: 0 for p in graph}
-
-    # Исправленная физика: Observer смотрит на front, выдает сигнал в back.
+    
+    # Карта блоков, в которые наблюдатели выдают сигнал (back)
+    powered_blocks = {}
     for pos, dir_str in observers.items():
         vec = DIR_MAP[dir_str]
-        front = (pos[0] + vec[0], pos[1] + vec[1], pos[2] + vec[2])
         back = (pos[0] - vec[0], pos[1] - vec[1], pos[2] - vec[2])
+        if back not in powered_blocks:
+            powered_blocks[back] = []
+        powered_blocks[back].append(pos)
 
-        # Сигнал передается в блок позади наблюдателя
-        if back in observers:
-            graph[pos].append(back)
-            in_degree[back] += 1
+    print("[*] Строим граф по правильной физике Minecraft...")
+    for B_pos, B_dir in observers.items():
+        vecB = DIR_MAP[B_dir]
+        # Координата блока, на который СМОТРИТ наблюдатель B
+        frontB = (B_pos[0] + vecB[0], B_pos[1] + vecB[1], B_pos[2] + vecB[2])
 
-    print("[*] Подключаем периферию (геометрический поиск)...")
-    roots = [pos for pos in observers if in_degree[pos] == 0]
-    leaves = [pos for pos in observers if len(graph[pos]) == 0]
+        # 1. Если перед B стоит другой наблюдатель A, моргание A триггерит B
+        if frontB in observers:
+            A_pos = frontB
+            graph[A_pos].append(B_pos)
 
-    used_roots = set()
+        # 2. Если какой-то наблюдатель A пускает сигнал (питает) в блок frontB, это тоже триггерит B
+        if frontB in powered_blocks:
+            for A_pos in powered_blocks[frontB]:
+                if A_pos != B_pos:
+                    graph[A_pos].append(B_pos)
+
+    print("[*] Подключаем периферию 1-к-1...")
+    used_inputs = set()
     for lever in lever_positions:
-        avail = [r for r in roots if r not in used_roots]
+        avail = [p for p in observers.keys() if p not in used_inputs]
         if not avail: break
-        closest = min(avail, key=lambda r: abs(r[0]-lever[0]) + abs(r[1]-lever[1]) + abs(r[2]-lever[2]))
-        graph[lever].append(closest)
-        in_degree[closest] += 1
-        used_roots.add(closest)
+        # Ищем наблюдателя, чье ЛИЦО ближе всего к рычагу
+        closest_B = min(avail, key=lambda p: abs(p[0]+DIR_MAP[observers[p]][0] - lever[0]) + 
+                                             abs(p[1]+DIR_MAP[observers[p]][1] - lever[1]) + 
+                                             abs(p[2]+DIR_MAP[observers[p]][2] - lever[2]))
+        graph[lever].append(closest_B)
+        used_inputs.add(closest_B)
 
-    used_leaves = set()
+    used_outputs = set()
     for bulb in copper_positions:
-        avail = [l for l in leaves if l not in used_leaves]
+        avail = [p for p in observers.keys() if p not in used_outputs]
         if not avail: break
-        closest = min(avail, key=lambda l: abs(l[0]-bulb[0]) + abs(l[1]-bulb[1]) + abs(l[2]-bulb[2]))
-        graph[closest].append(bulb)
-        in_degree[bulb] += 1
-        used_leaves.add(closest)
+        # Ищем наблюдателя, чей ЗАД (выход) ближе всего к медной лампе
+        closest_A = min(avail, key=lambda p: abs(p[0]-DIR_MAP[observers[p]][0] - bulb[0]) + 
+                                             abs(p[1]-DIR_MAP[observers[p]][1] - bulb[1]) + 
+                                             abs(p[2]-DIR_MAP[observers[p]][2] - bulb[2]))
+        graph[closest_A].append(bulb)
+        used_outputs.add(closest_A)
 
     print("[*] Поиск активных путей (BFS)...")
     reachable = set(lever_positions)
@@ -415,41 +436,39 @@ def solve_lights_out_v6():
 
     print(f"[+] Блоков в активной цепи: {len(reachable)}")
 
-    print("[*] Топологическая сортировка...")
-    topo_order = []
-    queue = deque(lever_positions)
-
-    local_in = {n: 0 for n in reachable}
+    print("[*] Подготовка к итеративному вычислению состояний...")
+    # Предварительно собираем входящие ребра для быстрого XOR
+    incoming = {n: [] for n in reachable}
     for u in reachable:
         for v in graph[u]:
             if v in reachable:
-                local_in[v] += 1
+                incoming[v].append(u)
 
-    queue = deque([n for n in reachable if local_in[n] == 0])
-
-    while queue:
-        u = queue.popleft()
-        topo_order.append(u)
-        for v in graph[u]:
-            if v in reachable:
-                local_in[v] -= 1
-                if local_in[v] == 0:
-                    queue.append(v)
-
-    if len(topo_order) != len(reachable):
-        print(f"[-] ВНИМАНИЕ: Обнаружен цикл! Отсортировано {len(topo_order)} из {len(reachable)}.")
-
-    print("[*] Расчет матрицы состояний (XOR)...")
+    print("[*] Итеративное прохождение сигнала (релаксация графа)...")
     state = {n: 0 for n in reachable}
     for i, pos in enumerate(lever_positions):
         state[pos] = 1 << i
 
-    for u in topo_order:
-        val = state[u]
-        if val == 0: continue
-        for v in graph[u]:
-            if v in reachable:
-                state[v] ^= val
+    active_nodes = [n for n in reachable if n not in lever_positions]
+    changed = True
+    iterations = 0
+    max_iter = 1000
+
+    while changed and iterations < max_iter:
+        changed = False
+        iterations += 1
+        for u in active_nodes:
+            new_val = 0
+            for p in incoming[u]:
+                new_val ^= state[p]
+            if new_val != state[u]:
+                state[u] = new_val
+                changed = True
+
+    if iterations >= max_iter:
+        print(f"[-] ВНИМАНИЕ: Достигнут лимит итераций. Сигнал застрял в бесконечном цикле.")
+    else:
+        print(f"[+] Состояния стабилизировались за {iterations} итераций!")
 
     matrix_size = len(lever_positions)
     M = Matrix(GF(2), matrix_size, matrix_size)
@@ -464,7 +483,7 @@ def solve_lights_out_v6():
     print(f"[*] Ранг матрицы: {M.rank()}")
 
     if M.rank() == 0:
-        print("[-] Матрица пустая. Физического соединения нет.")
+        print("[-] Матрица все еще нулевая.")
         return
 
     Y = vector(GF(2), [1 if item[1] else 0 for item in copper_bulbs])
@@ -497,4 +516,4 @@ def solve_lights_out_v6():
         print("[-] Уравнение не сходится.")
 
 if __name__ == '__main__':
-    solve_lights_out_v6()
+    solve_lights_out_v7()
