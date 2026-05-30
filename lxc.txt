@@ -326,7 +326,7 @@ from sage.all import *
 from collections import deque
 
 def solve():
-    print("[*] Читаем дамп графа (это займет пару секунд)...")
+    print("[*] Читаем дамп графа ...")
     with open("graph_dump.txt", "r") as f:
         lines = f.read().splitlines()
 
@@ -346,18 +346,27 @@ def solve():
         c_str, val = line.split(":")
         coords = tuple(map(int, c_str.split(",")))
 
-        if mode == "levers": levers[coords] = val
-        elif mode == "lamps": lamps[coords] = val
-        elif mode == "obs": observers.append((coords, val))
+        if mode == "levers": levers[coords] = val.strip()
+        elif mode == "lamps": lamps[coords] = val.strip()
+        elif mode == "obs": observers.append((coords, val.strip()))
 
     print(f"[*] Сортируем координаты 16x16...")
-    # Сортируем по высоте (Y), затем по глубине (Z) и ширине (X)
-    # Это гарантирует правильную 2D-развертку
     sorted_levers = sorted(levers.keys(), key=lambda c: (c[1], c[2], c[0]))
     sorted_lamps = sorted(lamps.keys(), key=lambda c: (c[1], c[2], c[0]))
     lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
 
-    print("[*] Строим карту направлений наблюдателей...")
+    # Бронебойная проверка состояния NBT-тегов
+    def is_active(val):
+        return str(val).lower() in ["true", "1", "t", "on"]
+
+    lit_lamps_count = sum(1 for c in sorted_lamps if is_active(lamps[c]))
+    print(f"[*] Горящих ламп найдено: {lit_lamps_count} из {len(lamps)}")
+    
+    if lit_lamps_count == 0:
+        print("[!] Скрипт по-прежнему видит 0 горящих ламп. Проверь graph_dump.txt!")
+        return
+
+    print("[*] Строим граф наблюдателей...")
     vecs = {
         "north": (0, 0, -1), "south": (0, 0, 1),
         "west": (-1, 0, 0), "east": (1, 0, 0),
@@ -366,17 +375,17 @@ def solve():
 
     obs_by_watched = {}
     for obs_coord, facing in observers:
-        dx, dy, dz = vecs[facing]
-        # Лицо (что триггерит)
+        dx, dy, dz = vecs.get(facing.lower(), (0,0,0))
+        # watched - блок, на который смотрит "лицо"
         watched = (obs_coord[0] + dx, obs_coord[1] + dy, obs_coord[2] + dz)
-        # Спина (куда бьет сигнал)
+        # output - блок, в который бьет импульс со "спины"
         output = (obs_coord[0] - dx, obs_coord[1] - dy, obs_coord[2] - dz)
 
         if watched not in obs_by_watched:
             obs_by_watched[watched] = []
         obs_by_watched[watched].append(output)
 
-    print("[*] Трассируем сигналы в графе (BFS)...")
+    print("[*] Вычисляем влияние рычагов на лампы (BFS)...")
     matrix_data = [[0]*256 for _ in range(256)]
 
     for j, start_lever in enumerate(sorted_levers):
@@ -390,37 +399,33 @@ def solve():
                     if out_c not in visited:
                         visited.add(out_c)
                         queue.append(out_c)
-                        # Если сигнал дошел до лампы, фиксируем связь
                         if out_c in lamp_to_idx:
                             i = lamp_to_idx[out_c]
-                            matrix_data[i][j] = 1 
+                            # XOR - так как два сигнала в одну лампу гасят друг друга
+                            matrix_data[i][j] ^= 1 
 
-    print("[*] Решаем систему уравнений Lights Out над GF(2)...")
+    print("[*] Решаем систему GF(2)...")
     M = Matrix(GF(2), matrix_data)
     S = vector(GF(2), 256)
 
-    # Заполняем целевой вектор (гасим горящие)
     for i, lamp in enumerate(sorted_lamps):
-        if lamps[lamp] == "true":
+        if is_active(lamps[lamp]):
             S[i] = 1
 
     try:
         X = M.solve_right(S)
     except ValueError:
-        print("[!] Матрица сингулярна, решений нет. Граф считан с ошибкой.")
+        print("[!] ОШИБКА: Матрица сингулярна и не имеет точного решения.")
         return
 
-    print("\n[+] УСПЕХ! Визуализация решения (1 = нажать рычаг):")
+    print("\n[+] УСПЕХ! Штрихкод (DataMatrix):")
     print("+" + "-"*32 + "+")
     for i in range(16):
         row_str = "|"
         for j in range(16):
-            val = X[i*16 + j]
-            # Используем плотные символы для хорошего контраста
-            row_str += "██" if val == 1 else "  "
+            row_str += "██" if X[i*16 + j] == 1 else "  "
         print(row_str + "|")
     print("+" + "-"*32 + "+")
-    print("[*] Если это штрихкод, просканируй его телефоном с экрана.")
 
 if __name__ == '__main__':
     solve()
