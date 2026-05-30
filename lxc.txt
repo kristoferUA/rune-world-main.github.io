@@ -323,58 +323,141 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 import glob
+import math
 from nbt.region import RegionFile
 
-def scan_palettes(region_path):
-    region = RegionFile(region_path)
-    blocks = set()
+def get_blocks_from_section(section, global_cx, global_cz, sy):
+    found = []
+    # В новых версиях Minecraft (1.16+) состояния лежат в block_states
+    if "block_states" not in section:
+        return found
+        
+    block_states = section["block_states"]
+    if "palette" not in block_states:
+        return found
+        
+    palette = block_states["palette"]
     
-    for z in range(32):
-        for x in range(32):
-            try:
-                # Пытаемся прочитать чанк
-                chunk = region.get_chunk(x, z)
-            except Exception:
-                continue
+    # Сначала проверяем, есть ли вообще в этой секции нужные нам блоки
+    interesting = False
+    for p in palette:
+        name = p["Name"].value if "Name" in p else p["name"].value
+        if name in ["minecraft:lever", "minecraft:observer", "minecraft:redstone_lamp"]:
+            interesting = True
+            break
+            
+    # Если блоков нет или секция пустая - скипаем (экономит 99% времени)
+    if not interesting or "data" not in block_states:
+        return found
+        
+    # Распаковка битового массива 
+    data_array = block_states["data"]
+    palette_len = len(palette)
+    bits_per_block = max(4, math.ceil(math.log2(palette_len)))
+    blocks_per_long = 64 // bits_per_block
+    mask = (1 << bits_per_block) - 1
+    
+    for i in range(4096):
+        long_index = i // blocks_per_long
+        if long_index >= len(data_array):
+            break
+        long_val = data_array[long_index].value
+        
+        # Java longs знаковые, переводим в беззнаковые
+        if long_val < 0:
+            long_val += (1 << 64)
+            
+        bit_offset = (i % blocks_per_long) * bits_per_block
+        palette_index = (long_val >> bit_offset) & mask
+        
+        if palette_index < palette_len:
+            block_prop = palette[palette_index]
+            name = block_prop["Name"].value if "Name" in block_prop else block_prop["name"].value
+            
+            if name in ["minecraft:lever", "minecraft:observer", "minecraft:redstone_lamp"]:
+                # Вычисляем локальные координаты внутри 16x16x16
+                y = (i >> 8) & 0xF
+                z = (i >> 4) & 0xF
+                x = i & 0xF
                 
-            # Minecraft 1.18+ формат
-            if "sections" in chunk:
-                sections = chunk["sections"]
-            # Старый формат
-            elif "Level" in chunk and "Sections" in chunk["Level"]:
-                sections = chunk["Level"]["Sections"]
-            else:
-                continue
+                # Переводим в глобальные координаты мира
+                gx = global_cx * 16 + x
+                gy = sy * 16 + y
+                gz = global_cz * 16 + z
                 
-            for section in sections:
-                palette = None
-                # Ищем палитру блоков в секции
-                if "block_states" in section and "palette" in section["block_states"]:
-                    palette = section["block_states"]["palette"]
-                elif "Palette" in section:
-                    palette = section["Palette"]
-                    
-                if palette:
-                    for item in palette:
-                        # Извлекаем строковый ID блока
-                        name = item["Name"].value if "Name" in item else item["name"].value
-                        blocks.add(name)
-    return blocks
+                # Вытягиваем свойства (powered, lit, facing)
+                props = {}
+                if "Properties" in block_prop:
+                    for k, v in block_prop["Properties"].items():
+                        props[k] = v.value
+                        
+                found.append((name, (gx, gy, gz), props))
+                
+    return found
 
 def main():
-    print("[*] Анализируем чанки на наличие редстоун-компонентов...")
+    print("[*] Распаковываем BlockStates и вытягиваем граф...")
     mca_files = glob.glob("dist-lights-out/region/*.mca")
     
-    all_blocks = set()
-    for f in mca_files:
-        all_blocks.update(scan_palettes(f))
-        
-    print("\n[+] Найдены следующие интересные блоки:")
-    for b in sorted(all_blocks):
-        # Фильтруем только то, что относится к логике
-        keywords = ["redstone", "lamp", "button", "repeater", "comparator", "observer", "lever", "piston", "target"]
-        if any(kw in b for kw in keywords):
-            print(f" ---> {b}")
+    levers = {}
+    lamps = {}
+    observers = []
+    
+    for filepath in mca_files:
+        try:
+            region = RegionFile(filepath)
+        except Exception:
+            continue
             
+        # Узнаем смещение региона из названия файла r.X.Z.mca
+        filename = filepath.split('/')[-1]
+        rx = int(filename.split('.')[1])
+        rz = int(filename.split('.')[2])
+        
+        for cx in range(32):
+            for cz in range(32):
+                try:
+                    chunk = region.get_chunk(cx, cz)
+                except Exception:
+                    continue
+                    
+                global_cx = rx * 32 + cx
+                global_cz = rz * 32 + cz
+                
+                if "sections" in chunk:
+                    sections = chunk["sections"]
+                elif "Level" in chunk and "Sections" in chunk["Level"]:
+                    sections = chunk["Level"]["Sections"]
+                else:
+                    continue
+                    
+                for section in sections:
+                    # Читаем координату Y (высоту) самой секции
+                    sy = section["Y"].value
+                    blocks = get_blocks_from_section(section, global_cx, global_cz, sy)
+                    
+                    for name, coords, props in blocks:
+                        if name == "minecraft:lever":
+                            levers[coords] = props.get("powered", "false")
+                        elif name == "minecraft:redstone_lamp":
+                            lamps[coords] = props.get("lit", "false")
+                        elif name == "minecraft:observer":
+                            observers.append((coords, props.get("facing", "north")))
+
+    print("\n[+] Извлечение завершено!")
+    print(f" ---> Рычагов: {len(levers)}")
+    print(f" ---> Ламп: {len(lamps)}")
+    print(f" ---> Наблюдателей: {len(observers)}")
+    
+    with open("graph_dump.txt", "w") as f:
+        f.write("--- LEVERS ---\n")
+        for c, s in levers.items(): f.write(f"{c[0]},{c[1]},{c[2]}:{s}\n")
+        f.write("\n--- LAMPS ---\n")
+        for c, s in lamps.items(): f.write(f"{c[0]},{c[1]},{c[2]}:{s}\n")
+        f.write("\n--- OBSERVERS ---\n")
+        for c, d in observers: f.write(f"{c[0]},{c[1]},{c[2]}:{d}\n")
+        
+    print("[+] Данные сохранены в graph_dump.txt")
+
 if __name__ == '__main__':
     main()
