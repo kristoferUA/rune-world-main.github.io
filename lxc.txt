@@ -1,5 +1,5 @@
 https://ctfd.nusgreyhats.org
-
+dcua:q81FqbJT%k78%aV0
 
 ltrace -C -s 120 ./schrodinger_unpacked 2>&1 | grep "SecLeaf"
 for i in {0..5}; do
