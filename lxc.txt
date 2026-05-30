@@ -322,139 +322,105 @@ http://154.57.164.64:31484/esp-analytics/webhook
 
 
 
-import glob
-import math
-from nbt.region import RegionFile
+from sage.all import *
+from collections import deque
 
-def get_blocks_from_section(section, global_cx, global_cz, sy):
-    found = []
-    if "block_states" not in section:
-        return found
-        
-    block_states = section["block_states"]
-    if "palette" not in block_states:
-        return found
-        
-    palette = block_states["palette"]
-    
-    interesting = False
-    for p in palette:
-        name = p["Name"].value if "Name" in p else p["name"].value
-        if name in ["minecraft:lever", "minecraft:observer", "minecraft:redstone_lamp"]:
-            interesting = True
-            break
-            
-    if not interesting or "data" not in block_states:
-        return found
-        
-    data_array = block_states["data"]
-    palette_len = len(palette)
-    bits_per_block = max(4, math.ceil(math.log2(palette_len)))
-    blocks_per_long = 64 // bits_per_block
-    mask = (1 << bits_per_block) - 1
-    
-    for i in range(4096):
-        long_index = i // blocks_per_long
-        if long_index >= len(data_array):
-            break
-            
-        # БЕЗОПАСНОЕ ИЗВЛЕЧЕНИЕ (исправление ошибки)
-        raw_val = data_array[long_index]
-        long_val = raw_val.value if hasattr(raw_val, 'value') else raw_val
-        
-        # Java longs знаковые, переводим в беззнаковые
-        if long_val < 0:
-            long_val += (1 << 64)
-            
-        bit_offset = (i % blocks_per_long) * bits_per_block
-        palette_index = (long_val >> bit_offset) & mask
-        
-        if palette_index < palette_len:
-            block_prop = palette[palette_index]
-            name = block_prop["Name"].value if "Name" in block_prop else block_prop["name"].value
-            
-            if name in ["minecraft:lever", "minecraft:observer", "minecraft:redstone_lamp"]:
-                y = (i >> 8) & 0xF
-                z = (i >> 4) & 0xF
-                x = i & 0xF
-                
-                gx = global_cx * 16 + x
-                gy = sy * 16 + y
-                gz = global_cz * 16 + z
-                
-                props = {}
-                if "Properties" in block_prop:
-                    for k, v in block_prop["Properties"].items():
-                        props[k] = v.value if hasattr(v, 'value') else v
-                        
-                found.append((name, (gx, gy, gz), props))
-                
-    return found
+def solve():
+    print("[*] Читаем дамп графа (это займет пару секунд)...")
+    with open("graph_dump.txt", "r") as f:
+        lines = f.read().splitlines()
 
-def main():
-    print("[*] Распаковываем BlockStates и вытягиваем граф...")
-    mca_files = glob.glob("dist-lights-out/region/*.mca")
-    
     levers = {}
     lamps = {}
     observers = []
-    
-    for filepath in mca_files:
-        try:
-            region = RegionFile(filepath)
-        except Exception:
-            continue
-            
-        filename = filepath.split('/')[-1]
-        rx = int(filename.split('.')[1])
-        rz = int(filename.split('.')[2])
-        
-        for cx in range(32):
-            for cz in range(32):
-                try:
-                    chunk = region.get_chunk(cx, cz)
-                except Exception:
-                    continue
-                    
-                global_cx = rx * 32 + cx
-                global_cz = rz * 32 + cz
-                
-                if "sections" in chunk:
-                    sections = chunk["sections"]
-                elif "Level" in chunk and "Sections" in chunk["Level"]:
-                    sections = chunk["Level"]["Sections"]
-                else:
-                    continue
-                    
-                for section in sections:
-                    # Извлекаем Y безопасно
-                    sy_tag = section["Y"]
-                    sy = sy_tag.value if hasattr(sy_tag, 'value') else sy_tag
-                    
-                    blocks = get_blocks_from_section(section, global_cx, global_cz, sy)
-                    
-                    for name, coords, props in blocks:
-                        if name == "minecraft:lever":
-                            levers[coords] = props.get("powered", "false")
-                        elif name == "minecraft:redstone_lamp":
-                            lamps[coords] = props.get("lit", "false")
-                        elif name == "minecraft:observer":
-                            observers.append((coords, props.get("facing", "north")))
 
-    print("\n[+] Извлечение завершено!")
-    print(f" ---> Рычагов: {len(levers)}")
-    print(f" ---> Ламп: {len(lamps)}")
-    print(f" ---> Наблюдателей: {len(observers)}")
-    
-    with open("graph_dump.txt", "w") as f:
-        f.write("--- LEVERS ---\n")
-        for c, s in levers.items(): f.write(f"{c[0]},{c[1]},{c[2]}:{s}\n")
-        f.write("\n--- LAMPS ---\n")
-        for c, s in lamps.items(): f.write(f"{c[0]},{c[1]},{c[2]}:{s}\n")
-        f.write("\n--- OBSERVERS ---\n")
-        for c, d in observers: f.write(f"{c[0]},{c[1]},{c[2]}:{d}\n")
-        
-    print("[+] Данные сохранены в graph_dump.txt")
+    mode = None
+    for line in lines:
+        if not line: continue
+        if line.startswith("---"):
+            if "LEVERS" in line: mode = "levers"
+            elif "LAMPS" in line: mode = "lamps"
+            elif "OBSERVERS" in line: mode = "obs"
+            continue
+
+        c_str, val = line.split(":")
+        coords = tuple(map(int, c_str.split(",")))
+
+        if mode == "levers": levers[coords] = val
+        elif mode == "lamps": lamps[coords] = val
+        elif mode == "obs": observers.append((coords, val))
+
+    print(f"[*] Сортируем координаты 16x16...")
+    # Сортируем по высоте (Y), затем по глубине (Z) и ширине (X)
+    # Это гарантирует правильную 2D-развертку
+    sorted_levers = sorted(levers.keys(), key=lambda c: (c[1], c[2], c[0]))
+    sorted_lamps = sorted(lamps.keys(), key=lambda c: (c[1], c[2], c[0]))
+    lamp_to_idx = {c: i for i, c in enumerate(sorted_lamps)}
+
+    print("[*] Строим карту направлений наблюдателей...")
+    vecs = {
+        "north": (0, 0, -1), "south": (0, 0, 1),
+        "west": (-1, 0, 0), "east": (1, 0, 0),
+        "up": (0, 1, 0), "down": (0, -1, 0)
+    }
+
+    obs_by_watched = {}
+    for obs_coord, facing in observers:
+        dx, dy, dz = vecs[facing]
+        # Лицо (что триггерит)
+        watched = (obs_coord[0] + dx, obs_coord[1] + dy, obs_coord[2] + dz)
+        # Спина (куда бьет сигнал)
+        output = (obs_coord[0] - dx, obs_coord[1] - dy, obs_coord[2] - dz)
+
+        if watched not in obs_by_watched:
+            obs_by_watched[watched] = []
+        obs_by_watched[watched].append(output)
+
+    print("[*] Трассируем сигналы в графе (BFS)...")
+    matrix_data = [[0]*256 for _ in range(256)]
+
+    for j, start_lever in enumerate(sorted_levers):
+        queue = deque([start_lever])
+        visited = set()
+
+        while queue:
+            curr = queue.popleft()
+            if curr in obs_by_watched:
+                for out_c in obs_by_watched[curr]:
+                    if out_c not in visited:
+                        visited.add(out_c)
+                        queue.append(out_c)
+                        # Если сигнал дошел до лампы, фиксируем связь
+                        if out_c in lamp_to_idx:
+                            i = lamp_to_idx[out_c]
+                            matrix_data[i][j] = 1 
+
+    print("[*] Решаем систему уравнений Lights Out над GF(2)...")
+    M = Matrix(GF(2), matrix_data)
+    S = vector(GF(2), 256)
+
+    # Заполняем целевой вектор (гасим горящие)
+    for i, lamp in enumerate(sorted_lamps):
+        if lamps[lamp] == "true":
+            S[i] = 1
+
+    try:
+        X = M.solve_right(S)
+    except ValueError:
+        print("[!] Матрица сингулярна, решений нет. Граф считан с ошибкой.")
+        return
+
+    print("\n[+] УСПЕХ! Визуализация решения (1 = нажать рычаг):")
+    print("+" + "-"*32 + "+")
+    for i in range(16):
+        row_str = "|"
+        for j in range(16):
+            val = X[i*16 + j]
+            # Используем плотные символы для хорошего контраста
+            row_str += "██" if val == 1 else "  "
+        print(row_str + "|")
+    print("+" + "-"*32 + "+")
+    print("[*] Если это штрихкод, просканируй его телефоном с экрана.")
 
 if __name__ == '__main__':
-    main()
+    solve()
