@@ -165,7 +165,8 @@ for row in L:
     try:
         response = requests.post(
             'https://sagecell.sagemath.org/service',
-            data={'code': sage_script}
+            data={'code': sage_script, 'accepted_tos': 'true'},
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
         )
         result = response.json()
         if not result.get('success'):
