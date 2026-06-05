@@ -217,7 +217,7 @@ def main():
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    # Алгоритм Бабаи - прямое решение CVP (Closest Vector Problem)
+    # Гибридная Каннан-Бабаи решетка
     sage_code = f"""
 from sage.all import *
 
@@ -236,11 +236,11 @@ for j in range(N_dim):
 A_mat = Matrix(GF(q), A)
 b_vec = vector(GF(q), b_centered)
 
-# Частное решение (гигантский вектор)
+# 1. Частное решение (огромный вектор)
 t = A_mat.solve_right(b_vec)
 t_lift = vector(ZZ, [ZZ(x) for x in t])
 
-# Ядро матрицы
+# 2. Ядро матрицы
 K = A_mat.right_kernel().matrix()
 basis_rows = []
 for row in K:
@@ -250,41 +250,63 @@ for i in range(M_dim):
     v[i] = q
     basis_rows.append(v)
 
-print("[*] Базовая LLL редукция ядра (чистка матрицы)...")
+print("[*] LLL редукция ядра...")
 L_sub = Matrix(ZZ, basis_rows).LLL()
-# Обязательно удаляем нулевые строки, чтобы матрица стала обратимой
 L_sub = Matrix(ZZ, [row for row in L_sub if not row.is_zero()])
 
-# Функция проекции Бабаи
-def try_babai(L_basis, target):
-    L_inv = Matrix(QQ, L_basis).inverse()
-    c = vector(QQ, target) * L_inv
-    c_round = vector(ZZ, [round(x) for x in c])
-    return target - c_round * L_basis
+print("[*] Предварительное обрезание вектора (Babai)...")
+L_inv = Matrix(QQ, L_sub).inverse()
+c = vector(QQ, t_lift) * L_inv
+c_round = vector(ZZ, [round(x) for x in c])
+t_reduced = t_lift - c_round * L_sub
 
-print("[*] Выполняю Babai Rounding (точная проекция вектора)...")
-t_reduced = try_babai(L_sub, t_lift)
-s_orig = [x + 4 for x in t_reduced]
+# 3. Строим матрицу Каннана с идеальным весом
+W_kan = 37
+M = Matrix(ZZ, M_dim + 1, M_dim + 1)
+for i in range(M_dim):
+    for j in range(M_dim):
+        M[i, j] = L_sub[i, j]
+for j in range(M_dim):
+    M[M_dim, j] = t_reduced[j]
+M[M_dim, M_dim] = W_kan
 
-if all(0 <= v <= 9 for v in s_orig):
-    print("!!! СЕКРЕТ НАЙДЕН (Babai) !!!")
-    print(" ".join(map(str, s_orig)))
-else:
-    print("[-] Babai не добил с первого раза. Усиливаю базис через легкий BKZ-15...")
-    L_sub = L_sub.BKZ(block_size=15)
-    t_reduced = try_babai(L_sub, t_lift)
-    s_orig = [x + 4 for x in t_reduced]
-    
-    if all(0 <= v <= 9 for v in s_orig):
-        print("!!! СЕКРЕТ НАЙДЕН (BKZ+Babai) !!!")
-        print(" ".join(map(str, s_orig)))
+def check_matrix(mat):
+    for row in mat:
+        if abs(row[-1]) == W_kan:
+            x = row[:M_dim]
+            if row[-1] == -W_kan:
+                x = [-v for v in x]
+            s = [v + 4 for v in x]
+            if all(0 <= v <= 9 for v in s):
+                return s
+    return None
+
+print("[*] Запускаю перебор мощностей BKZ...")
+found = False
+for blk in [2, 15, 20, 25, 30, 35]:
+    if blk == 2:
+        print("[*] Проход LLL...")
+        M = M.LLL()
     else:
-        print("[-] Вывожу дебаг. Норма вектора Бабаи (должна быть около 37):", t_reduced.norm().n())
+        print(f"[*] Проход BKZ-{{blk}}...")
+        M = M.BKZ(block_size=blk)
+    
+    s = check_matrix(M)
+    if s:
+        print("!!! СЕКРЕТ НАЙДЕН !!!")
+        print(" ".join(map(str, s)))
+        found = True
+        break
+    else:
+        print("    -> Пока мимо, норма лучшего вектора:", M[0].norm().n() if M.nrows() > 0 else "N/A")
+
+if not found:
+    print("[-] Секрет не найден. Скрипт дошел до предела.")
 """
     with open("solve.sage", "w") as f:
         f.write(sage_code)
 
-    log.info("Файл solve.sage готов! Алгоритм Бабаи заряжен.")
+    log.info("Файл solve.sage готов! Идеальная гибридная решетка построена.")
     log.info("Запускай sage solve.sage в соседней вкладке.")
     
     s_input = input("\n[?] Скопируй найденный секрет из соседней вкладки и вставь сюда: ").strip()
@@ -293,7 +315,7 @@ else:
     io.sendlineafter(b"Your choice: ", b"0")
     io.sendlineafter(b"ours:", s_input.encode())
 
-    log.success("Победа! Забирай флаг:")
+    log.success("Забирай флаг:")
     io.interactive()
 
 if __name__ == "__main__":
