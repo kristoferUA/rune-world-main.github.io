@@ -190,29 +190,110 @@ from pwn import *
 # ВСТАВЬ СВЕЖИЙ ХОСТ СЮДА
 host = "ТВОЙ_НОВЫЙ_ХОСТ.gpn24.ctf.kitctf.de"
 
-log.info("Шаг 1: Нагло крадем секрет...")
-io = process(['ncat', '--ssl', host, '443'])
-io.recvuntil(b"Your choice: ")
-io.sendline(b"0")
+def main():
+    log.info("Поднимаем ncat-процесс...")
+    io = process(['ncat', '--ssl', host, '443'])
 
-# Отправляем 164 нуля, чтобы гарантированно ошибиться
-io.recvuntil(b"ours:")
-io.sendline(b" ".join([b"0"] * 164))
+    io.recvuntil(b"Break this hash to obtain the flag \n")
+    flag_hash_line = io.recvline().decode().strip()
+    b_target = [int(x) for x in flag_hash_line.split()]
 
-# Сервер ругается и сам печатает нам решение
-io.recvuntil(b"Wrong guess! Try again.\n")
-secret = io.recvline().decode().strip()
-log.success(f"Секрет вытащен: {secret[:40]}...")
-io.close()
+    A_cols = []
+    log.info("Извлекаем матрицу A (164 столбца)...")
+    for i in range(164):
+        io.sendlineafter(b"Your choice: ", b"2")
+        io.sendlineafter(b"How many vectors do you want to hash? (max 100): ", b"1")
+        io.sendlineafter(b"ingridient", b"2")
 
-log.info("Шаг 2: Идем за флагом...")
-io2 = process(['ncat', '--ssl', host, '443'])
-io2.recvuntil(b"Your choice: ")
-io2.sendline(b"0")
+        vec = [0] * 164
+        vec[i] = 1
+        io.sendlineafter(b"ours:", (" ".join(map(str, vec))).encode())
 
-# Отправляем честно "украденный" секрет
-io2.recvuntil(b"ours:")
-io2.sendline(secret.encode())
+        hash_line = io.recvline().decode().strip()
+        A_cols.append([int(x) for x in hash_line.split()])
 
-log.success("Мы великолепны. Забирай:")
-io2.interactive()
+        if (i + 1) % 41 == 0:
+            log.success(f"Извлечено {i+1}/164 столбцов")
+
+    A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
+
+    # Идеальная LWE-решетка без переполнения точности fpylll
+    sage_code = f"""
+from sage.all import *
+
+A = {A_rows}
+b = {b_target}
+M_dim = 164
+N_dim = 64
+q = 12289
+
+# Центрируем цель (сдвиг -4)
+b_centered = []
+for j in range(N_dim):
+    sum_A = sum(A[j][i] for i in range(M_dim))
+    b_centered.append((b[j] - 4 * sum_A) % q)
+
+# Строим классическую LWE-решетку
+# C=100 достаточно для жестких уравнений, но не крашит математику с плавающей точкой
+C = 100
+M = Matrix(ZZ, N_dim + M_dim + 1, N_dim + M_dim + 1)
+
+for i in range(N_dim):
+    M[i, i] = C * q
+
+for i in range(M_dim):
+    for j in range(N_dim):
+        M[N_dim + i, j] = C * A[j][i]
+    M[N_dim + i, N_dim + i] = 1
+
+for j in range(N_dim):
+    M[N_dim + M_dim, j] = -C * b_centered[j]
+M[N_dim + M_dim, N_dim + M_dim] = 1
+
+def check_matrix(mat):
+    for row in mat:
+        if row[-1] == 1 or row[-1] == -1:
+            # Проверяем, что первые 64 уравнения жестко сошлись в 0
+            if all(v == 0 for v in row[:N_dim]):
+                x = row[N_dim:N_dim+M_dim]
+                if row[-1] == -1:
+                    x = [-v for v in x]
+                s = [v + 4 for v in x]
+                if all(0 <= v <= 9 for v in s):
+                    return s
+    return None
+
+print("[*] Запускаю LLL (займет 2-4 секунды)...")
+res = M.LLL()
+s = check_matrix(res)
+
+if s:
+    print("!!! СЕКРЕТ НАЙДЕН (LLL) !!!")
+    print(" ".join(map(str, s)))
+else:
+    print("[-] LLL не вытянул, подключаю легкий BKZ-15...")
+    res = res.BKZ(block_size=15)
+    s = check_matrix(res)
+    if s:
+        print("!!! СЕКРЕТ НАЙДЕН (BKZ) !!!")
+        print(" ".join(map(str, s)))
+    else:
+        print("[-] Не найдено. Скорее всего сервер оборвал или исказил данные.")
+"""
+    with open("solve.sage", "w") as f:
+        f.write(sage_code)
+
+    log.info("Файл solve.sage с идеальной решеткой сгенерирован!")
+    log.info("ОТКРОЙ НОВУЮ ВКЛАДКУ терминала и запусти команду: sage solve.sage")
+    
+    s_input = input("\n[?] Скопируй найденный секрет из соседней вкладки и вставь сюда: ").strip()
+
+    log.info("Сдаем секрет серверу...")
+    io.sendlineafter(b"Your choice: ", b"0")
+    io.sendlineafter(b"ours:", s_input.encode())
+
+    log.success("Финальный рывок! Флаг твой:")
+    io.interactive()
+
+if __name__ == "__main__":
+    main()
