@@ -96,74 +96,86 @@ print(f"s2 (hex): {hex(s)[2:]}")
 
 
 from pwn import *
-import random
-from hashlib import sha256
-from Crypto.PublicKey import ECC
 
 # ВСТАВЬ СВЕЖИЙ ХОСТ СЮДА
-host = " glazed-foie-gras-stuffed-with-shaved-thyme-awrp.gpn24.ctf.kitctf.de"
+host = "ТВОЙ_ХОСТ.gpn24.ctf.kitctf.de"
 
 def main():
     log.info("Поднимаем ncat-процесс...")
     io = process(['ncat', '--ssl', host, '443'])
-    
-    io.recvuntil(b"check please`.")
-    
-    data = []
-    log.info("Парсим 6 подписей на лету...")
-    for i in range(1, 7):
-        msg = f"{i}{i}"
-        io.sendlineafter(b"\n> ", f"sign {msg}".encode())
-        
-        io.recvuntil(b"s1: ")
-        s1 = io.recvline().decode().strip()
-        io.recvuntil(b"s2: ")
-        s2 = io.recvline().decode().strip()
-        
-        data.append((msg, s1, s2))
-        log.success(f"[{i}/6] Вытащили подпись")
 
-    # Формируем блок для Sage
-    sage_block = "data = [\n"
-    for msg, s1, s2 in data:
-        sage_block += f'    ("{msg}", "{s1}", "{s2}"),\n'
-    sage_block += "]\n"
+    io.recvuntil(b"Break this hash to obtain the flag \n")
+    flag_hash_line = io.recvline().decode().strip()
+    b_target = [int(x) for x in flag_hash_line.split()]
 
-    with open("sage_data.txt", "w") as f:
-        f.write(sage_block)
+    A_cols = []
+    log.info("Извлекаем настоящую матрицу A (164 столбца) в обход AVX2-бага...")
+    for i in range(164):
+        io.sendlineafter(b"Your choice: ", b"2")
+        io.sendlineafter(b"How many vectors do you want to hash? (max 100): ", b"1")
+        io.sendlineafter(b"ingridient", b"2")
 
-    log.info("Данные сохранены в sage_data.txt!")
-    log.info("Соединение удерживается. Быстро копируй данные в SageCell.")
-    
-    # Скрипт ждет твоего ввода
-    d_input = input("\n[?] Вставь найденный приватный ключ (d) сюда и нажми Enter: ").strip()
-    
-    try:
-        # Поддерживаем и hex, и обычные числа
-        d = int(d_input, 16) if d_input.startswith("0x") else int(d_input)
-    except ValueError:
-        log.error("Неверный формат ключа!")
-        return
+        # Создаем базисный вектор
+        vec = [0] * 164
+        vec[i] = 1
+        vec_str = " ".join(map(str, vec))
+        io.sendlineafter(b"ours:", vec_str.encode())
 
-    log.info("Подписываем победный рецепт...")
-    sk = ECC.construct(curve="p521", d=d)
-    n_order = int(sk._curve.order)
-    recipe = b"give_me_the_flag_now_please"
-    
-    e = int.from_bytes(sha256(recipe).digest())
-    z = e & ~(1 << n_order.bit_length())
-    k = random.randrange(1, n_order)
-    P = k * sk._curve.G
-    r = int(P.x % n_order)
-    s = (pow(k, -1, n_order) * (z + r * d)) % n_order
+        hash_line = io.recvline().decode().strip()
+        A_cols.append([int(x) for x in hash_line.split()])
 
-    log.info("Сдаем рецепт серверу...")
-    io.sendlineafter(b"\n> ", b"flag please")
-    io.sendlineafter(b"recipe (hex): ", recipe.hex().encode())
-    io.sendlineafter(b"s1 (hex): ", hex(r)[2:].encode())
-    io.sendlineafter(b"s2 (hex): ", hex(s)[2:].encode())
-    
-    log.success("Готово! Забирай флаг:")
+        if (i + 1) % 20 == 0:
+            log.success(f"Извлечено {i+1}/164 столбцов")
+
+    # Транспонируем извлеченные столбцы в строки для Sage
+    A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
+
+    # Формируем скрипт для решения точного LWE через Каннаново вложение
+    sage_code = f"""
+A = {A_rows}
+b = {b_target}
+
+M_dim = 164
+N_dim = 64
+q = 12289
+
+L = Matrix(ZZ, M_dim + N_dim + 1, M_dim + N_dim + 1)
+for i in range(M_dim):
+    L[i, i] = 1
+for i in range(M_dim):
+    for j in range(N_dim):
+        L[i, M_dim + j] = A[j][i] * 1000
+for i in range(N_dim):
+    L[M_dim + i, M_dim + i] = q * 1000
+for i in range(N_dim):
+    L[M_dim + N_dim, M_dim + i] = b[i] * 1000
+
+L[M_dim + N_dim, M_dim + N_dim] = 1
+
+print("Запускаю LLL...")
+L = L.LLL()
+for row in L:
+    if row[-1] == 1 or row[-1] == -1:
+        s = row[:M_dim]
+        if row[-1] == -1:
+            s = [-x for x in s]
+        if all(0 <= x <= 9 for x in s):
+            print(" ".join(map(str, s)))
+            break
+"""
+    with open("sage_solver.txt", "w") as f:
+        f.write(sage_code)
+
+    log.info("Данные сохранены в sage_solver.txt!")
+    log.info("Соединение открыто. Вставь код в SageCell, скопируй числа и введи их сюда.")
+
+    s_input = input("\n[?] Вставь найденный секрет (164 числа через пробел) сюда: ").strip()
+
+    log.info("Отправляем секрет на проверку...")
+    io.sendlineafter(b"Your choice: ", b"0")
+    io.sendlineafter(b"ours:", s_input.encode())
+
+    log.success("Готово! Забирай свой first blood:")
     io.interactive()
 
 if __name__ == "__main__":
