@@ -186,7 +186,6 @@ if __name__ == "__main__":
 
 
 from pwn import *
-from z3 import *
 
 # ВСТАВЬ СВЕЖИЙ ХОСТ СЮДА
 host = "ТВОЙ_НОВЫЙ_ХОСТ.gpn24.ctf.kitctf.de"
@@ -200,7 +199,7 @@ def main():
     b_target = [int(x) for x in flag_hash_line.split()]
 
     A_cols = []
-    log.info("Извлекаем матрицу A (164 столбца) в обход AVX2 бага...")
+    log.info("Извлекаем матрицу A (164 столбца)...")
     for i in range(164):
         io.sendlineafter(b"Your choice: ", b"2")
         io.sendlineafter(b"How many vectors do you want to hash? (max 100): ", b"1")
@@ -218,41 +217,60 @@ def main():
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    log.info("Строим чистую LIA-модель для Z3...")
-    
-    # 164 переменные секрета и 64 переменные для обхода модуля
-    s_vars = [Int(f's_{i}') for i in range(164)]
-    k_vars = [Int(f'k_{i}') for i in range(64)]
-    solver = Solver()
-    
-    # Задаем рамки из исходников (модуль beta)
-    for i in range(164):
-        solver.add(s_vars[i] >= 0, s_vars[i] <= 9)
-        
-    q = 12289
-    for i in range(64):
-        # Жестко ограничиваем k, чтобы Z3 не блуждал
-        solver.add(k_vars[i] >= 0, k_vars[i] <= 1500)
-        
-        # Строим линейное уравнение без оператора %
-        eq = Sum([A_rows[i][j] * s_vars[j] for j in range(164)])
-        solver.add(eq == b_target[i] + k_vars[i] * q)
+    # Генерируем идеальный MILP-скрипт
+    sage_code = f"""
+from sage.all import *
 
-    log.info("Решаем систему... (теперь это займет меньше секунды)")
+A = {A_rows}
+b = {b_target}
+M_dim = 164
+N_dim = 64
+q = 12289
+
+print("[*] Поднимаю супероружие: MILP-солвер (Mixed Integer Linear Programming)...")
+# Используем встроенный движок для решения линейных задач
+p = MixedIntegerLinearProgram(maximization=False)
+
+s = p.new_variable(integer=True)
+k = p.new_variable(integer=True)
+
+# 1. Жестко ограничиваем секрет (по условию задачи от 0 до 9)
+for i in range(M_dim):
+    p.add_constraint(s[i] >= 0)
+    p.add_constraint(s[i] <= 9)
+
+# 2. Ограничиваем множитель k и добавляем линейные уравнения без оператора модуля
+for i in range(N_dim):
+    p.add_constraint(k[i] >= 0)
+    expr = sum(A[i][j] * s[j] for j in range(M_dim))
+    p.add_constraint(expr - k[i] * q == b[i])
+
+# Ставим фиктивную цель, так как нам нужно просто любое валидное решение
+p.set_objective(0)
+
+try:
+    print("[*] Решаю систему... Это займет буквально доли секунды.")
+    p.solve()
+    sol = [int(round(p.get_values(s[i]))) for i in range(M_dim)]
+    print("!!! СЕКРЕТ НАЙДЕН !!!")
+    print(" ".join(map(str, sol)))
+except MIPSolverException:
+    print("[-] MILP не нашел решения. Возможно, сервер сгенерировал кривые данные.")
+"""
+    with open("solve.sage", "w") as f:
+        f.write(sage_code)
+
+    log.info("Файл solve.sage с MILP-алгоритмом успешно сгенерирован!")
+    log.info("ОТКРОЙ НОВУЮ ВКЛАДКУ терминала и запусти команду: sage solve.sage")
     
-    if solver.check() == sat:
-        m = solver.model()
-        sol = [m[s_vars[i]].as_long() for i in range(164)]
-        sol_str = " ".join(map(str, sol))
-        
-        log.success("!!! СЕКРЕТ НАЙДЕН !!!")
-        io.sendlineafter(b"Your choice: ", b"0")
-        io.sendlineafter(b"ours:", sol_str.encode())
-        
-        log.success("Победа! Перехватываю флаг:")
-        io.interactive()
-    else:
-        log.error("Z3 не нашел решение. Матрица могла быть искажена при передаче.")
+    s_input = input("\n[?] Скопируй найденный секрет из соседней вкладки и вставь сюда: ").strip()
+
+    log.info("Отправляем секрет на проверку...")
+    io.sendlineafter(b"Your choice: ", b"0")
+    io.sendlineafter(b"ours:", s_input.encode())
+
+    log.success("Финальный рывок! Забирай флаг:")
+    io.interactive()
 
 if __name__ == "__main__":
     main()
