@@ -1,5 +1,5 @@
-https://ctfd.nusgreyhats.org
-dcua:q81FqbJT%k78%aV0
+https://gpn24.ctf.kitctf.de
+user: dcua | email: dcua@defcon.org.ua | passwd: 8^LJ2Weh8lu2he4t
 
 ltrace -C -s 120 ./schrodinger_unpacked 2>&1 | grep "SecLeaf"
 for i in {0..5}; do
