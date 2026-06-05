@@ -96,17 +96,16 @@ print(f"s2 (hex): {hex(s)[2:]}")
 
 
 from pwn import *
-import subprocess
+import requests
 import random
 from hashlib import sha256
 from Crypto.PublicKey import ECC
 
 # ВСТАВЬ СЮДА СВЕЖИЙ АДРЕС ИЗ ЗАДАНИЯ
-host = "glazed-foie-gras-stuffed-with-shaved-thyme-awrp.gpn24.ctf.kitctf.de"
+host = "ТВОЙ_НОВЫЙ_ХОСТ.gpn24.ctf.kitctf.de"
 
 def main():
     log.info("Поднимаем ncat-процесс для связи...")
-    # pwntools + ncat работают безотказно и не падают на SSL хендшейках
     io = process(['ncat', '--ssl', host, '443'])
     
     io.recvuntil(b"check please`.")
@@ -161,18 +160,24 @@ for row in L:
         print(d % n)
         break
 """
-    with open("solver.sage", "w") as f:
-        f.write(sage_script)
 
-    log.info("Делегируем вычисление решетки в движок Sage...")
+    log.info("Отправляем матрицу в онлайн API SageCell...")
     try:
-        # Вызываем системный sage и перехватываем вывод
-        output = subprocess.check_output(['sage', 'solver.sage'], stderr=subprocess.STDOUT)
-        # Очищаем вывод от лишних логов саджа, забираем последнюю строку (сам ключ)
-        d = int(output.decode().strip().split('\n')[-1])
+        response = requests.post(
+            'https://sagecell.sagemath.org/service',
+            data={'code': sage_script}
+        )
+        result = response.json()
+        if not result.get('success'):
+            log.error(f"Ошибка на стороне SageCell: {result.get('stderr')}")
+            return
+        
+        output = result['stdout'].strip()
+        # Забираем последнюю строку из вывода, это наш ключ
+        d = int(output.split('\n')[-1])
         log.success(f"Приватный ключ взломан: {hex(d)}")
     except Exception as e:
-        log.error(f"Sage не справился: {e}")
+        log.error(f"Сбой при работе с API: {e}")
         return
 
     log.info("Подписываем победный рецепт от лица сервера...")
