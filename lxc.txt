@@ -186,10 +186,9 @@ if __name__ == "__main__":
 
 
 from pwn import *
-import subprocess
 
 # ВСТАВЬ СВЕЖИЙ ХОСТ СЮДА
-host = "ТВОЙ_ХОСТ.gpn24.ctf.kitctf.de"
+host = "ТВОЙ_НОВЫЙ_ХОСТ.gpn24.ctf.kitctf.de"
 
 def main():
     log.info("Поднимаем ncat-процесс...")
@@ -218,7 +217,7 @@ def main():
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    # Обновленный скрипт с центрированием и BKZ
+    # Обновленный скрипт с прогрессивным поиском (LLL -> BKZ-10 -> BKZ-15)
     sage_code = f"""
 A = {A_rows}
 b = {b_target}
@@ -226,15 +225,13 @@ M_dim = 164
 N_dim = 64
 q = 12289
 
-# 1. Центрируем мишень
 b_centered = []
 for j in range(N_dim):
     sum_A = sum(A[j][i] for i in range(M_dim))
     b_centered.append((b[j] - 4 * sum_A) % q)
 
-# 2. Настраиваем веса для Каннанова вложения
-W_eq = 10000
-W_kan = 40
+W_eq = 1000
+W_kan = 2
 
 L = Matrix(ZZ, M_dim + N_dim + 1, M_dim + N_dim + 1)
 for i in range(M_dim):
@@ -249,27 +246,40 @@ for j in range(N_dim):
 
 L[M_dim + N_dim, M_dim + N_dim] = W_kan
 
-print("Запускаю алгоритм BKZ (это мощнее LLL, займет 2-10 секунд)...")
-L = L.BKZ(block_size=25)
+def check_matrix(mat):
+    for row in mat:
+        if abs(row[-1]) == W_kan:
+            x = row[:M_dim]
+            if row[-1] == -W_kan:
+                x = [-v for v in x]
+            s = [v + 4 for v in x]
+            if all(0 <= v <= 9 for v in s):
+                return s
+    return None
 
-found = False
-for row in L:
-    if abs(row[-1]) == W_kan:
-        x = row[:M_dim]
-        if row[-1] == -W_kan:
-            x = [-v for v in x]
-            
-        # Смещаем обратно из [-4, 5] в [0, 9]
-        s = [v + 4 for v in x]
-        
-        if all(0 <= v <= 9 for v in s):
-            print("!!! СЕКРЕТ НАЙДЕН !!!")
+print("[*] Запускаю моментальный LLL...")
+L = L.LLL()
+s = check_matrix(L)
+
+if s:
+    print("!!! СЕКРЕТ НАЙДЕН (LLL) !!!")
+    print(" ".join(map(str, s)))
+else:
+    print("[-] LLL не вытянул, пробую легкий BKZ-10 (1-2 секунды)...")
+    L = L.BKZ(block_size=10)
+    s = check_matrix(L)
+    if s:
+        print("!!! СЕКРЕТ НАЙДЕН (BKZ-10) !!!")
+        print(" ".join(map(str, s)))
+    else:
+        print("[-] BKZ-10 мимо, запускаю BKZ-15 (до 10 секунд)...")
+        L = L.BKZ(block_size=15)
+        s = check_matrix(L)
+        if s:
+            print("!!! СЕКРЕТ НАЙДЕН (BKZ-15) !!!")
             print(" ".join(map(str, s)))
-            found = True
-            break
-
-if not found:
-    print("[-] Секрет не найден. Проверьте матрицу.")
+        else:
+            print("[-] Секрет не найден. Матрица повреждена.")
 """
     with open("solve.sage", "w") as f:
         f.write(sage_code)
