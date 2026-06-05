@@ -122,4 +122,5 @@ def solve():
 if __name__ == "__main__":
     solve()
 
-socat TCP-LISTEN:1337,fork,reuseaddr OPENSSL:pan-seared-leek-dusted-with-sauced-chimichurri-k1ug.gpn24.ctf.de:443,verify=0
+host = "pickled-celery-under-minced-spaetzle-4pmx.gpn24.ctf.kitctf.de"
+io = process(['ncat', '--ssl', host, '443'])
