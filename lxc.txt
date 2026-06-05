@@ -61,11 +61,68 @@ conda activate ctf_sage
 
 
 
-sudo apt install -y g++ libboost-program-options-dev libboost-filesystem-dev libboost-system-dev git
+import hashlib
 
+# Порядок кривой NIST P-521
+n = 6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
 
-git clone https://github.com/brimstone/fastcoll.git
-cd fastcoll
-make
+# ВСТАВЬ СВОИ 6 ПОДПИСЕЙ СЮДА
+# Формат: ("hex_сообщения", "s1_hex", "s2_hex")
+data = [
+    ("11", "0x...", "0x..."),
+    ("22", "0x...", "0x..."),
+    ("33", "0x...", "0x..."),
+    ("44", "0x...", "0x..."),
+    ("55", "0x...", "0x..."),
+    ("66", "0x...", "0x...")
+]
 
-./fastcoll -p ../prefix.bin -o ../out1.bin ../out2.bin
+t_list = []
+u_list = []
+
+for msg_hex, r_hex, s_hex in data:
+    msg = bytes.fromhex(msg_hex)
+    r = Integer(r_hex)
+    s = Integer(s_hex)
+    
+    # Считаем хэш так же, как на сервере
+    e = Integer(int.from_bytes(hashlib.sha256(msg).digest(), 'big'))
+    z = e & ~(1 << int(n).bit_length())
+    
+    s_inv = inverse_mod(s, n)
+    t = (r * s_inv) % n
+    u = (z * s_inv) % n
+    
+    t_list.append(t)
+    u_list.append(u)
+
+m = len(t_list)
+
+# Строим матрицу для LLL
+# X - коэффициент масштабирования, чтобы сбалансировать d и k
+X = n // (2**256)
+
+M = Matrix(ZZ, m + 2, m + 2)
+for i in range(m):
+    M[i, i] = n * X
+    M[m, i] = t_list[i] * X
+    M[m+1, i] = u_list[i] * X
+    
+M[m, m] = 1
+M[m+1, m+1] = n
+
+print("[*] Запускаю LLL...")
+L = M.LLL()
+
+d = None
+for row in L:
+    if row[-1] == n or row[-1] == -n:
+        d_candidate = row[-2]
+        if row[-1] == -n:
+            d_candidate = -d_candidate
+        d = d_candidate % n
+        print(f"[+] Найден приватный ключ (d):\n{hex(d)}")
+        break
+
+if d is None:
+    print("[-] Ключ не найден. Проверь ввод или добавь еще одну подпись.")
