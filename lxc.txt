@@ -186,6 +186,7 @@ if __name__ == "__main__":
 
 
 from pwn import *
+from z3 import *
 
 # ВСТАВЬ СВЕЖИЙ ХОСТ СЮДА
 host = "ТВОЙ_НОВЫЙ_ХОСТ.gpn24.ctf.kitctf.de"
@@ -199,7 +200,7 @@ def main():
     b_target = [int(x) for x in flag_hash_line.split()]
 
     A_cols = []
-    log.info("Извлекаем матрицу A (164 столбца)...")
+    log.info("Извлекаем матрицу A (164 столбца) в обход AVX2 бага...")
     for i in range(164):
         io.sendlineafter(b"Your choice: ", b"2")
         io.sendlineafter(b"How many vectors do you want to hash? (max 100): ", b"1")
@@ -212,111 +213,46 @@ def main():
         hash_line = io.recvline().decode().strip()
         A_cols.append([int(x) for x in hash_line.split()])
 
-        if (i + 1) % 20 == 0:
+        if (i + 1) % 41 == 0:
             log.success(f"Извлечено {i+1}/164 столбцов")
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    # Гибридная Каннан-Бабаи решетка
-    sage_code = f"""
-from sage.all import *
-
-A = {A_rows}
-b = {b_target}
-M_dim = 164
-N_dim = 64
-q = 12289
-
-# Центрируем цель
-b_centered = []
-for j in range(N_dim):
-    sum_A = sum(A[j][i] for i in range(M_dim))
-    b_centered.append((b[j] - 4 * sum_A) % q)
-
-A_mat = Matrix(GF(q), A)
-b_vec = vector(GF(q), b_centered)
-
-# 1. Частное решение (огромный вектор)
-t = A_mat.solve_right(b_vec)
-t_lift = vector(ZZ, [ZZ(x) for x in t])
-
-# 2. Ядро матрицы
-K = A_mat.right_kernel().matrix()
-basis_rows = []
-for row in K:
-    basis_rows.append([ZZ(x) for x in row])
-for i in range(M_dim):
-    v = [0]*M_dim
-    v[i] = q
-    basis_rows.append(v)
-
-print("[*] LLL редукция ядра...")
-L_sub = Matrix(ZZ, basis_rows).LLL()
-L_sub = Matrix(ZZ, [row for row in L_sub if not row.is_zero()])
-
-print("[*] Предварительное обрезание вектора (Babai)...")
-L_inv = Matrix(QQ, L_sub).inverse()
-c = vector(QQ, t_lift) * L_inv
-c_round = vector(ZZ, [round(x) for x in c])
-t_reduced = t_lift - c_round * L_sub
-
-# 3. Строим матрицу Каннана с идеальным весом
-W_kan = 37
-M = Matrix(ZZ, M_dim + 1, M_dim + 1)
-for i in range(M_dim):
-    for j in range(M_dim):
-        M[i, j] = L_sub[i, j]
-for j in range(M_dim):
-    M[M_dim, j] = t_reduced[j]
-M[M_dim, M_dim] = W_kan
-
-def check_matrix(mat):
-    for row in mat:
-        if abs(row[-1]) == W_kan:
-            x = row[:M_dim]
-            if row[-1] == -W_kan:
-                x = [-v for v in x]
-            s = [v + 4 for v in x]
-            if all(0 <= v <= 9 for v in s):
-                return s
-    return None
-
-print("[*] Запускаю перебор мощностей BKZ...")
-found = False
-for blk in [2, 15, 20, 25, 30, 35]:
-    if blk == 2:
-        print("[*] Проход LLL...")
-        M = M.LLL()
-    else:
-        print(f"[*] Проход BKZ-{{blk}}...")
-        M = M.BKZ(block_size=blk)
+    log.info("Матрица собрана. Заряжаем логический движок Z3...")
     
-    s = check_matrix(M)
-    if s:
-        print("!!! СЕКРЕТ НАЙДЕН !!!")
-        print(" ".join(map(str, s)))
-        found = True
-        break
-    else:
-        print("    -> Пока мимо, норма лучшего вектора:", M[0].norm().n() if M.nrows() > 0 else "N/A")
-
-if not found:
-    print("[-] Секрет не найден. Скрипт дошел до предела.")
-"""
-    with open("solve.sage", "w") as f:
-        f.write(sage_code)
-
-    log.info("Файл solve.sage готов! Идеальная гибридная решетка построена.")
-    log.info("Запускай sage solve.sage в соседней вкладке.")
+    # Объявляем 164 целочисленные переменные
+    s_vars = [Int(f's_{i}') for i in range(164)]
+    solver = Solver()
     
-    s_input = input("\n[?] Скопируй найденный секрет из соседней вкладки и вставь сюда: ").strip()
+    # Накладываем жесткие границы из исходного кода (модуль beta)
+    for i in range(164):
+        solver.add(s_vars[i] >= 0, s_vars[i] <= 9)
+        
+    # Загоняем 64 уравнения по модулю Q
+    q = 12289
+    for i in range(64):
+        # Используем z3.Sum для оптимизации большого дерева сложений
+        eq = Sum([A_rows[i][j] * s_vars[j] for j in range(164)])
+        solver.add(eq % q == b_target[i])
 
-    log.info("Отправляем секрет на проверку...")
-    io.sendlineafter(b"Your choice: ", b"0")
-    io.sendlineafter(b"ours:", s_input.encode())
-
-    log.success("Забирай флаг:")
-    io.interactive()
+    log.info("Z3 ищет точное решение. Обычно это занимает от 1 до 10 секунд...")
+    
+    if solver.check() == sat:
+        m = solver.model()
+        # Вытаскиваем значения из модели
+        sol = [m[s_vars[i]].as_long() for i in range(164)]
+        sol_str = " ".join(map(str, sol))
+        
+        log.success("!!! СЕКРЕТ НАЙДЕН !!!")
+        log.info("Сдаем вектор серверу...")
+        
+        io.sendlineafter(b"Your choice: ", b"0")
+        io.sendlineafter(b"ours:", sol_str.encode())
+        
+        log.success("Победа! Перехватываю флаг:")
+        io.interactive()
+    else:
+        log.error("Z3 не смог найти решение (unsat). Матрица могла быть искажена при передаче.")
 
 if __name__ == "__main__":
     main()
