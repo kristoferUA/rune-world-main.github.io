@@ -61,68 +61,34 @@ conda activate ctf_sage
 
 
 
-import hashlib
+from Crypto.PublicKey import ECC
+from hashlib import sha256
+import random
 
-# Порядок кривой NIST P-521
-n = 6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
+# Твой честно добытый приватный ключ
+d = 0x1865368b3d1d732aa408a4370fa5689cc33e662fbcdba0cefbff5d450cb26d50137c1748dc4a28372a02c2dfc4ea48e9598081c3fcc57b878d5ad42f1854613f9c5
 
-# ВСТАВЬ СВОИ 6 ПОДПИСЕЙ СЮДА
-# Формат: ("hex_сообщения", "s1_hex", "s2_hex")
-data = [
-    ("11", "0x...", "0x..."),
-    ("22", "0x...", "0x..."),
-    ("33", "0x...", "0x..."),
-    ("44", "0x...", "0x..."),
-    ("55", "0x...", "0x..."),
-    ("66", "0x...", "0x...")
-]
+# Восстанавливаем объект ключа
+sk = ECC.construct(curve="p521", d=d)
+n = int(sk._curve.order)
 
-t_list = []
-u_list = []
+# Уникальный рецепт, который мы подписываем
+recipe = b"give_me_the_flag_now_please"
 
-for msg_hex, r_hex, s_hex in data:
-    msg = bytes.fromhex(msg_hex)
-    r = Integer(r_hex)
-    s = Integer(s_hex)
-    
-    # Считаем хэш так же, как на сервере
-    e = Integer(int.from_bytes(hashlib.sha256(msg).digest(), 'big'))
-    z = e & ~(1 << int(n).bit_length())
-    
-    s_inv = inverse_mod(s, n)
-    t = (r * s_inv) % n
-    u = (z * s_inv) % n
-    
-    t_list.append(t)
-    u_list.append(u)
+def hash_message(message: bytes) -> int:
+    return int.from_bytes(sha256(message).digest())
 
-m = len(t_list)
+# Формируем стандартную подпись ECDSA
+e = hash_message(recipe)
+z = e & ~(1 << n.bit_length())
 
-# Строим матрицу для LLL
-# X - коэффициент масштабирования, чтобы сбалансировать d и k
-X = n // (2**256)
+k = random.randrange(1, n)
+P = k * sk._curve.G
+r = int(P.x % n)
+s = (pow(k, -1, n) * (z + r * d)) % n
 
-M = Matrix(ZZ, m + 2, m + 2)
-for i in range(m):
-    M[i, i] = n * X
-    M[m, i] = t_list[i] * X
-    M[m+1, i] = u_list[i] * X
-    
-M[m, m] = 1
-M[m+1, m+1] = n
-
-print("[*] Запускаю LLL...")
-L = M.LLL()
-
-d = None
-for row in L:
-    if row[-1] == n or row[-1] == -n:
-        d_candidate = row[-2]
-        if row[-1] == -n:
-            d_candidate = -d_candidate
-        d = d_candidate % n
-        print(f"[+] Найден приватный ключ (d):\n{hex(d)}")
-        break
-
-if d is None:
-    print("[-] Ключ не найден. Проверь ввод или добавь еще одну подпись.")
+print("Вводи на сервере 'flag please' и вставляй эти данные:")
+print("-" * 40)
+print(f"recipe (hex): {recipe.hex()}")
+print(f"s1 (hex): {hex(r)[2:]}")
+print(f"s2 (hex): {hex(s)[2:]}")
