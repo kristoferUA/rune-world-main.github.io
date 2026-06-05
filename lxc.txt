@@ -217,7 +217,7 @@ def main():
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    # Элегантное решение через ядро матрицы (без багов Babai)
+    # Добавлен прогрессивный BKZ без весов, который не вылетает в babai
     sage_code = f"""
 A = {A_rows}
 b = {b_target}
@@ -233,13 +233,9 @@ for j in range(N_dim):
 A_mat = Matrix(GF(q), A)
 b_vec = vector(GF(q), b_centered)
 
-# 1. Находим частное решение
 t = A_mat.solve_right(b_vec)
-
-# 2. Находим базис ядра
 K = A_mat.right_kernel().matrix()
 
-# 3. Строим решетку решений по модулю q
 basis_rows = []
 for row in K:
     basis_rows.append([ZZ(x) for x in row])
@@ -248,11 +244,9 @@ for i in range(M_dim):
     v[i] = q
     basis_rows.append(v)
 
-# 4. Сжимаем базис 
 L_sub = Matrix(ZZ, basis_rows).LLL()
 L_sub = Matrix(ZZ, [row for row in L_sub if not row.is_zero()])
 
-# 5. Строим финальную матрицу Каннана (всего 165x165)
 M = Matrix(ZZ, L_sub.nrows() + 1, M_dim + 1)
 for i in range(L_sub.nrows()):
     for j in range(M_dim):
@@ -263,26 +257,47 @@ for j in range(M_dim):
     M[L_sub.nrows(), j] = t_lift[j]
 M[L_sub.nrows(), M_dim] = 1
 
-print("[*] Запускаю идеальный LLL без весов...")
-res = M.LLL()
+def check_matrix(mat):
+    for row in mat:
+        if abs(row[-1]) == 1:
+            x = row[:M_dim]
+            if row[-1] == -1:
+                x = [-v for v in x]
+            s = [v + 4 for v in x]
+            if all(0 <= v <= 9 for v in s):
+                return s
+    return None
 
-for row in res:
-    if abs(row[-1]) == 1:
-        x = row[:M_dim]
-        if row[-1] == -1:
-            x = [-v for v in x]
-        # Смещаем обратно из [-4, 5] в [0, 9]
-        s = [v + 4 for v in x]
-        if all(0 <= v <= 9 for v in s):
-            print("!!! СЕКРЕТ НАЙДЕН !!!")
+print("[*] Предварительный проход LLL...")
+M = M.LLL()
+s = check_matrix(M)
+
+if s:
+    print("!!! СЕКРЕТ НАЙДЕН (LLL) !!!")
+    print(" ".join(map(str, s)))
+else:
+    print("[-] LLL не справился. Подключаю безопасный BKZ-15...")
+    M = M.BKZ(block_size=15)
+    s = check_matrix(M)
+    if s:
+        print("!!! СЕКРЕТ НАЙДЕН (BKZ-15) !!!")
+        print(" ".join(map(str, s)))
+    else:
+        print("[-] BKZ-15 не добил. Запускаю BKZ-20 (до 10 секунд)...")
+        M = M.BKZ(block_size=20)
+        s = check_matrix(M)
+        if s:
+            print("!!! СЕКРЕТ НАЙДЕН (BKZ-20) !!!")
             print(" ".join(map(str, s)))
-            break
+        else:
+            print("[-] Ошибка. Вывожу лучшие векторы для дебага:")
+            for row in M[:3]:
+                print("Последний элемент:", row[-1], " Норма:", row.norm().n())
 """
     with open("solve.sage", "w") as f:
         f.write(sage_code)
 
-    log.info("Файл solve.sage успешно сгенерирован (версия через ядро)!")
-    log.info("ОТКРОЙ НОВУЮ ВКЛАДКУ терминала и запусти команду: sage solve.sage")
+    log.info("Файл solve.sage готов! Запускай sage solve.sage в соседней вкладке.")
     
     s_input = input("\n[?] Скопируй найденный секрет из соседней вкладки и вставь сюда: ").strip()
 
