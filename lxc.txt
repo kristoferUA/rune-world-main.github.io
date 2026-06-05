@@ -310,3 +310,79 @@ else:
 
 if __name__ == "__main__":
     main()
+
+
+
+sage_code = f"""
+A = {A_rows}
+b = {b_target}
+M_dim = 164
+N_dim = 64
+q = 12289
+
+b_centered = []
+for j in range(N_dim):
+    sum_A = sum(A[j][i] for i in range(M_dim))
+    b_centered.append((b[j] - 4 * sum_A) % q)
+
+A_mat = Matrix(GF(q), A)
+b_vec = vector(GF(q), b_centered)
+
+t = A_mat.solve_right(b_vec)
+K = A_mat.right_kernel().matrix()
+
+basis_rows = []
+for row in K:
+    basis_rows.append([ZZ(x) for x in row])
+for i in range(M_dim):
+    v = [0]*M_dim
+    v[i] = q
+    basis_rows.append(v)
+
+L_sub = Matrix(ZZ, basis_rows).LLL()
+L_sub = Matrix(ZZ, [row for row in L_sub if not row.is_zero()])
+
+# Задаем вес Каннана
+W_kan = 60
+
+M = Matrix(ZZ, L_sub.nrows() + 1, M_dim + 1)
+for i in range(L_sub.nrows()):
+    for j in range(M_dim):
+        M[i, j] = L_sub[i, j]
+    M[i, M_dim] = 0
+
+t_lift = [ZZ(x) for x in t]
+for j in range(M_dim):
+    M[L_sub.nrows(), j] = t_lift[j]
+M[L_sub.nrows(), M_dim] = W_kan
+
+def check_matrix(mat):
+    for row in mat:
+        if abs(row[-1]) == W_kan:
+            x = row[:M_dim]
+            if row[-1] == -W_kan:
+                x = [-v for v in x]
+            s = [v + 4 for v in x]
+            if all(0 <= v <= 9 for v in s):
+                return s
+    return None
+
+print("[*] Запускаю идеальный LLL с правильным весом...")
+M = M.LLL()
+s = check_matrix(M)
+
+if s:
+    print("!!! СЕКРЕТ НАЙДЕН (LLL) !!!")
+    print(" ".join(map(str, s)))
+else:
+    print("[-] LLL не справился. Подключаю безопасный BKZ-15...")
+    M = M.BKZ(block_size=15)
+    s = check_matrix(M)
+    if s:
+        print("!!! СЕКРЕТ НАЙДЕН (BKZ-15) !!!")
+        print(" ".join(map(str, s)))
+    else:
+        print("[-] Ошибка. Вывожу лучшие векторы для дебага:")
+        for row in M[:3]:
+            print("Последний элемент:", row[-1] / W_kan, " Норма:", row.norm().n())
+"""
