@@ -96,16 +96,15 @@ print(f"s2 (hex): {hex(s)[2:]}")
 
 
 from pwn import *
-import requests
 import random
 from hashlib import sha256
 from Crypto.PublicKey import ECC
 
-# ВСТАВЬ СЮДА СВЕЖИЙ АДРЕС ИЗ ЗАДАНИЯ
-host = "ТВОЙ_НОВЫЙ_ХОСТ.gpn24.ctf.kitctf.de"
+# ВСТАВЬ СВЕЖИЙ ХОСТ СЮДА
+host = " glazed-foie-gras-stuffed-with-shaved-thyme-awrp.gpn24.ctf.kitctf.de"
 
 def main():
-    log.info("Поднимаем ncat-процесс для связи...")
+    log.info("Поднимаем ncat-процесс...")
     io = process(['ncat', '--ssl', host, '443'])
     
     io.recvuntil(b"check please`.")
@@ -124,64 +123,29 @@ def main():
         data.append((msg, s1, s2))
         log.success(f"[{i}/6] Вытащили подпись")
 
-    log.info("Генерируем скрипт для SageMath...")
-    sage_script = f"""
-import hashlib
-n = 6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449
-data = {data}
-t_list = []
-u_list = []
-for msg_hex, r_hex, s_hex in data:
-    msg = bytes.fromhex(msg_hex)
-    r = Integer(r_hex)
-    s = Integer(s_hex)
-    e = Integer(int.from_bytes(hashlib.sha256(msg).digest(), 'big'))
-    z = e & ~(1 << int(n).bit_length())
-    s_inv = inverse_mod(s, n)
-    t = (r * s_inv) % n
-    u = (z * s_inv) % n
-    t_list.append(t)
-    u_list.append(u)
+    # Формируем блок для Sage
+    sage_block = "data = [\n"
+    for msg, s1, s2 in data:
+        sage_block += f'    ("{msg}", "{s1}", "{s2}"),\n'
+    sage_block += "]\n"
 
-m = len(t_list)
-X = n // (2**256)
-M = Matrix(ZZ, m + 2, m + 2)
-for i in range(m):
-    M[i, i] = n * X
-    M[m, i] = t_list[i] * X
-    M[m+1, i] = u_list[i] * X
-M[m, m] = 1
-M[m+1, m+1] = n
+    with open("sage_data.txt", "w") as f:
+        f.write(sage_block)
 
-L = M.LLL()
-for row in L:
-    if row[-1] == n or row[-1] == -n:
-        d = row[-2] if row[-1] == n else -row[-2]
-        print(d % n)
-        break
-"""
-
-    log.info("Отправляем матрицу в онлайн API SageCell...")
+    log.info("Данные сохранены в sage_data.txt!")
+    log.info("Соединение удерживается. Быстро копируй данные в SageCell.")
+    
+    # Скрипт ждет твоего ввода
+    d_input = input("\n[?] Вставь найденный приватный ключ (d) сюда и нажми Enter: ").strip()
+    
     try:
-        response = requests.post(
-            'https://sagecell.sagemath.org/service',
-            data={'code': sage_script, 'accepted_tos': 'true'},
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
-        result = response.json()
-        if not result.get('success'):
-            log.error(f"Ошибка на стороне SageCell: {result.get('stderr')}")
-            return
-        
-        output = result['stdout'].strip()
-        # Забираем последнюю строку из вывода, это наш ключ
-        d = int(output.split('\n')[-1])
-        log.success(f"Приватный ключ взломан: {hex(d)}")
-    except Exception as e:
-        log.error(f"Сбой при работе с API: {e}")
+        # Поддерживаем и hex, и обычные числа
+        d = int(d_input, 16) if d_input.startswith("0x") else int(d_input)
+    except ValueError:
+        log.error("Неверный формат ключа!")
         return
 
-    log.info("Подписываем победный рецепт от лица сервера...")
+    log.info("Подписываем победный рецепт...")
     sk = ECC.construct(curve="p521", d=d)
     n_order = int(sk._curve.order)
     recipe = b"give_me_the_flag_now_please"
@@ -193,14 +157,13 @@ for row in L:
     r = int(P.x % n_order)
     s = (pow(k, -1, n_order) * (z + r * d)) % n_order
 
-    log.info("Отправляем 'flag please'...")
+    log.info("Сдаем рецепт серверу...")
     io.sendlineafter(b"\n> ", b"flag please")
-    
     io.sendlineafter(b"recipe (hex): ", recipe.hex().encode())
     io.sendlineafter(b"s1 (hex): ", hex(r)[2:].encode())
     io.sendlineafter(b"s2 (hex): ", hex(s)[2:].encode())
     
-    log.success("Пейлоад отправлен! Переходим в интерактивный режим для получения флага:")
+    log.success("Готово! Забирай флаг:")
     io.interactive()
 
 if __name__ == "__main__":
