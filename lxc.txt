@@ -217,7 +217,7 @@ def main():
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    # Обновленный скрипт с прогрессивным поиском (LLL -> BKZ-10 -> BKZ-15)
+    # Элегантное решение через ядро матрицы (без багов Babai)
     sage_code = f"""
 A = {A_rows}
 b = {b_target}
@@ -230,61 +230,58 @@ for j in range(N_dim):
     sum_A = sum(A[j][i] for i in range(M_dim))
     b_centered.append((b[j] - 4 * sum_A) % q)
 
-W_eq = 1000
-W_kan = 2
+A_mat = Matrix(GF(q), A)
+b_vec = vector(GF(q), b_centered)
 
-L = Matrix(ZZ, M_dim + N_dim + 1, M_dim + N_dim + 1)
+# 1. Находим частное решение
+t = A_mat.solve_right(b_vec)
+
+# 2. Находим базис ядра
+K = A_mat.right_kernel().matrix()
+
+# 3. Строим решетку решений по модулю q
+basis_rows = []
+for row in K:
+    basis_rows.append([ZZ(x) for x in row])
 for i in range(M_dim):
-    L[i, i] = 1
-for i in range(M_dim):
-    for j in range(N_dim):
-        L[i, M_dim + j] = A[j][i] * W_eq
-for i in range(N_dim):
-    L[M_dim + i, M_dim + i] = q * W_eq
-for j in range(N_dim):
-    L[M_dim + N_dim, M_dim + j] = -b_centered[j] * W_eq
+    v = [0]*M_dim
+    v[i] = q
+    basis_rows.append(v)
 
-L[M_dim + N_dim, M_dim + N_dim] = W_kan
+# 4. Сжимаем базис 
+L_sub = Matrix(ZZ, basis_rows).LLL()
+L_sub = Matrix(ZZ, [row for row in L_sub if not row.is_zero()])
 
-def check_matrix(mat):
-    for row in mat:
-        if abs(row[-1]) == W_kan:
-            x = row[:M_dim]
-            if row[-1] == -W_kan:
-                x = [-v for v in x]
-            s = [v + 4 for v in x]
-            if all(0 <= v <= 9 for v in s):
-                return s
-    return None
+# 5. Строим финальную матрицу Каннана (всего 165x165)
+M = Matrix(ZZ, L_sub.nrows() + 1, M_dim + 1)
+for i in range(L_sub.nrows()):
+    for j in range(M_dim):
+        M[i, j] = L_sub[i, j]
 
-print("[*] Запускаю моментальный LLL...")
-L = L.LLL()
-s = check_matrix(L)
+t_lift = [ZZ(x) for x in t]
+for j in range(M_dim):
+    M[L_sub.nrows(), j] = t_lift[j]
+M[L_sub.nrows(), M_dim] = 1
 
-if s:
-    print("!!! СЕКРЕТ НАЙДЕН (LLL) !!!")
-    print(" ".join(map(str, s)))
-else:
-    print("[-] LLL не вытянул, пробую легкий BKZ-10 (1-2 секунды)...")
-    L = L.BKZ(block_size=10)
-    s = check_matrix(L)
-    if s:
-        print("!!! СЕКРЕТ НАЙДЕН (BKZ-10) !!!")
-        print(" ".join(map(str, s)))
-    else:
-        print("[-] BKZ-10 мимо, запускаю BKZ-15 (до 10 секунд)...")
-        L = L.BKZ(block_size=15)
-        s = check_matrix(L)
-        if s:
-            print("!!! СЕКРЕТ НАЙДЕН (BKZ-15) !!!")
+print("[*] Запускаю идеальный LLL без весов...")
+res = M.LLL()
+
+for row in res:
+    if abs(row[-1]) == 1:
+        x = row[:M_dim]
+        if row[-1] == -1:
+            x = [-v for v in x]
+        # Смещаем обратно из [-4, 5] в [0, 9]
+        s = [v + 4 for v in x]
+        if all(0 <= v <= 9 for v in s):
+            print("!!! СЕКРЕТ НАЙДЕН !!!")
             print(" ".join(map(str, s)))
-        else:
-            print("[-] Секрет не найден. Матрица повреждена.")
+            break
 """
     with open("solve.sage", "w") as f:
         f.write(sage_code)
 
-    log.info("Файл solve.sage успешно сгенерирован!")
+    log.info("Файл solve.sage успешно сгенерирован (версия через ядро)!")
     log.info("ОТКРОЙ НОВУЮ ВКЛАДКУ терминала и запусти команду: sage solve.sage")
     
     s_input = input("\n[?] Скопируй найденный секрет из соседней вкладки и вставь сюда: ").strip()
