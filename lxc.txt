@@ -123,4 +123,5 @@ if __name__ == "__main__":
     solve()
 
 host = "pan-seared-leek-dusted-with-sauced-chimichurri-k1ug.gpn24.ctf.de"
-io = process(['ncat', '--ssl', host, '443'])
+# На всякий случай сверь порт с тем, что указан на платформе. Если там скрыт другой - поменяй 443 на нужный
+io = process(['openssl', 's_client', '-quiet', '-connect', f'{host}:443'])
