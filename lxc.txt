@@ -61,6 +61,65 @@ conda activate ctf_sage
 
 
 
+from pwn import *
+import hashlib
+import os
 
+# Логика разбиения базовой строки rockpaperscissors
+# Ключ - ход сервера, значение - (наш ход, суффикс для r1, r2)
+logic = {
+    b"rock": (b"paper", b"rock", b"scissors"),
+    b"paper": (b"scissors", b"rockpaper", b""),
+    b"scissors": (b"rock", b"", b"paperscissors")
+}
+
+def solve():
+    # Для тестирования локально:
+    io = process(['python3', 'main.py'])
+    
+    # Для удаленного сервера раскомментируй и вставь свои данные:
+    # Обрати внимание на порт - ncat --ssl обычно работает на 443 или 1337
+    # host = "pan-seared-leek-dusted-with-sauced-chimichurri-k1ug.gpntcf.com"
+    # io = remote(host, 443, ssl=True)
+    
+    io.recvline() # Пропускаем приветствие 
+    
+    for i in range(100):
+        # Генерируем уникальную соль для обхода already_seen
+        salt = os.urandom(8)
+        base_str = b"rockpaperscissors"
+        
+        # Формируем commitment
+        full_str = salt + base_str
+        commitment = hashlib.sha256(full_str).hexdigest()
+        
+        io.recvuntil(b"Commitment (hex): ")
+        io.sendline(commitment.encode())
+        
+        # Читаем ход сервера
+        io.recvuntil(b"I choose ")
+        server_choice = io.recvuntil(b".", drop=True)
+        
+        # Определяем наш ход и параметры доказательства
+        our_choice, r1_suffix, r2 = logic[server_choice]
+        
+        r1 = salt + r1_suffix
+        proof = f"{r1.hex()} {r2.hex()}".encode()
+        
+        # Отправляем наш ход
+        io.recvuntil(b"What did you choose? ")
+        io.sendline(our_choice)
+        
+        # Отправляем доказательство
+        io.recvuntil(b"Proof (hex): ")
+        io.sendline(proof)
+        
+        log.info(f"Раунд {i+1}/100: Сервер - {server_choice.decode()}, Мы - {our_choice.decode()}")
+
+    # Переходим в интерактивный режим, чтобы забрать флаг
+    io.interactive()
+
+if __name__ == "__main__":
+    solve()
 
 
