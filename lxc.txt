@@ -218,41 +218,41 @@ def main():
 
     A_rows = [[A_cols[col][row] for col in range(164)] for row in range(64)]
 
-    log.info("Матрица собрана. Заряжаем логический движок Z3...")
+    log.info("Строим чистую LIA-модель для Z3...")
     
-    # Объявляем 164 целочисленные переменные
+    # 164 переменные секрета и 64 переменные для обхода модуля
     s_vars = [Int(f's_{i}') for i in range(164)]
+    k_vars = [Int(f'k_{i}') for i in range(64)]
     solver = Solver()
     
-    # Накладываем жесткие границы из исходного кода (модуль beta)
+    # Задаем рамки из исходников (модуль beta)
     for i in range(164):
         solver.add(s_vars[i] >= 0, s_vars[i] <= 9)
         
-    # Загоняем 64 уравнения по модулю Q
     q = 12289
     for i in range(64):
-        # Используем z3.Sum для оптимизации большого дерева сложений
+        # Жестко ограничиваем k, чтобы Z3 не блуждал
+        solver.add(k_vars[i] >= 0, k_vars[i] <= 1500)
+        
+        # Строим линейное уравнение без оператора %
         eq = Sum([A_rows[i][j] * s_vars[j] for j in range(164)])
-        solver.add(eq % q == b_target[i])
+        solver.add(eq == b_target[i] + k_vars[i] * q)
 
-    log.info("Z3 ищет точное решение. Обычно это занимает от 1 до 10 секунд...")
+    log.info("Решаем систему... (теперь это займет меньше секунды)")
     
     if solver.check() == sat:
         m = solver.model()
-        # Вытаскиваем значения из модели
         sol = [m[s_vars[i]].as_long() for i in range(164)]
         sol_str = " ".join(map(str, sol))
         
         log.success("!!! СЕКРЕТ НАЙДЕН !!!")
-        log.info("Сдаем вектор серверу...")
-        
         io.sendlineafter(b"Your choice: ", b"0")
         io.sendlineafter(b"ours:", sol_str.encode())
         
         log.success("Победа! Перехватываю флаг:")
         io.interactive()
     else:
-        log.error("Z3 не смог найти решение (unsat). Матрица могла быть искажена при передаче.")
+        log.error("Z3 не нашел решение. Матрица могла быть искажена при передаче.")
 
 if __name__ == "__main__":
     main()
