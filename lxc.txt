@@ -122,6 +122,4 @@ def solve():
 if __name__ == "__main__":
     solve()
 
-host = "pan-seared-leek-dusted-with-sauced-chimichurri-k1ug.gpn24.ctf.de"
-# На всякий случай сверь порт с тем, что указан на платформе. Если там скрыт другой - поменяй 443 на нужный
-io = process(['openssl', 's_client', '-quiet', '-connect', f'{host}:443'])
+socat TCP-LISTEN:1337,fork,reuseaddr OPENSSL:pan-seared-leek-dusted-with-sauced-chimichurri-k1ug.gpn24.ctf.de:443,verify=0
