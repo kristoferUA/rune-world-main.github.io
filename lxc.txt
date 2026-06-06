@@ -205,19 +205,10 @@ class TieNode:
             return self.tie_val < other.tie_val
         return self.freq < other.freq
 
-class PureNode:
-    def __init__(self, char, freq):
-        self.char = char
-        self.freq = freq
-        self.left = None
-        self.right = None
-    def __lt__(self, other):
-        return self.freq < other.freq
-
 def build_trees(nodes_data):
     trees = {}
     
-    # 1. FIFO (стандартный алгоритм со счетчиком)
+    # 1. FIFO (Классический тайм-брейкер по времени добавления)
     heap = []
     for i, (char, freq) in enumerate(nodes_data):
         heapq.heappush(heap, TieNode(char, freq, i))
@@ -232,7 +223,7 @@ def build_trees(nodes_data):
         counter += 1
     trees['1_FIFO'] = heap[0]
 
-    # 2. LIFO (обратный тайм-брейкер для внутренних узлов)
+    # 2. LIFO (Обратный порядок)
     heap = []
     for i, (char, freq) in enumerate(nodes_data):
         heapq.heappush(heap, TieNode(char, freq, i))
@@ -247,32 +238,21 @@ def build_trees(nodes_data):
         counter -= 1
     trees['2_LIFO'] = heap[0]
 
-    # 3. Алфавитный порядок при коллизиях
+    # 3. Алфавитный порядок при равных весах
     heap = []
     for char, freq in nodes_data:
         heapq.heappush(heap, TieNode(char, freq, char))
     while len(heap) > 1:
         left = heapq.heappop(heap)
         right = heapq.heappop(heap)
-        parent = TieNode(None, left.freq + right.freq, '')
+        min_char = min(left.tie_val, right.tie_val)
+        parent = TieNode(None, left.freq + right.freq, min_char)
         parent.left = left
         parent.right = right
         heapq.heappush(heap, parent)
     trees['3_Alphabetical'] = heap[0]
 
-    # 4. Чистый Python Heap (без обработки коллизий, полагаемся на детерминизм Python)
-    heap = [PureNode(char, freq) for char, freq in nodes_data]
-    heapq.heapify(heap)
-    while len(heap) > 1:
-        left = heapq.heappop(heap)
-        right = heapq.heappop(heap)
-        parent = PureNode(None, left.freq + right.freq)
-        parent.left = left
-        parent.right = right
-        heapq.heappush(heap, parent)
-    trees['4_Pure_Heap'] = heap[0]
-
-    # 5. Стабильная сортировка списка (очень частый подход у тех, кто пишет алгоритм руками)
+    # 4. Стабильная ручная сортировка списка
     class StableNode:
         def __init__(self, char, freq):
             self.char = char
@@ -289,34 +269,43 @@ def build_trees(nodes_data):
         parent.left = left
         parent.right = right
         nodes.append(parent)
-    trees['5_Stable_Sort'] = nodes[0]
-
-    # 6. Shannon-Fano (альтернативный алгоритм, который иногда путают с Хаффманом)
-    sorted_nodes = sorted(nodes_data, key=lambda x: x[1], reverse=True)
-    class SFNode:
-        def __init__(self, char=None):
-            self.char = char
-            self.left = None
-            self.right = None
-    def split(sub_nodes):
-        if len(sub_nodes) == 1:
-            return SFNode(char=sub_nodes[0][0])
-        best_diff = float('inf')
-        best_idx = 1
-        total = sum(n[1] for n in sub_nodes)
-        left_sum = 0
-        for i in range(1, len(sub_nodes)):
-            left_sum += sub_nodes[i-1][1]
-            right_sum = total - left_sum
-            diff = abs(left_sum - right_sum)
-            if diff < best_diff:
-                best_diff = diff
-                best_idx = i
-        node = SFNode()
-        node.left = split(sub_nodes[:best_idx])
-        node.right = split(sub_nodes[best_idx:])
-        return node
-    trees['6_Shannon_Fano'] = split(sorted_nodes)
+    trees['4_Stable_Sort'] = nodes[0]
+    
+    # 5. Canonical Huffman (Используется в 90% криптографических библиотек)
+    lengths = {}
+    def get_lengths(node, depth):
+        if node.char is not None:
+            lengths[node.char] = depth
+        else:
+            get_lengths(node.left, depth + 1)
+            get_lengths(node.right, depth + 1)
+    
+    get_lengths(trees['1_FIFO'], 0)
+    sorted_lengths = sorted(lengths.items(), key=lambda x: (x[1], x[0]))
+    
+    canonical_codes = {}
+    current_code = 0
+    current_length = sorted_lengths[0][1]
+    
+    for char, length in sorted_lengths:
+        current_code = current_code << (length - current_length)
+        current_length = length
+        canonical_codes[char] = format(current_code, f'0{length}b')
+        current_code += 1
+        
+    can_tree = TieNode(None, 0, 0)
+    for char, code in canonical_codes.items():
+        curr = can_tree
+        for bit in code:
+            if bit == '0':
+                if not curr.left: curr.left = TieNode(None, 0, 0)
+                curr = curr.left
+            else:
+                if not curr.right: curr.right = TieNode(None, 0, 0)
+                curr = curr.right
+        curr.char = char
+        
+    trees['5_Canonical'] = can_tree
 
     return trees
 
@@ -324,7 +313,11 @@ def decode(tree, encoded_data, flip=False):
     decoded = []
     current = tree
     for bit in encoded_data:
-        b = '1' if bit == '0' else '0' if flip else bit
+        b = bit
+        if flip:
+            # Исправленная логика инверсии
+            b = '1' if bit == '0' else '0'
+            
         if b == '0':
             current = current.left
         else:
@@ -341,7 +334,8 @@ def main():
         for line in f:
             if not line.strip(): continue
             char = line[0]
-            freq = float(line[1:].strip())
+            # Умножаем на 100000, чтобы избежать проблем с плавающей запятой в Python
+            freq = int(round(float(line[1:].strip()) * 100000))
             nodes_data.append((char, freq))
             
     trees = build_trees(nodes_data)
@@ -350,15 +344,15 @@ def main():
         encoded_data = f.read().strip()
         
     for name, tree in trees.items():
-        res1 = decode(tree, encoded_data, flip=False)
-        res2 = decode(tree, encoded_data, flip=True)
+        print(f"\n--- Стратегия: {name} ---")
         
-        if "ctf{" in res1:
-            print(f"\\n--- Стратегия: {name} ---")
-            print("[0-left, 1-right]:", res1)
-        if "ctf{" in res2:
-            print(f"\\n--- Стратегия: {name} ---")
-            print("[1-left, 0-right]:", res2)
+        res1 = decode(tree, encoded_data, flip=False)
+        prefix1 = "[!!!] " if "ctf{" in res1 else "      "
+        print(f"{prefix1}[Standard]: {res1[:80]}...")
+        
+        res2 = decode(tree, encoded_data, flip=True)
+        prefix2 = "[!!!] " if "ctf{" in res2 else "      "
+        print(f"{prefix2}[Flipped] : {res2[:80]}...")
 
 if __name__ == '__main__':
     main()
