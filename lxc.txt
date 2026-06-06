@@ -193,44 +193,139 @@ if __name__ == "__main__":
 
 import heapq
 
-class Node:
+class TieNode:
+    def __init__(self, char, freq, tie_val):
+        self.char = char
+        self.freq = freq
+        self.tie_val = tie_val
+        self.left = None
+        self.right = None
+    def __lt__(self, other):
+        if self.freq == other.freq:
+            return self.tie_val < other.tie_val
+        return self.freq < other.freq
+
+class PureNode:
     def __init__(self, char, freq):
         self.char = char
         self.freq = freq
         self.left = None
         self.right = None
-
     def __lt__(self, other):
         return self.freq < other.freq
 
-def build_tree(nodes_list):
+def build_trees(nodes_data):
+    trees = {}
+    
+    # 1. FIFO (стандартный алгоритм со счетчиком)
     heap = []
-    # Добавляем счетчик, чтобы избежать ошибок сравнения при одинаковых частотах
-    for i, node in enumerate(nodes_list):
-        heapq.heappush(heap, (node.freq, i, node))
-        
-    counter = len(nodes_list)
+    for i, (char, freq) in enumerate(nodes_data):
+        heapq.heappush(heap, TieNode(char, freq, i))
+    counter = len(nodes_data)
     while len(heap) > 1:
-        freq1, _, left = heapq.heappop(heap)
-        freq2, _, right = heapq.heappop(heap)
-        
-        parent = Node(None, freq1 + freq2)
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+        parent = TieNode(None, left.freq + right.freq, counter)
         parent.left = left
         parent.right = right
-        
-        heapq.heappush(heap, (parent.freq, counter, parent))
+        heapq.heappush(heap, parent)
         counter += 1
-        
-    return heap[0][2]
+    trees['1_FIFO'] = heap[0]
 
-def decode(tree, encoded_data, flip_bits=False):
+    # 2. LIFO (обратный тайм-брейкер для внутренних узлов)
+    heap = []
+    for i, (char, freq) in enumerate(nodes_data):
+        heapq.heappush(heap, TieNode(char, freq, i))
+    counter = -1
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+        parent = TieNode(None, left.freq + right.freq, counter)
+        parent.left = left
+        parent.right = right
+        heapq.heappush(heap, parent)
+        counter -= 1
+    trees['2_LIFO'] = heap[0]
+
+    # 3. Алфавитный порядок при коллизиях
+    heap = []
+    for char, freq in nodes_data:
+        heapq.heappush(heap, TieNode(char, freq, char))
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+        parent = TieNode(None, left.freq + right.freq, '')
+        parent.left = left
+        parent.right = right
+        heapq.heappush(heap, parent)
+    trees['3_Alphabetical'] = heap[0]
+
+    # 4. Чистый Python Heap (без обработки коллизий, полагаемся на детерминизм Python)
+    heap = [PureNode(char, freq) for char, freq in nodes_data]
+    heapq.heapify(heap)
+    while len(heap) > 1:
+        left = heapq.heappop(heap)
+        right = heapq.heappop(heap)
+        parent = PureNode(None, left.freq + right.freq)
+        parent.left = left
+        parent.right = right
+        heapq.heappush(heap, parent)
+    trees['4_Pure_Heap'] = heap[0]
+
+    # 5. Стабильная сортировка списка (очень частый подход у тех, кто пишет алгоритм руками)
+    class StableNode:
+        def __init__(self, char, freq):
+            self.char = char
+            self.freq = freq
+            self.left = None
+            self.right = None
+            
+    nodes = [StableNode(char, freq) for char, freq in nodes_data]
+    while len(nodes) > 1:
+        nodes.sort(key=lambda x: x.freq, reverse=True)
+        right = nodes.pop()
+        left = nodes.pop()
+        parent = StableNode(None, left.freq + right.freq)
+        parent.left = left
+        parent.right = right
+        nodes.append(parent)
+    trees['5_Stable_Sort'] = nodes[0]
+
+    # 6. Shannon-Fano (альтернативный алгоритм, который иногда путают с Хаффманом)
+    sorted_nodes = sorted(nodes_data, key=lambda x: x[1], reverse=True)
+    class SFNode:
+        def __init__(self, char=None):
+            self.char = char
+            self.left = None
+            self.right = None
+    def split(sub_nodes):
+        if len(sub_nodes) == 1:
+            return SFNode(char=sub_nodes[0][0])
+        best_diff = float('inf')
+        best_idx = 1
+        total = sum(n[1] for n in sub_nodes)
+        left_sum = 0
+        for i in range(1, len(sub_nodes)):
+            left_sum += sub_nodes[i-1][1]
+            right_sum = total - left_sum
+            diff = abs(left_sum - right_sum)
+            if diff < best_diff:
+                best_diff = diff
+                best_idx = i
+        node = SFNode()
+        node.left = split(sub_nodes[:best_idx])
+        node.right = split(sub_nodes[best_idx:])
+        return node
+    trees['6_Shannon_Fano'] = split(sorted_nodes)
+
+    return trees
+
+def decode(tree, encoded_data, flip=False):
     decoded = []
     current = tree
     for bit in encoded_data:
-        if flip_bits:
-            bit = '1' if bit == '0' else '0'
-            
-        if bit == '0':
+        b = '1' if bit == '0' else '0' if flip else bit
+        if b == '0':
             current = current.left
         else:
             current = current.right
@@ -238,30 +333,32 @@ def decode(tree, encoded_data, flip_bits=False):
         if current.char is not None:
             decoded.append(current.char)
             current = tree
-            
     return "".join(decoded)
 
 def main():
-    nodes = []
+    nodes_data = []
     with open('alphabet.txt', 'r', encoding='utf-8') as f:
         for line in f:
             if not line.strip(): continue
             char = line[0]
             freq = float(line[1:].strip())
-            nodes.append(Node(char, freq))
+            nodes_data.append((char, freq))
             
-    tree = build_tree(nodes)
+    trees = build_trees(nodes_data)
     
     with open('output(1).txt', 'r', encoding='utf-8') as f:
         encoded_data = f.read().strip()
         
-    print("[*] Пробуем стандартную расшифровку (0 - влево, 1 - вправо):")
-    res1 = decode(tree, encoded_data, flip_bits=False)
-    print(res1)
-    
-    print("\n[*] Пробуем инвертированную расшифровку (1 - влево, 0 - вправо):")
-    res2 = decode(tree, encoded_data, flip_bits=True)
-    print(res2)
+    for name, tree in trees.items():
+        res1 = decode(tree, encoded_data, flip=False)
+        res2 = decode(tree, encoded_data, flip=True)
+        
+        if "ctf{" in res1:
+            print(f"\\n--- Стратегия: {name} ---")
+            print("[0-left, 1-right]:", res1)
+        if "ctf{" in res2:
+            print(f"\\n--- Стратегия: {name} ---")
+            print("[1-left, 0-right]:", res2)
 
 if __name__ == '__main__':
     main()
