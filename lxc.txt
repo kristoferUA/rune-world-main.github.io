@@ -1,6 +1,12 @@
 https://gpn24.ctf.kitctf.de
 user: dcua | email: dcua@defcon.org.ua | passwd: 8^LJ2Weh8lu2he4t
 
+
+
+https://dalctf2026.com/
+user: dcua | email: dcua@defcon.org.ua | passwd: Reo!rvC5$SNQvzI&
+
+
 ltrace -C -s 120 ./schrodinger_unpacked 2>&1 | grep "SecLeaf"
 for i in {0..5}; do
     echo "int rand(void) { return $i; }" > hook.c
