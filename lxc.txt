@@ -300,3 +300,7 @@ for width in range(200, 400):
         print(f"[+] Создан вариант: {filename}")
 
 print("[*] Готово! Открой папку и посмотри картинки.")
+
+
+
+dalCTF{WhY_$O_L0N5}
