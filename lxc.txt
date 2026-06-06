@@ -279,3 +279,24 @@ new_img.putdata(pixels)
 new_img.save('qr_final.png')
 
 print("[+] Файл qr_final.png успешно сохранен! Можно сканировать.")
+
+
+from PIL import Image
+
+img = Image.open('fixed.png').convert('RGB')
+pixels = list(img.getdata())
+total = len(pixels)
+
+print(f"[*] Всего пикселей: {total}")
+
+# Ищем все целые делители в разумном диапазоне
+for width in range(200, 400):
+    if total % width == 0:
+        height = total // width
+        new_img = Image.new('RGB', (width, height))
+        new_img.putdata(pixels)
+        filename = f'qr_{width}x{height}.png'
+        new_img.save(filename)
+        print(f"[+] Создан вариант: {filename}")
+
+print("[*] Готово! Открой папку и посмотри картинки.")
