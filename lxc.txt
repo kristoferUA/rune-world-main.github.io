@@ -258,3 +258,24 @@ fixed_data = fixed_data.replace(b'SEND', b'IEND')
 # 3. Сохраняем починенную картинку
 with open('fixed.png', 'wb') as f:
     f.write(fixed_data)
+
+
+from PIL import Image
+import math
+
+# Открываем нашу восстановленную картинку
+img = Image.open('fixed.png').convert('RGB')
+pixels = list(img.getdata())
+
+total_pixels = len(pixels)
+side = int(math.sqrt(total_pixels))
+
+print(f"[*] Всего пикселей: {total_pixels}")
+print(f"[*] Вычисленный размер квадрата: {side}x{side}")
+
+# Создаем новую квадратную картинку и заливаем туда пиксели по порядку
+new_img = Image.new('RGB', (side, side))
+new_img.putdata(pixels)
+new_img.save('qr_final.png')
+
+print("[+] Файл qr_final.png успешно сохранен! Можно сканировать.")
