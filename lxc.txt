@@ -342,3 +342,35 @@ while diff > 0:
         flag += chr(char_code)
 
 print(flag)
+
+
+zm a
+zpaa zzta zzzb zzzb zzze aaaa zqaa aaaa zzpa zzzc aaaa
+zm b
+maaa aaaa zzpa zzzd zzsa aaaa zqaa aaaa zzzb zzxa zzza zzta aaaa
+zm c
+oaaa
+zm d
+zqaa aaaa zzwa zzpa zzzj zzta aaaa
+zz fi
+zz fi
+zz fi
+zz di
+a
+zz fr
+zz dp
+zz di
+b
+zz fr
+zz dp
+zz di
+c
+zz fo
+zz di
+d
+zz fr
+zz dp
+zz di
+c
+zz fo
+ex
