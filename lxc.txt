@@ -1,3 +1,6 @@
+https://boroctf.com/
+dcua-school:9M@H*CSqkZmdY*gT
+
 https://gpn24.ctf.kitctf.de
 user: dcua | email: dcua@defcon.org.ua | passwd: 8^LJ2Weh8lu2he4t
 
