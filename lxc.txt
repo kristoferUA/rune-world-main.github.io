@@ -347,34 +347,40 @@ print(flag)
 
 
 zm a
-aapz atzz bzzz bzzz ezzz aaaa aaqz aaaa apzz czzz aaaa
-zz fi
+aapz atzz bzzz bzzz ezzz aaaa aaqz aaaa apzz czzz aaaa aaaa aaaa
 zz di
 a
+zz fo
+zz fi
+zz di
 zz fr
 zz fo
 zm a
 aaam aaaa apzz dzzz aszz aaaa aaqz aaaa bzzz axzz azzz atzz aaaa
-zz fi
 zz di
 a
+zz fo
+zz fi
+zz di
 zz fr
 zz fo
 zm a
-aaao aaaa
+aaao aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
 zz di
 a
 zz dp
 zz fo
 zm a
-aaqz aaaa awzz apzz jzzz atzz aaaa
-zz fi
+aaqz aaaa awzz apzz jzzz atzz aaaa aaaa aaaa aaaa aaaa aaaa aaaa
 zz di
 a
+zz fo
+zz fi
+zz di
 zz fr
 zz fo
 zm a
-aaao aaaa
+aaao aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa aaaa
 zz di
 a
 zz dp
