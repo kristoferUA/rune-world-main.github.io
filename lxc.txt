@@ -344,28 +344,37 @@ while diff > 0:
 print(flag)
 
 
+zz fi
+zz fi
+zz fi
 zm a
 aapz atzz bzzz bzzz ezzz aaaa aaqz aaaa apzz czzz aaaa
-zm b
-aaam aaaa apzz dzzz aszz aaaa aaqz aaaa bzzz axzz azzz atzz aaaa
-zm c
-aaao
-zm d
-aaqz aaaa awzz apzz jzzz atzz aaaa
-zm e
-aaao
-zz fi
-zz fi
-zz fi
 zz di
 a
 zz fr
-b
+zz fo
+zm a
+aaam aaaa apzz dzzz aszz aaaa aaqz aaaa bzzz axzz azzz atzz aaaa
+zz di
+a
 zz fr
-c
+zz fo
+zm a
+aaao
+zz di
+a
 zz dp
-d
+zz fo
+zm a
+aaqz aaaa awzz apzz jzzz atzz aaaa
+zz di
+a
 zz fr
-e
+zz fo
+zm a
+aaao
+zz di
+a
+zz dp
 zz fo
 ex
