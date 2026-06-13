@@ -358,30 +358,25 @@ def show_image(image):
             print(f"\033[38;2;{pixel[0]};{pixel[1]};{pixel[2]}m\033[48;2;{below_pixel[0]};{below_pixel[1]};{below_pixel[2]}m▀\033[0m", end="")
         print()
 
-# Генерируем 940 символов для 2 * BIG_INT_PAGE (Little Endian смещение)
-val_2 = BIG_INT_PAGE * 2
-chars = []
-temp = val_2
-for _ in range(940):
-    temp, remainder = divmod(temp, 55)
-    chars.append(ALPHABET[remainder])
-text_from_2x = "".join(chars)
+# Идеальный текст из 940 символов со всеми пробелами
+perfect_text = (
+    "This library is one that is held very dear to me. "
+    "When I was younger, I was obsessed with ciphers like Ceaser Cipher, Vigenere, and XOR. "
+    "Today however, those are far from secure, with more modern encryption like RSA taking the stand. "
+    "Faced with this, the older ciphers have become used more as an aesthetic than for actual purpose. "
+    "The neat part is however, that you can still use these, and if you do it well enough, people will not notice. "
+    "Still, the methods I previously mentioned are too common and recognizable to actually make a purpose of, so inventing new methods is more desirable. "
+    "Creation of an actual cipher like this is nearly impossible, yet I have set myself towards achieving this goal. "
+    "I became aware of the Library of Babel, and before trying to make a cipher with it, I had decided to learn how it works by creating this library. "
+    "What you see now is the finished product, and I hope you can have fun trying it out. Thanks"
+)
 
-# Идеальное начало текста (ровно 128 символов)
-perfect_start = "This library is one that is held very dear to me. When I was younger, I was obsessed with ciphers like Ceaser Cipher, Vigenere, "
-
-# Склеиваем идеальный текст из двух частей, игнорируя поврежденный файл
-perfect_text = perfect_start + text_from_2x[128:]
-
-# Вычисляем val от идеального текста
 val = 0
 for i, char in enumerate(perfect_text):
     val += ALPHABET.index(char) * (55 ** i)
 
-# Получаем правильный сид
 seed = val - BIG_INT_PAGE
 
-# Рисуем флаг
-print("На этот раз никаких белых квадратов. Рисуем флаг:")
+print("Рисуем флаг по-настоящему:")
 img = image_from_seed(seed)
 show_image(img)
