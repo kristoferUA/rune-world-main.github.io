@@ -353,12 +353,11 @@ oaaa
 zm d
 zqaa aaaa zzwa zzpa zzzj zzta aaaa
 zz fi
-zz fi
-zz fi
 zz di
 a
 zz fr
 zz dp
+zz fi
 zz di
 b
 zz fr
@@ -366,6 +365,7 @@ zz dp
 zz di
 c
 zz fo
+zz fi
 zz di
 d
 zz fr
