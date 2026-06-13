@@ -346,39 +346,37 @@ print(flag)
 
 
 
-zz fi
-zz fi
-zz fi
-zz di
-zz fr
-zz fr
-zz fr
-zz dp
-zz fo
-ex
-
-
-
-
-zz fi
 zm a
 aapz atzz bzzz bzzz ezzz aaaa aaqz aaaa apzz czzz aaaa
+zz fi
 zz di
 a
-zz dp
 zz fr
+zz fo
+zm a
+aaam aaaa apzz dzzz aszz aaaa aaqz aaaa bzzz axzz azzz atzz aaaa
+zz fi
+zz di
+a
+zz fr
+zz fo
+zm a
+aaao aaaa
+zz di
+a
 zz dp
 zz fo
-ex
-
-
-
 zm a
-aapz atzz bzzz bzzz ezzz aaaa
+aaqz aaaa awzz apzz jzzz atzz aaaa
+zz fi
 zz di
 a
-zz fi
 zz fr
+zz fo
+zm a
+aaao aaaa
+zz di
+a
 zz dp
 zz fo
 ex
