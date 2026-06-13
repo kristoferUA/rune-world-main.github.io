@@ -337,16 +337,46 @@ curl -X POST "https://dalctf-grafana-jitsu-39-64616c.instancer.dalctf2026.com/ap
 
 
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz., "
-# Вставь сюда начало своего вывода для проверки
-ciphertext = "yDpgjWtRNRSmkDeKUiITQdcYbOSNXIUXMGGCRWCZjqUsOzcMFUruNGSYGtaFQ"
+# Обязательно вставь сюда полный вывод скрипта
+ciphertext = "yDpgjWtRNRsmkDeKUiITQdcYbOSNXIUXMGGCRWCZjqUsOzcMFUruNGSYGtaFQ" 
 
-for shift in range(55):
+# Все слова из записки автора (очищенные от знаков препинания)
+note_words = [
+    "This", "library", "is", "one", "that", "held", "very", "dear", "to", "me",
+    "When", "I", "was", "younger", "obsessed", "with", "ciphers", "like", "Ceaser",
+    "Cipher", "Vigenere", "and", "XOR", "Today", "however", "those", "are", "far",
+    "from", "secure", "more", "modern", "encryption", "RSA", "taking", "the",
+    "stand", "Faced", "older", "have", "become", "used", "as", "an", "aesthetic",
+    "than", "for", "actual", "purpose", "The", "neat", "part", "you", "can",
+    "still", "use", "these", "if", "do", "it", "well", "enough", "people", "will",
+    "not", "notice", "Still", "methods", "previously", "mentioned", "too", "common",
+    "recognizable", "actually", "make", "a", "of", "so", "inventing", "new",
+    "desirable", "Creation", "cipher", "this", "nearly", "impossible", "yet",
+    "set", "myself", "towards", "achieving", "goal", "became", "aware", "Library",
+    "Babel", "before", "trying", "made", "decided", "learn", "how", "works", "by",
+    "creating", "What", "see", "now", "finished", "product", "hope", "fun", "out",
+    "Thanks"
+]
+
+# Оставляем только уникальные слова для оптимизации
+keys_to_try = list(set(note_words))
+
+for key in keys_to_try:
     plaintext = ""
-    for char in ciphertext:
+    key_len = len(key)
+    for i, char in enumerate(ciphertext):
         if char in ALPHABET:
-            idx = ALPHABET.index(char)
-            # Сдвигаем влево по нашему кастомному алфавиту
-            plaintext += ALPHABET[(idx - shift) % 55]
+            idx_c = ALPHABET.index(char)
+            key_char = key[i % key_len]
+            
+            if key_char in ALPHABET:
+                idx_k = ALPHABET.index(key_char)
+                # Выполняем сдвиг обратно
+                plaintext += ALPHABET[(idx_c - idx_k) % 55]
+            else:
+                plaintext += char
         else:
             plaintext += char
-    print(f"Сдвиг {shift}: {plaintext[:60]}")
+    
+    # Выводим ключ и начало текста, чтобы визуально найти осмысленный результат
+    print(f"Ключ [{key}]: {plaintext[:60]}")
