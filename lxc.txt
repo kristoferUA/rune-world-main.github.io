@@ -358,17 +358,30 @@ def show_image(image):
             print(f"\033[38;2;{pixel[0]};{pixel[1]};{pixel[2]}m\033[48;2;{below_pixel[0]};{below_pixel[1]};{below_pixel[2]}m▀\033[0m", end="")
         print()
 
-# ВАЖНО: Убедись, что читается оригинальный текст!
-with open("AUTHORSNOTE.txt", "r") as f:
-    text = f.read().replace("\n", "")
+# Генерируем 940 символов для 2 * BIG_INT_PAGE (Little Endian смещение)
+val_2 = BIG_INT_PAGE * 2
+chars = []
+temp = val_2
+for _ in range(940):
+    temp, remainder = divmod(temp, 55)
+    chars.append(ALPHABET[remainder])
+text_from_2x = "".join(chars)
 
+# Идеальное начало текста (ровно 128 символов)
+perfect_start = "This library is one that is held very dear to me. When I was younger, I was obsessed with ciphers like Ceaser Cipher, Vigenere, "
+
+# Склеиваем идеальный текст из двух частей, игнорируя поврежденный файл
+perfect_text = perfect_start + text_from_2x[128:]
+
+# Вычисляем val от идеального текста
 val = 0
-for i, char in enumerate(text):
+for i, char in enumerate(perfect_text):
     val += ALPHABET.index(char) * (55 ** i)
 
-# Вычисляем правильный seed
+# Получаем правильный сид
 seed = val - BIG_INT_PAGE
 
-print("Рисуем флаг...")
+# Рисуем флаг
+print("На этот раз никаких белых квадратов. Рисуем флаг:")
 img = image_from_seed(seed)
 show_image(img)
