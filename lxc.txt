@@ -352,24 +352,39 @@ zm c
 oaaa
 zm d
 zqaa aaaa zzwa zzpa zzzj zzta aaaa
+zm x
+aaaa
+zm y
+aaaa
+zm z
+aaaa
 zz fi
+zz fi
+zz fi
+zz di
+x
 zz fr
-zz fi
+zz di
+y
 zz fr
-zz fi
+zz di
+z
 zz fr
 zz di
 a
-zz dp
+zz di
+z
 zz di
 b
-zz dp
+zz di
+y
 zz di
 c
 zz fo
 zz di
 d
-zz dp
+zz di
+x
 zz di
 c
 zz fo
