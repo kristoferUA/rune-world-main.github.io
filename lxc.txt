@@ -345,36 +345,27 @@ print(flag)
 
 
 zm a
-zpaa zzta zzzb zzzb zzze aaaa zqaa aaaa zzpa zzzc aaaa
+aapz atzz bzzz bzzz ezzz aaaa aaqz aaaa apzz czzz aaaa
 zm b
-maaa aaaa zzpa zzzd zzsa aaaa zqaa aaaa zzzb zzxa zzza zzta aaaa
+aaam aaaa apzz dzzz aszz aaaa aaqz aaaa bzzz axzz azzz atzz aaaa
 zm c
-oaaa
+aaao
 zm d
-zqaa aaaa zzwa zzpa zzzj zzta aaaa
+aaqz aaaa awzz apzz jzzz atzz aaaa
+zm e
+aaao
 zz fi
-zz di
-d
-zz fr
 zz fi
-zz di
-b
-zz fr
 zz fi
 zz di
 a
 zz fr
-zz dp
-zz di
 b
-zz dp
-zz di
+zz fr
 c
-zz fo
-zz di
+zz dp
 d
-zz dp
-zz di
-c
+zz fr
+e
 zz fo
 ex
