@@ -94,3 +94,33 @@ print(f"Секретный сид для картинки: {seed}")
 
 
 boroCTF{oneSeedCipherInInfinity}
+
+
+import re
+
+with open('code(1)', 'r') as f:
+    text = f.read().strip()
+
+# Вырезаем фейк-флаг, чтобы восстановить оригинальное смещение пикселей
+text = re.sub(r'boroCTF\{.*?\}', '', text)
+
+# Разбиваем на строки по HEX-маркеру переноса (0A)
+lines = text.split('0A')
+
+print("\nОтрисовка картинки:\n")
+for line in lines:
+    # Убираем возможный мусор, оставляем только валидные HEX-символы
+    clean = re.sub(r'[^0-9A-Fa-f]', '', line)
+    
+    # Режем на куски по 6 символов (один RGB пиксель)
+    pixels = [clean[i:i+6] for i in range(0, len(clean), 6) if len(clean[i:i+6]) == 6]
+    
+    line_str = ""
+    for color in pixels:
+        r = int(color[0:2], 16)
+        g = int(color[2:4], 16)
+        b = int(color[4:6], 16)
+        # Печатаем двойной пробел с нужным цветом фона
+        line_str += f"\033[48;2;{r};{g};{b}m  \033[0m"
+    print(line_str)
+print("\n")
