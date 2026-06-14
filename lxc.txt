@@ -162,18 +162,18 @@ for y in range(height):
 
 draw = ImageDraw.Draw(img)
 
-# Функция для отрисовки правильного якоря QR-кода
+# Функция для отрисовки якоря (1 модуль = 2 пикселя, итого 14x14)
 def draw_anchor(start_x, start_y):
-    draw.rectangle([start_x, start_y, start_x+6, start_y+6], fill=(0, 0, 0))
-    draw.rectangle([start_x+1, start_y+1, start_x+5, start_y+5], fill=(255, 255, 255))
-    draw.rectangle([start_x+2, start_y+2, start_x+4, start_y+4], fill=(0, 0, 0))
+    draw.rectangle([start_x, start_y, start_x+13, start_y+13], fill=(0, 0, 0))
+    draw.rectangle([start_x+2, start_y+2, start_x+11, start_y+11], fill=(255, 255, 255))
+    draw.rectangle([start_x+4, start_y+4, start_x+9, start_y+9], fill=(0, 0, 0))
 
-# Восстанавливаем три угла
+# Восстанавливаем три угла с правильным смещением
 draw_anchor(0, 0)                # Левый верхний
-draw_anchor(width - 7, 0)        # Правый верхний
-draw_anchor(0, height - 7)       # Левый нижний
+draw_anchor(width - 14, 0)       # Правый верхний
+draw_anchor(0, height - 14)      # Левый нижний
 
-# Увеличиваем в 10 раз без сглаживания (чтобы пиксели остались четкими)
+# Увеличиваем в 10 раз без сглаживания
 img = img.resize((width * 10, height * 10), Image.Resampling.NEAREST)
 
 img.save('fixed_qr.png')
