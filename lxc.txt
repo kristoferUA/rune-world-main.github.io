@@ -122,3 +122,6 @@ print("Твой флаг:")
 print(flag)
 
 BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
+
+
+boroCTF\{[a-zA-Z0-9_]+\}
