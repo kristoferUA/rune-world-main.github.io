@@ -126,42 +126,55 @@ for line in lines:
 print("\n")
 
 
+from PIL import Image, ImageDraw
 import re
 
 with open('code(1)', 'r') as f:
     text = f.read().strip()
 
+# Вырезаем фейк-флаг
 text = re.sub(r'boroCTF\{.*?\}', '', text)
 lines = text.split('0A')
 clean_lines = [re.sub(r'[^0-9A-Fa-f]', '', line) for line in lines if line]
 
 width = len(clean_lines[0]) // 6
 height = len(clean_lines)
-scale = 10  # Увеличиваем в 10 раз для удобного редактирования
 
-with open('qr_to_fix.ppm', 'w') as out:
-    # Заголовок формата PPM (Portable Pixmap)
-    out.write(f"P3\n{width * scale} {height * scale}\n255\n")
+# Создаем базовое изображение
+img = Image.new('RGB', (width, height))
+pixels = img.load()
+
+# Заполняем пиксели и убираем красный цвет
+for y in range(height):
+    line = clean_lines[y]
+    colors = [line[i:i+6] for i in range(0, len(line), 6) if len(line[i:i+6]) == 6]
     
-    for y in range(height):
-        line = clean_lines[y]
-        colors = [line[i:i+6] for i in range(0, len(line), 6) if len(line[i:i+6]) == 6]
+    for x, color in enumerate(colors):
+        r = int(color[0:2], 16)
+        g = int(color[2:4], 16)
+        b = int(color[4:6], 16)
         
-        # Повторяем каждую строку scale раз (масштабирование по высоте)
-        for _ in range(scale):
-            for color in colors:
-                r = int(color[0:2], 16)
-                g = int(color[2:4], 16)
-                b = int(color[4:6], 16)
-                
-                # Обесцвечиваем красный вандализм (превращаем в белый)
-                # Коррекция ошибок QR-кода сама додумает стертые места
-                if r > 200 and g < 50 and b < 50:
-                    r, g, b = 255, 255, 255
-                    
-                # Масштабирование по ширине
-                for _ in range(scale):
-                    out.write(f"{r} {g} {b} ")
-            out.write("\n")
+        # Обесцвечиваем испорченные участки
+        if r > 200 and g < 50 and b < 50:
+            r, g, b = 255, 255, 255
+            
+        pixels[x, y] = (r, g, b)
 
-print("Сохранено как qr_to_fix.ppm!")
+draw = ImageDraw.Draw(img)
+
+# Функция для отрисовки правильного якоря QR-кода
+def draw_anchor(start_x, start_y):
+    draw.rectangle([start_x, start_y, start_x+6, start_y+6], fill=(0, 0, 0))
+    draw.rectangle([start_x+1, start_y+1, start_x+5, start_y+5], fill=(255, 255, 255))
+    draw.rectangle([start_x+2, start_y+2, start_x+4, start_y+4], fill=(0, 0, 0))
+
+# Восстанавливаем три угла
+draw_anchor(0, 0)                # Левый верхний
+draw_anchor(width - 7, 0)        # Правый верхний
+draw_anchor(0, height - 7)       # Левый нижний
+
+# Увеличиваем в 10 раз без сглаживания (чтобы пиксели остались четкими)
+img = img.resize((width * 10, height * 10), Image.Resampling.NEAREST)
+
+img.save('fixed_qr.png')
+print("Готово! Идеальный QR-код сохранен как fixed_qr.png")
