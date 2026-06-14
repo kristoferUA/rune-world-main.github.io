@@ -99,28 +99,32 @@ boroCTF{oneSeedCipherInInfinity}
 import os
 
 mnt_dir = "mnt_chal"
-flag = ""
+flag_inodes = ""
+flag_sizes = ""
 
-# Перебираем нечетные номера для логов входа
 for i in range(1, 505, 2):
     entry_file = os.path.join(mnt_dir, f"entry_log_{i}.txt")
-    # Лог выхода - это следующее четное число
     exit_file = os.path.join(mnt_dir, f"exit_log_{i+1}.txt")
     
     if os.path.exists(entry_file) and os.path.exists(exit_file):
-        t_entry = os.path.getmtime(entry_file)
-        t_exit = os.path.getmtime(exit_file)
+        # Проверяем иноды (главная теория для ext4)
+        ino_entry = os.stat(entry_file).st_ino
+        ino_exit = os.stat(exit_file).st_ino
         
-        # Считаем разницу (время "работы")
-        diff = int(t_exit - t_entry)
+        diff_ino = abs(ino_exit - ino_entry)
+        if diff_ino < 128:
+            flag_inodes += chr(diff_ino)
+            
+        # Проверяем размеры (запасной вариант)
+        size_entry = os.path.getsize(entry_file)
+        size_exit = os.path.getsize(exit_file)
         
-        try:
-            flag += chr(diff)
-        except ValueError:
-            pass
+        diff_size = abs(size_exit - size_entry)
+        if diff_size < 128:
+            flag_sizes += chr(diff_size)
 
-print("Расшифрованный флаг:")
-print(flag)
+print("Флаг из Inodes: " + flag_inodes)
+print("Флаг из Размеров: " + flag_sizes)
 
 
 BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
