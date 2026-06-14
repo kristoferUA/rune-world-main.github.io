@@ -96,30 +96,27 @@ print(f"Секретный сид для картинки: {seed}")
 boroCTF{oneSeedCipherInInfinity}
 
 
-import os
+import matplotlib.pyplot as plt
 
-mnt_dir = "mnt_chal"
-flag = ""
+xs = []
+ys = []
 
-# Файлы идут парами: 1-2, 3-4, 5-6...
-for i in range(1, 505, 2):
-    entry_file = os.path.join(mnt_dir, f"entry_log_{i}.txt")
-    exit_file = os.path.join(mnt_dir, f"exit_log_{i+1}.txt")
-    
-    if os.path.exists(entry_file) and os.path.exists(exit_file):
-        # Берем иноды обоих файлов
-        ino_entry = os.stat(entry_file).st_ino
-        ino_exit = os.stat(exit_file).st_ino
-        
-        # Считаем разницу
-        diff = abs(ino_exit - ino_entry)
-        
-        # Переводим в символ
-        if 32 <= diff <= 126: # Диапазон печатаемых ASCII
-            flag += chr(diff)
+# Читаем извлеченные IP-адреса
+with open("ips.txt", "r") as f:
+    for line in f:
+        parts = line.strip().split('.')
+        if len(parts) == 4:
+            # Третий октет - X, четвертый - Y
+            xs.append(int(parts[2]))
+            ys.append(int(parts[3]))
 
-print("Твой флаг:")
-print(flag)
+# Отрисовываем карту
+plt.figure(figsize=(10, 10), facecolor='black')
+plt.scatter(xs, ys, s=0.5, c='white')
+plt.gca().invert_yaxis() # Переворачиваем Y, так как координаты картинок идут сверху вниз
+plt.axis('off')
+plt.title("Exfiltrated Flag")
+plt.show()
 
 BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
 
