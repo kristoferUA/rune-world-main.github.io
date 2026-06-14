@@ -178,3 +178,6 @@ img = img.resize((width * 10, height * 10), Image.Resampling.NEAREST)
 
 img.save('fixed_qr.png')
 print("Готово! Идеальный QR-код сохранен как fixed_qr.png")
+
+
+BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
