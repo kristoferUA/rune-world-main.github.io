@@ -73,3 +73,66 @@ conda activate ctf_sage
 boroctf{typ0)m4st3r]
 boroCTF{SeArVZrMdSBeRgMcXe}
 boroCTF{SeArVzRmDsBeRgMcXe}
+
+
+import hashlib
+
+# Параметры кривой secp256k1
+N = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+
+def inverse_mod(k, p):
+    return pow(k, p - 2, p)
+
+# Сообщения транзакций 4 и 19
+msg1 = b"Suspect:FranklinGothic:21.68"
+msg2 = b"Suspect:ForeverFlames:45.46"
+
+# Хэши сообщений
+z1 = int(hashlib.sha256(msg1).hexdigest(), 16)
+z2 = int(hashlib.sha256(msg2).hexdigest(), 16)
+
+# Извлеченные параметры r и s из DER-подписей транзакций 4 и 19
+r = 0x2cbda85fc21f5e62f94d8378d2dad1a05bc5d5522d5a717f2bdf1df13d558ec7
+s1 = 0x4b2f38c18c2a933f81112350ae048f0162feaaed599f827180944ea3203570de
+s2 = 0x7db2d815212aab6b986d0a403b724ad5fd57d2d9e826bf2893e29d9d179d59f3
+
+# Вычисление скомпрометированного nonce k
+k = ((z1 - z2) * inverse_mod((s1 - s2) % N, N)) % N
+
+# Восстановление приватного ключа d (решение Boro Coin 1)
+d = ((s1 * k - z1) * inverse_mod(r, N)) % N
+
+# Создание новой транзакции для комитета
+msg3 = b"Suspect:Boro_Confiscation_Committee:32.35"
+z3 = int(hashlib.sha256(msg3).hexdigest(), 16)
+
+# Генерация новой подписи с использованием того же k
+s3 = ((z3 + r * d) * inverse_mod(k, N)) % N
+
+# Стандартизация s (BIP62)
+if s3 > N // 2:
+    s3 = N - s3
+
+# Упаковка в DER-формат
+def encode_der(r, s):
+    def to_bytes(val):
+        hex_str = hex(val)[2:]
+        if len(hex_str) % 2 != 0:
+            hex_str = '0' + hex_str
+        b = bytes.fromhex(hex_str)
+        if b[0] & 0x80:
+            b = b'\x00' + b
+        return b
+
+    r_b = to_bytes(r)
+    s_b = to_bytes(s)
+
+    r_encoded = b'\x02' + bytes([len(r_b)]) + r_b
+    s_encoded = b'\x02' + bytes([len(s_b)]) + s_b
+
+    seq = r_encoded + s_encoded
+    der = b'\x30' + bytes([len(seq)]) + seq
+    return der.hex()
+
+final_sig = encode_der(r, s3)
+print(f"boroCTF{{{final_sig}}}")
