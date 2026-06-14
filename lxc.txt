@@ -72,3 +72,4 @@ conda activate ctf_sage
 
 boroctf{typ0)m4st3r]
 boroCTF{SeArVZrMdSBeRgMcXe}
+boroCTF{SeArVzRmDsBeRgMcXe}
