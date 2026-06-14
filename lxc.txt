@@ -101,21 +101,19 @@ import os
 mnt_dir = "mnt_chal"
 flag = ""
 
-# Файлов около 500, берем с небольшим запасом
-for i in range(1, 505):
+# Перебираем нечетные номера для логов входа
+for i in range(1, 505, 2):
     entry_file = os.path.join(mnt_dir, f"entry_log_{i}.txt")
-    exit_file = os.path.join(mnt_dir, f"exit_log_{i}.txt")
+    # Лог выхода - это следующее четное число
+    exit_file = os.path.join(mnt_dir, f"exit_log_{i+1}.txt")
     
-    # Проверяем наличие пары логов
     if os.path.exists(entry_file) and os.path.exists(exit_file):
-        # Получаем время модификации (mtime)
         t_entry = os.path.getmtime(entry_file)
         t_exit = os.path.getmtime(exit_file)
         
-        # Вычисляем разницу во времени в секундах
+        # Считаем разницу (время "работы")
         diff = int(t_exit - t_entry)
         
-        # Переводим секунды в символ
         try:
             flag += chr(diff)
         except ValueError:
