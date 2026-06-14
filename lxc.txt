@@ -96,88 +96,33 @@ print(f"Секретный сид для картинки: {seed}")
 boroCTF{oneSeedCipherInInfinity}
 
 
-import re
+import os
 
-with open('code(1)', 'r') as f:
-    text = f.read().strip()
+mnt_dir = "mnt_chal"
+flag = ""
 
-# Вырезаем фейк-флаг, чтобы восстановить оригинальное смещение пикселей
-text = re.sub(r'boroCTF\{.*?\}', '', text)
-
-# Разбиваем на строки по HEX-маркеру переноса (0A)
-lines = text.split('0A')
-
-print("\nОтрисовка картинки:\n")
-for line in lines:
-    # Убираем возможный мусор, оставляем только валидные HEX-символы
-    clean = re.sub(r'[^0-9A-Fa-f]', '', line)
+# Файлов около 500, берем с небольшим запасом
+for i in range(1, 505):
+    entry_file = os.path.join(mnt_dir, f"entry_log_{i}.txt")
+    exit_file = os.path.join(mnt_dir, f"exit_log_{i}.txt")
     
-    # Режем на куски по 6 символов (один RGB пиксель)
-    pixels = [clean[i:i+6] for i in range(0, len(clean), 6) if len(clean[i:i+6]) == 6]
-    
-    line_str = ""
-    for color in pixels:
-        r = int(color[0:2], 16)
-        g = int(color[2:4], 16)
-        b = int(color[4:6], 16)
-        # Печатаем двойной пробел с нужным цветом фона
-        line_str += f"\033[48;2;{r};{g};{b}m  \033[0m"
-    print(line_str)
-print("\n")
-
-
-from PIL import Image, ImageDraw
-import re
-
-with open('code(1)', 'r') as f:
-    text = f.read().strip()
-
-# Вырезаем фейк-флаг
-text = re.sub(r'boroCTF\{.*?\}', '', text)
-lines = text.split('0A')
-clean_lines = [re.sub(r'[^0-9A-Fa-f]', '', line) for line in lines if line]
-
-width = len(clean_lines[0]) // 6
-height = len(clean_lines)
-
-# Создаем базовое изображение
-img = Image.new('RGB', (width, height))
-pixels = img.load()
-
-# Заполняем пиксели и убираем красный цвет
-for y in range(height):
-    line = clean_lines[y]
-    colors = [line[i:i+6] for i in range(0, len(line), 6) if len(line[i:i+6]) == 6]
-    
-    for x, color in enumerate(colors):
-        r = int(color[0:2], 16)
-        g = int(color[2:4], 16)
-        b = int(color[4:6], 16)
+    # Проверяем наличие пары логов
+    if os.path.exists(entry_file) and os.path.exists(exit_file):
+        # Получаем время модификации (mtime)
+        t_entry = os.path.getmtime(entry_file)
+        t_exit = os.path.getmtime(exit_file)
         
-        # Обесцвечиваем испорченные участки
-        if r > 200 and g < 50 and b < 50:
-            r, g, b = 255, 255, 255
-            
-        pixels[x, y] = (r, g, b)
+        # Вычисляем разницу во времени в секундах
+        diff = int(t_exit - t_entry)
+        
+        # Переводим секунды в символ
+        try:
+            flag += chr(diff)
+        except ValueError:
+            pass
 
-draw = ImageDraw.Draw(img)
-
-# Функция для отрисовки якоря (1 модуль = 2 пикселя, итого 14x14)
-def draw_anchor(start_x, start_y):
-    draw.rectangle([start_x, start_y, start_x+13, start_y+13], fill=(0, 0, 0))
-    draw.rectangle([start_x+2, start_y+2, start_x+11, start_y+11], fill=(255, 255, 255))
-    draw.rectangle([start_x+4, start_y+4, start_x+9, start_y+9], fill=(0, 0, 0))
-
-# Восстанавливаем три угла с правильным смещением
-draw_anchor(0, 0)                # Левый верхний
-draw_anchor(width - 14, 0)       # Правый верхний
-draw_anchor(0, height - 14)      # Левый нижний
-
-# Увеличиваем в 10 раз без сглаживания
-img = img.resize((width * 10, height * 10), Image.Resampling.NEAREST)
-
-img.save('fixed_qr.png')
-print("Готово! Идеальный QR-код сохранен как fixed_qr.png")
+print("Расшифрованный флаг:")
+print(flag)
 
 
 BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
