@@ -91,3 +91,6 @@ for i, char in enumerate(page):
 
 seed = V_val - C1
 print(f"Секретный сид для картинки: {seed}")
+
+
+boroCTF{oneSeedCipherInInfinity}
