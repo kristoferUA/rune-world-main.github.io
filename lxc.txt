@@ -99,13 +99,26 @@ boroCTF{oneSeedCipherInInfinity}
 import os
 
 mnt_dir = "mnt_chal"
-print("Анализ метаданных первых 20 файлов:")
+flag = ""
 
-for i in range(1, 21):
-    f_path = os.path.join(mnt_dir, f"entry_log_{i}.txt")
-    if os.path.exists(f_path):
-        stat = os.stat(f_path)
-        print(f"Файл: entry_log_{i}.txt | Inode: {stat.st_ino} | Size: {stat.st_size}")
+# Файлы идут парами: 1-2, 3-4, 5-6...
+for i in range(1, 505, 2):
+    entry_file = os.path.join(mnt_dir, f"entry_log_{i}.txt")
+    exit_file = os.path.join(mnt_dir, f"exit_log_{i+1}.txt")
+    
+    if os.path.exists(entry_file) and os.path.exists(exit_file):
+        # Берем иноды обоих файлов
+        ino_entry = os.stat(entry_file).st_ino
+        ino_exit = os.stat(exit_file).st_ino
+        
+        # Считаем разницу
+        diff = abs(ino_exit - ino_entry)
+        
+        # Переводим в символ
+        if 32 <= diff <= 126: # Диапазон печатаемых ASCII
+            flag += chr(diff)
 
+print("Твой флаг:")
+print(flag)
 
 BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
