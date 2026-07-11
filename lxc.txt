@@ -123,3 +123,12 @@ BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
 boroCTF\{[a-zA-Z0-9_]+\}
 
 sikorsky2026{ju5t_4n07h3r_1n53cur3_d4ta_c0n7a1n3r}
+
+
+
+import base64
+
+base64_string = "iBORw0KGgoAAAANSUhEUgAAALQAAAC0AQAAAAAVtjufAAABa0lEQVR42u2XMW4dMRBDnwz31A32/sf6N6BO8FLsxknjJhnDjQfYZrAgRhSHoOCnvrnUWhWQqoW3T37+h/5Zi7MPW6H7rMUc/jvgYZN9WLDBw+j8AHUfTrPb/8L5rH8d4LrKZh5/bc71InRRWHsQf4Fw/uoEzh7D/w3aWhIZ5h9olIpIaktH8ZNiSEqhyTA+NomEhEQ7PH9DW422iZnFN7Fow21DZZ5/DJX7m+ZfVRoJNcPzPzM3epM0qZ83IMts4KzNdXoc5t/GJNISGN2vdzhLoPt4EM7O8Py1oIgNidP3G4MmKjjuD4gGYlqTjOs/SWwNpOP+XA2NiM8KD+tTKkWx5Sv8GcyHyQ3jh8QYkz4nGPb/tsYI3PSM+n+11NrQFKf1XyR5dPQV+a2nHK59XmE8P0c2t21mv4bzMxC1aVOStNP6rNEkpvemTeK/wwYWOefFnyQ6qv8+Jgp3AB3OP8Y8Lsr0++unvrd+AdsxO+QpSUSHAAAAAElFTkSuQmCC"
+
+with open("puzzle.png", "wb") as file:
+    file.write(base64.b64decode(base64_string))
