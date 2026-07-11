@@ -121,3 +121,5 @@ BoroCTF{I_f1%ed_wHat_w4$_br0Ken}
 
 
 boroCTF\{[a-zA-Z0-9_]+\}
+
+sikorsky2026{ju5t_4n07h3r_1n53cur3_d4ta_c0n7a1n3r}
