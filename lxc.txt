@@ -140,3 +140,44 @@ with open("puzzle.png", "wb") as file:
 
 https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwi4hsTl8cqVAxXiIRAIHWK2L0YQFnoECBsQAQ&url=https%3A%2F%2Faddons.mozilla.org%2Fen-US%2Ffirefox%2Faddon%2Froblox-asset-downloader%2F&usg=AOvVaw2EJPWI5I5yZh8N7fQekDMn&opi=89978449
 124244210547931
+
+
+
+from Crypto.PublicKey import RSA
+from Crypto.Util.number import inverse, long_to_bytes, bytes_to_long
+import math
+
+def fermat_factor(n):
+    a = math.isqrt(n)
+    b2 = a*a - n
+    while b2 < 0 or math.isqrt(b2)**2 != b2:
+        a += 1
+        b2 = a*a - n
+    b = math.isqrt(b2)
+    return a - b, a + b
+
+# Читаем публичный ключ
+with open('public_key.pem', 'r') as f:
+    key = RSA.import_key(f.read())
+
+n = key.n
+e = key.e
+
+print("[*] Факторизуем модуль N методом Ферма...")
+p, q = fermat_factor(n)
+print(f"[+] Найдено p: {p}")
+print(f"[+] Найдено q: {q}")
+
+# Вычисляем приватную экспоненту d
+phi = (p - 1) * (q - 1)
+d = inverse(e, phi)
+
+# Расшифровываем флаг
+with open('flag.enc', 'rb') as f:
+    enc_data = f.read()
+
+c = bytes_to_long(enc_data)
+m = pow(c, d, n)
+
+flag = long_to_bytes(m)
+print(f"\n[!] Расшифрованный флаг: {flag.decode('utf-8', errors='ignore')}")
