@@ -13,153 +13,181 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 <!DOCTYPE html>
 <html lang="uk">
-    <!-- Прелоадер -->
-    <div id="preloader">
-      <div class="spinner-box">
-        <div class="configure-border-1">  
-          <div class="configure-core"></div>
-        </div>  
-        <div class="configure-border-2">
-          <div class="configure-core"></div>
-        </div> 
-      </div>
-    </div>
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RuneWorld</title>
-    <link rel="stylesheet" href="../../assets/css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/runeworld_css.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="icon" href="../../assets/images/favicon.ico" type="image/x-icon">
-
-    <!-- Open Graph метатеги -->
+    
     <meta property="og:title" content="RuneWorld - Сервер із теплою атмосферою Minecraft">
     <meta property="og:description" content="RuneWorld - ванільний сервер Minecraft із доброю атмосферою, низьким пінгом та дружнім ком'юніті. Приєднуйтесь до нас!">
-    <meta property="og:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg1.png">
+    <meta property="og:image" content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png">
     <meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/index.html?v=1">
     <meta property="og:type" content="website">
-
-    <!-- Для Twitter (Twitter Cards) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="RuneWorld - Сервер із теплою атмосферою Minecraft">
-    <meta name="twitter:description" content="RuneWorld - ванільний сервер Minecraft із доброю атмосферою, гарним античитом і дружнім ком'юніті. Приєднуйтесь до нас!">
-    <meta name="twitter:image" content="https://github.com/kristoferUA/rune-world-main.github.io/blob/main/tgimg.png">
 </head>
 <body>
+<div id="preloader">
+        <div class="spinner-box">
+            <div class="configure-border-1">  
+                <div class="configure-core"></div>
+            </div>  
+            <div class="configure-border-2">
+                <div class="configure-core"></div>
+            </div> 
+        </div>
+    </div>
     <header>
         <div class="header">
             <a href="../../index.html" class="logo-link">
-    <div class="logo">
-        RuneWorld
-        <img src="../../assets/images/iconrw.png" alt="RuneWorld Logo" class="logo-image">
-    </div>
-</a>
+                <div class="logo">
+                    RuneWorld
+                    <img src="../../assets/images/iconrw.png" alt="RuneWorld Logo" class="logo-image">
+                </div>
+            </a>
             <button class="menu-button" id="menu-button">Меню</button>
             <nav class="desktop-menu">
                 <a href="#application">Подати заявку</a>
                 <a href="#reviews">Відгуки</a>
                 <a href="#about">Античит</a>
-                <a href="ukrseasons.html">Мапи сезонів</a>
-                <a href="PlayerListMenuUkr.html">Список гравців</a>
+                <a href="../uk/ukrseasons.html">Мапи сезонів</a>
+                <a href="../uk/PlayerListMenuUkr.html">Список гравців</a>
                 <div class="dropdown-container">
-            <a href="#" class="dropdown-trigger" onclick="toggleDropdown(event)">
-                Клани
-                <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
-                    <path d="M7 10l5 5 5-5z" fill="currentColor"/>
-                </svg>
-            </a>
-            <div class="dropdown-menu" id="clansDropdown">
-                <a href="ukrMonolithPage.html" class="dropdown-item">
-                    <span class="dropdown-icon">⚔️</span>
-                    Моноліт
-                </a>
-                <a href="ukrmoytash.html" class="dropdown-item">
-                    <span class="dropdown-icon">🏗️</span>
-                    Мойташбуд
-                </a>
-            </div>
-        </div>
-                <a href="ukrEvents.html">Івенти</a>
+                    <a href="#" class="dropdown-trigger" onclick="toggleDropdown(event)">
+                        Клани
+                        <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16">
+                            <path d="M7 10l5 5 5-5z" fill="currentColor"/>
+                        </svg>
+                    </a>
+                    <div class="dropdown-menu" id="clansDropdown">
+                        <a href="../uk/ukrMonolithPage.html" class="dropdown-item">
+                            <span class="dropdown-icon">⚔️</span>
+                            Моноліт
+                        </a>
+                        <a href="../uk/ukrmoytash.html" class="dropdown-item">
+                            <span class="dropdown-icon">🗡️</span>
+                            Мойташбуд
+                        </a>
+                    </div>
+                </div>
+                <a href="../uk/ukrEvents.html">Івенти</a>
                 <a href="../../index.html">Російська версія</a>
-                <div class="menu-overlay" id="menu-overlay"></div>
             </nav>
+            <div class="menu-overlay" id="menu-overlay"></div>
         </div>
     </header>
+
     <div class="mobile-menu-overlay" id="mobile-menu-overlay">
         <div class="mobile-menu" id="mobile-menu">
             <button class="close-menu" id="close-menu">×</button>
             <a href="#application">Подати заявку</a>
             <a href="#reviews">Відгуки</a>
             <a href="#about">Античит</a>
-            <a href="ukrseasons.html">Мапи сезонів</a>
-            <a href="PlayerListMenuUkr.html">Список гравців</a>
-            <a href="ukrMonolithPage.html">Моноліт</a>
-            <a href="ukrmoytash.html">Мойташбуд</a>
-            <a href="ukrEvents.html">Івенти</a>
+            <a href="../uk/ukrseasons.html">Мапи сезонів</a>
+            <a href="../uk/PlayerListMenuUkr.html">Список гравців</a>
+            <a href="../uk/ukrMonolithPage.html">Моноліт</a>
+            <a href="../uk/ukrmoytash.html">Мойташбуд</a>
+            <a href="../uk/ukrEvents.html">Івенти</a>
             <a href="../../index.html">Російська версія</a>
         </div>
     </div>
-    <div class="main">
-        <div class="runelogo">
-                <img src="../../assets/images/runeworld.png" alt="Логотип сервера" class="runelogo-image">
-            </div>
-        <div class="text-overlay">
-            <h3>Про сервер RuneWorld</h3>
-            <p>Сервер RuneWorld - це ванільний Minecraft-сервер із теплою атмосферою, гарним хостингом, дружніми гравцями та добрими адміністраторами. Наш сервер працює на хостингу Minecraft Realms, завдяки чому всі гравці мають безперебійний доступ до сервера з будь-якої країни. На нашому сервері завжди низький пінг у будь-якій точці світу, адже сервер розташований на хостингу від Microsoft. У нас панує тепла атмосфера, проводяться івенти, будуються мега-проєкти та розвивається інфраструктура. Основою сервера є система сезонів, які починаються та завершуються кожного року. Актуальний сезон - 3 сезон. Приєднуйтесь до нас і станьте частиною нашого дружнього ком'юніті!</p>
-        </div>
-        <section class="video">
-            <div class="container">
-                <h2>YouTube канал сервера RuneWorld</h2>
-                <p><a href="https://www.youtube.com/@rune_craft2287?si=9OCK7hWKA1nPm93C" target="_blank">Відвідати канал RuneWorld на YouTube</a></p>
+
+    <main class="main-container">
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="minecraft-title">Про сервер RuneWorld</h1>
+                    <p>Сервер RuneWorld - це ванільний Minecraft-сервер із теплою атмосферою, гарним хостингом, дружніми гравцями та добрими адміністраторами. Наш сервер працює на хостингу Minecraft Realms, завдяки чому всі гравці мають безперебійний доступ до сервера з будь-якої країни. На нашому сервері завжди низький пінг у будь-якій точці світу, адже сервер розташований на хостингу від Microsoft. У нас панує тепла атмосфера, проводяться івенти, будуються мега-проєкти та розвивається інфраструктура. Основою сервера є система сезонів, які починаються та завершуються кожного року. Актуальний сезон - 3 сезон. Приєднуйтесь до нас і станьте частиною нашого дружнього ком'юніті!</p>           
+                </div>
+                <div class="hero-image">
+                    <img src="../../assets/images/creeper-img.png" alt="Creeper on Block" class="creeper-img">
+                </div>
             </div>
         </section>
-        <div class="buttons">
-    <a href="#application" class="main-button">Подати заявку</a>
-    <a href="#contacts" class="main-button">Контакти</a>
-</div>
-    </div>
-    <section class="application" id="application">
-        <div class="container">
-            <h2>Подати заявку</h2>
-            <p>Заповніть форму, і ми зв’яжемося з Вами</p>
-            <form id="appl-form" action="#" method="POST">
-                <input type="text" name="name" placeholder="Ваш нік" required>
-                <input type="email" name="email" placeholder="Ваш email" required>
-                <input type="text" name="discord" placeholder="Ваш нік у Discord" required>
-                <input type="text" name="telegram" placeholder="Ваш юзернейм у Telegram" required>
-                <button class="but-appl" id="but-appl" type="submit">Відправити</button>
-            </form>
-        </div>
-    </section>
-    <section class="about" id="about">
-        <div class="container">
-            <h2>Античит</h2>
-            <p>Для забезпечення чесної гри та підтримання справедливості на сервері RuneWorld впроваджено передову античит-систему. Ми використовуємо найсучасніші алгоритми для виявлення та блокування нечесних гравців, які намагаються отримати перевагу за допомогою заборонених модифікацій та читів. Наша античит-система регулярно оновлюється, щоб ефективно протистояти новим загрозам і методам злому. Ми прагнемо створити умови, за яких кожен гравець може насолоджуватися грою в рівних умовах, без загрози шахрайства чи нечесних методів. Приєднуйтесь до RuneWorld і насолоджуйтесь грою, знаючи, що ваша чесність захищена!</p>
-        </div>
-    </section>
-    <section class="reviews" id="reviews">
-        <div class="container">
-            <h2>Відгуки</h2>
-            <div class="review" id="review-1">
-                <p>Kristofer UA: "RuneWorld - це найкращий сервер, на якому я коли-небудь грав! Тут завжди доброзичлива атмосфера, низький пінг і чудові івенти. Адміни дійсно дбають про комфорт гравців, і це відчувається на кожному кроці. Усім рекомендую!"</p>
-            </div>
-            <div class="review" id="review-2">
-                <p>Rune_craft2287: "Граю на RuneWorld вже понад рік і можу сказати, що це дійсно особливе місце. Сезони надають грі динамічності, а мега-проєкти завжди надихають на створення чогось нового. Безпека та античит-система на висоті, грайте спокійно!"</p>
-            </div>
-            <div class="review" id="review-3">
-                <p>sokibtw: "Сервер RuneWorld став для мене справжнім домом у світі Minecraft. Тут завжди можна знайти нових друзів і отримати масу задоволення від гри. Особлива подяка адмінам за їхню працю та турботу про безпеку сервера. Найкращий вибір для всіх майнкрафтерів!"</p>
-            </div>
-        </div>
-    </section>
-    <section class="video">
-        <div class="container">
-            <h2>Discord канал сервера</h2>
-            <iframe src="https://discord.com/widget?id=1062052663002398790&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
-        </div>
-    </section>
 
-<button class="contact-button" onclick="toggleContactPopup()" aria-label="Зв'язатися з нами">
+        <section id="about" class="about-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Античит</h2>
+                <p>Для забезпечення чесної гри та підтримання справедливості на сервері RuneWorld впроваджено передову античит-систему. Ми використовуємо найсучасніші алгоритми для виявлення та блокування нечесних гравців, які намагаються отримати перевагу за допомогою заборонених модифікацій та читів. Наша античит-система регулярно оновлюється, щоб ефективно протистояти новим загрозам і методам злому. Ми прагнемо створити умови, за яких кожен гравець може насолоджуватися грою в рівних умовах, без загрози шахрайства чи нечесних методів. Приєднуйтесь до RuneWorld і насолоджуйтесь грою, знаючи, що ваша чесність захищена!</p>
+            </div>
+        </section>
+
+        <section class="youtube-section">
+            <div class="section-container">
+                <div class="youtube-content">
+                    <div class="youtube-logo">
+                        <span class="minecraft-title">RuneWorld</span>
+                        <svg width="60" height="60" viewBox="0 0 24 24" fill="#FF0000">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </div>
+                    <h2 class="minecraft-title">YouTube канал сервера RuneWorld</h2>
+                    <a href="https://www.youtube.com/@rune_craft2287?si=9OCK7hWKA1nPm93C" target="_blank" class="youtube-button">Відвідати канал</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="reviews" class="reviews-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Відгуки</h2>
+                <div class="reviews-wrapper">
+                    <div class="reviews-cards">
+                        <div class="review-card">
+                            <p>Rune_craft2287: "Граю на RuneWorld вже понад рік і можу сказати, що це дійсно особливе місце. Сезони надають грі динамічності, а мега-проєкти завжди надихають на створення чогось нового. Безпека та античит-система на висоті, грайте спокійно!"</p>
+                        </div>
+                        <div class="review-card">
+                            <p>sokibtw: "Сервер RuneWorld став для мене справжнім домом у світі Minecraft. Тут завжди можна знайти нових друзів і отримати масу задоволення від гри. Особлива подяка адмінам за їхню працю та турботу про безпеку сервера. Найкращий вибір для всіх майнкрафтерів!"</p>
+                        </div>
+                        <div class="review-card">
+                            <p>Kristofer UA: "RuneWorld - це найкращий сервер, на якому я коли-небудь грав! Тут завжди доброзичлива атмосфера, низький пінг і чудові івенти. Адміни дійсно дбають про комфорт гравців, і це відчувається на кожному кроці. Усім рекомендую!"</p>
+                        </div>
+                    </div>
+                    <div class="characters-image">
+                        <img src="../../assets/images/minecraft-characters.png" alt="Minecraft Characters" class="characters-img">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="application" class="application-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Подати заявку</h2>
+                <p class="form-subtitle">Заповніть форму, і ми зв'яжемося з Вами</p>
+                <form id="appl-form" action="#" method="POST">
+                    <input type="text" name="name" placeholder="Ваш нік" required>
+                    <input type="email" name="email" placeholder="Ваш email" required>
+                    <input type="text" name="discord" placeholder="Ваш нік у Discord" required>
+                    <input type="text" name="telegram" placeholder="Ваш юзернейм у Telegram" required>
+                    <button class="submit-button" id="but-appl" type="submit">Відправити</button>
+                </form>
+            </div>
+        </section>
+
+        <section class="discord-section">
+            <div class="section-container">
+                <h2 class="minecraft-title">Discord канал сервера</h2>
+                <div class="discord-widget">
+                    <iframe src="https://discord.com/widget?id=1062052663002398790&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+                </div>
+                <div class="runeworld-logo">
+                    <img src="../../assets/images/runeworld.png" alt="RuneWorld Logo" class="rw-logo">
+                </div>
+            </div>
+        </section>
+
+        <section class="contacts-section" id="contacts">
+            <div class="section-container">
+                <h2 class="minecraft-title">Контакти</h2>
+                <div class="contacts-info">
+                    <p><strong>Телефон:</strong> +375 29 394 3461 | +380 97 214 22 17</p>
+                    <p><strong>Email:</strong> <a href="mailto:admruneworld@gmail.com">admruneworld@gmail.com</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button class="contact-button" onclick="toggleContactPopup()" aria-label="Зв'язатися з нами">
         <svg class="message-icon" viewBox="0 0 24 24">
             <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
         </svg>
@@ -190,582 +218,13 @@ limitations under the License. -->
             </div>
         </div>
     </div>
-    
-    <section class="contacts" id="contacts">
-            <h2>Контакти адміністрації</h2>
-            <p><strong>Телефон:</strong> +375 29 394 3461
-            +380 97 214 22 17</p>
-            <p><strong>Email:</strong> <a href="mailto:admruneworld@gmail.com" class="email-link">admruneworld@gmail.com</a></p>
-        </div>
-    </section>
+
     <footer>
         <div class="footer">
             <p>&copy; 2026 RUNEWORLD</p>
         </div>
     </footer>
+
+    <script src="../../assets/js/runeworld_js.js"></script>
 </body>
 </html>
-<script>
-    const menuButton = document.getElementById('menu-button');
-    const closeMenuButton = document.getElementById('close-menu');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-
-    menuButton.addEventListener('click', () => {
-        mobileMenu.classList.add('open');
-        mobileMenuOverlay.classList.add('open');
-    });
-
-    closeMenuButton.addEventListener('click', () => {
-        mobileMenu.classList.remove('open');
-        mobileMenuOverlay.classList.remove('open');
-    });
-
-    mobileMenuOverlay.addEventListener('click', () => {
-        mobileMenu.classList.remove('open');
-        mobileMenuOverlay.classList.remove('open');
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-    const menuButton = document.getElementById('menu-button');
-    const closeMenuButton = document.getElementById('close-menu');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const overlay = document.getElementById('menu-overlay');
-    const body = document.body;
-
-    menuButton.addEventListener('click', (event) => {
-        event.stopPropagation(); 
-        mobileMenu.classList.add('active');
-        overlay.classList.add('active');
-        body.classList.add('body-no-scroll'); 
-    });
-
-    closeMenuButton.addEventListener('click', (event) => {
-        event.stopPropagation(); 
-        closeMenu();
-    });
-
-    overlay.addEventListener('click', () => {
-        closeMenu();
-    });
-
-    document.addEventListener('click', () => {
-        closeMenu();
-    });
-
-    function closeMenu() {
-        mobileMenu.classList.remove('active');
-        overlay.classList.remove('active');
-        body.classList.remove('body-no-scroll'); 
-    }
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const contactSection = document.querySelector(".about");
-
-    function checkVisibility() {
-        const rect = contactSection.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom >= 0) {
-            contactSection.classList.add("visible");
-        }
-    }
-
-    window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); 
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const contactSection = document.querySelector(".contacts");
-
-    function checkVisibility() {
-        const rect = contactSection.getBoundingClientRect();
-        if (rect.top < window.innerHeight && rect.bottom >= 0) {
-            contactSection.classList.add("visible");
-        }
-    }
-
-    window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); 
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const reviews = document.querySelectorAll(".review");
-
-    function checkVisibility() {
-        reviews.forEach((review, index) => {
-            const rect = review.getBoundingClientRect();
-            if (rect.top < window.innerHeight && rect.bottom >= 0) {
-                review.classList.add("visible");
-            }
-        });
-    }
-
-    window.addEventListener("scroll", checkVisibility);
-    checkVisibility(); 
-});
-</script>
-<script src="https://unpkg.com/gsap@3/dist/gsap.min.js"></script>
-<script src="https://unpkg.com/gsap@3/dist/CustomEase.min.js"></script>
-<script>
-  gsap.registerPlugin(CustomEase);
-  CustomEase.create("menuEase", "0.65, 0.01, 0.05, 0.99");
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const menuButton = document.getElementById('menu-button');
-    const closeMenuButton = document.getElementById('close-menu');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
-    const menuLinks = mobileMenu.querySelectorAll("a");
-
-    gsap.set(mobileMenu, { xPercent: 100 });
-    gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
-    gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
-
-    let tl = gsap.timeline({ 
-      paused: true, 
-      defaults: { ease: "menuEase", duration: 0.5 },
-      onReverseComplete: resetMenuState
-    });
-
-    function resetMenuState() {
-      gsap.set(mobileMenuOverlay, { autoAlpha: 0, display: 'none' });
-      gsap.set(mobileMenu, { xPercent: 100 });
-      gsap.set(menuLinks, { y: 50, autoAlpha: 0 });
-    }
-
-    tl.set(mobileMenuOverlay, { display: 'block', autoAlpha: 0 })
-      .to(mobileMenuOverlay, { autoAlpha: 1 }, 0)
-      .to(mobileMenu, { xPercent: 0 }, 0)
-      .to(menuLinks, { 
-       y: 0, 
-       autoAlpha: 1, 
-       stagger: 0.1,
-       duration: 0.25
-     }, "<+=0.2");
-
-
-    menuButton.addEventListener('click', () => {
-  if (tl.reversed()) {
-    tl.progress(0);
-  }
-  tl.timeScale(1); 
-  tl.play();
-});
-
-    const closeMenu = () => {
-  if (tl.isActive()) {
-    tl.progress(1);
-  }
-  tl.timeScale(4); 
-  tl.reverse();
-};
-
-
-    closeMenuButton.addEventListener('click', closeMenu);
-    mobileMenuOverlay.addEventListener('click', closeMenu);
-    
-    menuLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        closeMenu();
-        const targetId = link.getAttribute('href');
-        if (targetId && targetId.startsWith('#')) {
-          setTimeout(() => {
-            document.querySelector(targetId)?.scrollIntoView({ behavior: 'smooth' });
-          }, 500);
-        }
-      });
-    });
-  });
-</script>
-    <script>
-      window.addEventListener("load", () => {
-        const preloader = document.getElementById("preloader");
-        preloader.style.opacity = "1";
-        setTimeout(() => {
-          preloader.style.transition = "opacity 0.5s ease";
-          preloader.style.opacity = "0";
-          setTimeout(() => preloader.style.display = "none", 500);
-        }, 300); 
-      });
-    </script>
-<script>
-        let isPopupOpen = false;
-
-        function toggleContactPopup() {
-            const popup = document.getElementById('contactPopup');
-            isPopupOpen = !isPopupOpen;
-            
-            if (isPopupOpen) {
-                popup.classList.add('show');
-            } else {
-                popup.classList.remove('show');
-            }
-        }
-
-        function closeContactPopup() {
-            const popup = document.getElementById('contactPopup');
-            popup.classList.remove('show');
-            isPopupOpen = false;
-        }
-
-        function copyToClipboard(text, message) {
-            navigator.clipboard.writeText(text).then(function() {
-                showNotification(message);
-            }).catch(function() {
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                showNotification(message);
-            });
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #4CAF50;
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                z-index: 10000;
-                font-family: inherit;
-                font-size: 14px;
-                opacity: 0;
-                transform: translateY(-20px);
-                transition: all 0.3s ease;
-            `;
-            
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.opacity = '1';
-                notification.style.transform = 'translateY(0)';
-            }, 10);
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                notification.style.transform = 'translateY(-20px)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
-        document.addEventListener('click', function(event) {
-            const popup = document.getElementById('contactPopup');
-            const button = document.querySelector('.contact-button');
-            
-            if (isPopupOpen && !popup.contains(event.target) && !button.contains(event.target)) {
-                closeContactPopup();
-            }
-        });
-
-
-    </script>
-
-
-
-
-<script>
-/* --- Параметры --- */
-const _KEY = 's3cr3tK!';
-const encryptedChunks = [
-  '1b471702', '404e640e', '155c111f', '40043944',
-  '161d0a1d', '1c12644c', '055c0618', '52052e'
-];
-const PLACEHOLDER_ACTION = '#';
-
-function hexToBytes(hex) {
-  const bytes = [];
-  for (let c = 0; c < hex.length; c += 2) {
-    bytes.push(parseInt(hex.substr(c, 2), 16));
-  }
-  return bytes;
-}
-
-function xorDecryptFromHex(hexString, key) {
-  const bytes = hexToBytes(hexString);
-  let out = '';
-  for (let i = 0; i < bytes.length; i++) {
-    const k = key.charCodeAt(i % key.length);
-    out += String.fromCharCode(bytes[i] ^ k);
-  }
-  return out;
-}
-
-function decryptToken() {
-  const hex = encryptedChunks.join('');
-  return xorDecryptFromHex(hex, _KEY);
-}
-
-function wipeDecrypted(referenceObj) {
-  if (referenceObj && typeof referenceObj === 'object') {
-    for (const k in referenceObj) {
-      try { referenceObj[k] = null; } catch(e) {}
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.querySelector("#application form");
-  form.action = PLACEHOLDER_ACTION;
-
-  form.addEventListener('submit', function(e) {
-    e.preventDefault(); 
-
-    const name = this.querySelector("[name='name']").value.trim();
-    const email = this.querySelector("[name='email']").value.trim();
-    const discord = this.querySelector("[name='discord']").value.trim();
-    const telegram = this.querySelector("[name='telegram']").value.trim();
-
-    const badPatterns = /(https?:\/\/|www\.|http|bit\.ly|t\.me|tinyurl|viagra|casino|xxx|porn|adult|free-money|clickbait)/i;
-    const cyrillic = /[а-яА-ЯёЁ]/;
-    const namePattern = /^[a-zA-Z0-9-_]{3,}$/;
-    const emailPattern = /^[a-zA-Z0-9._\-@]{3,}$/;
-    const discordPattern = /^[a-zA-Z0-9-_#]{3,}$/;
-    const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
-
-    if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-      showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення.");
-      return;
-    }
-    if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
-      showNotification("Введіть коректний email! Перевірте формат адреси електронної пошти.");
-      return;
-    }
-    if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-      showNotification("Введіть коректний Discord! Використовуйте формат username#1234.");
-      return;
-    }
-    if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
-      showNotification("Введіть коректний Telegram! Використовуйте формат @username.");
-      return;
-    }
-
-    const realAction = decryptToken();
-    form.action = realAction;
-
-    showNotification("✅ Форма успішно відправлена! Дякуємо за заявку.");
-
-    setTimeout(() => {
-      try { form.submit(); } catch(err) { console.error('Не вдалося відправити форму програмно:', err); }
-    }, 0);
-
-    setTimeout(() => {
-      try { form.action = PLACEHOLDER_ACTION; } catch(_) {}
-      try { wipeDecrypted({ realAction }); } catch(_) {}
-    }, 1000);
-  });
-});
-
-function showNotification(message) {
-  const existingNotification = document.querySelector('.notification');
-  if (existingNotification) existingNotification.remove();
-
-  const notification = document.createElement('div');
-  notification.className = 'notification';
-  notification.innerHTML = `<span class="notification-icon">⚠️</span> ${message} <button class="close-btn" onclick="this.parentElement.remove()">×</button>`;
-  document.body.appendChild(notification);
-
-  setTimeout(() => { notification.classList.add('show'); }, 100);
-  setTimeout(() => {
-    if (notification.parentElement) {
-      notification.classList.remove('show');
-      setTimeout(() => { if (notification.parentElement) notification.remove(); }, 400);
-    }
-  }, 5000);
-}
-</script>
-
-
-
-
-
-<script>
-        function toggleDropdown(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            const trigger = event.currentTarget;
-            const dropdown = document.getElementById('clansDropdown');
-            const overlay = document.getElementById('menu-overlay');
-            
-            const isOpen = dropdown.classList.contains('show');
-            
-            if (isOpen) {
-                closeDropdown();
-            } else {
-                openDropdown();
-            }
-            
-            function openDropdown() {
-                dropdown.classList.add('show');
-                trigger.classList.add('active');
-                overlay.classList.add('active');
-            }
-            
-            function closeDropdown() {
-                dropdown.classList.remove('show');
-                trigger.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-            
-            overlay.onclick = closeDropdown;
-        }
-    
-        document.addEventListener('click', function(event) {
-            const dropdown = document.getElementById('clansDropdown');
-            const trigger = document.querySelector('.dropdown-trigger');
-            const overlay = document.getElementById('menu-overlay');
-            
-            if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
-                dropdown.classList.remove('show');
-                trigger.classList.remove('active');
-                overlay.classList.remove('active');
-            }
-        });
-    </script>
-
-
-<style>
-        header, .header {
-    z-index: 10; 
-    overflow: visible; 
-}
-
-        .dropdown-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .dropdown-trigger {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dropdown-arrow {
-            transition: transform 0.3s ease;
-        }
-
-        .dropdown-trigger.active .dropdown-arrow {
-            transform: rotate(180deg);
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            top: calc(100% + 10px);
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,248,255,0.95) 100%);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15), 
-                        0 0 0 1px rgba(255,255,255,0.2),
-                        inset 0 1px 0 rgba(255,255,255,0.8);
-            min-width: 180px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-50%) translateY(-10px) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            z-index: 9999;
-            overflow: hidden;
-        }
-
-        .dropdown-menu.show {
-            display: block;
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0) scale(1);
-        }
-
-        .dropdown-menu::before {
-            content: '';
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 8px solid transparent;
-            border-right: 8px solid transparent;
-            border-bottom: 8px solid rgba(255,255,255,0.95);
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            color: #333;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            font-weight: 500;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-
-        .dropdown-item:hover {
-            background: linear-gradient(135deg, rgba(71,184,255,0.1) 0%, rgba(58,125,233,0.1) 100%);
-            color: #2563eb;
-            transform: translateX(3px);
-        }
-
-        .dropdown-icon {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .menu-overlay {
-            display: none;
-        }
-
-        .menu-overlay.active {
-            display: block;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 999;
-            background: transparent;
-        }
-        #clansDropdown {
-    background: #ffffff; 
-    border: 1px solid #ffffff;
-    border-radius: 8px;
-    padding: 10px;
-    z-index: 9999;
-}
-
-#clansDropdown a {
-    display: block;
-    padding: 8px 12px;
-    color: #020202;        
-    text-decoration: none;
-    border-radius: 6px;
-    transition: background 0.3s, color 0.3s;
-}
-
-#clansDropdown a:hover {
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
-    color: #fff;
-}
-</style>
