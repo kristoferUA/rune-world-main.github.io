@@ -13,116 +13,298 @@ See the License for the specific language governing permissions and
 limitations under the License. -->
 <!DOCTYPE html>
 <html lang="uk">
-    <!-- 🔹 Прелоадер -->
-    <div id="preloader">
-      <div class="spinner-box">
-        <div class="configure-border-1">  
-          <div class="configure-core"></div>
-        </div>  
-        <div class="configure-border-2">
-          <div class="configure-core"></div>
-        </div> 
-      </div>
-    </div>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Список гравців - RuneWorld</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../../assets/css/seasons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/players-modern.css">
     <link rel="icon" href="../../assets/images/favicon.ico" type="image/x-icon">
 </head>
 <body>
+    <div id="preloader">
+        <div class="spinner-box">
+            <div class="configure-border-1">
+                <div class="configure-core"></div>
+            </div>
+            <div class="configure-border-2">
+                <div class="configure-core"></div>
+            </div>
+        </div>
+    </div>
+
     <header>
         <div class="header">
             <a href="ukrindex.html" class="logo-link">
-    <div class="logo">
-        RuneWorld
-        <img src="../../assets/images/iconrw.png" alt="RuneWorld Logo" class="logo-image">
-    </div>
-</a>
-            <nav>
+                <div class="logo">
+                    RuneWorld
+                    <img src="../../assets/images/iconrw.png" alt="RuneWorld Logo" class="logo-image">
+                </div>
+            </a>
+            <nav class="desktop-menu">
                 <a href="ukrindex.html">Головна</a>
             </nav>
         </div>
     </header>
 
-    <div class="main">
-        <h1 class="main-title">Список гравців</h1>
-        <div class="player-list">
-            <ul>
-                <li><button onclick="showPlayerMenu('runecraft2287')">Runecraft2287</button></li>
-                <li><button onclick="showPlayerMenu('💾kristoferUA💻')">kristofer UA</button></li>
-                <li><button onclick="showPlayerMenu('luotettawa4503')">Luotettawa4503</button></li>
-                <li><button onclick="showPlayerMenu('nickmoytash')">NickMoytash</button></li>
-                <li><button onclick="showPlayerMenu('denis12096')">Denis12096</button></li>
-                <li><button onclick="showPlayerMenu('moki8707')">Moki8707</button></li>
-                <li><button onclick="showPlayerMenu('sasha123490')">Sasha123490</button></li>
-                <li><button onclick="showPlayerMenu('sokibtw')">sokibtw</button></li>
-                <li><button onclick="showPlayerMenu('vlad_merea')">Vlad_merea</button></li>
-                <li><button onclick="showPlayerMenu('lidazub')">LidaZub</button></li>
-                <li><button onclick="showPlayerMenu('wrongaura742120')">WrongAura742120</button></li>
-                <li><button onclick="showPlayerMenu('andrusha513')">andrusha513</button></li>
-                <li><button onclick="showPlayerMenu('radion6774')">Radion6774</button></li>
-            </ul>
-        </div>
-        <div id="player-menu" class="mobile-menu" style="display: none;">
-            <h2 id="player-name"></h2>
-            <p id="player-stats"></p>
+    <main class="players-page">
+        <section class="players-hero">
+            <div class="hero-badge">Гравці сервера</div>
+            <h1 class="minecraft-title">Список гравців RuneWorld</h1>
+        </section>
+
+        <section class="players-panel" aria-label="Список гравців RuneWorld">
+            <div class="players-grid" id="playersGrid"></div>
+        </section>
+    </main>
+
+    <div class="player-modal" id="playerModal" aria-hidden="true">
+        <div class="player-modal-content" role="dialog" aria-modal="true" aria-labelledby="modalName">
+            <div class="modal-header">
+                <div class="modal-avatar" id="modalAvatar"></div>
+                <div>
+                    <div class="card-kicker modal-kicker">Профіль гравця</div>
+                    <h2 class="modal-name" id="modalName"></h2>
+                </div>
+                <button class="close-modal" type="button" id="closeModal" aria-label="Закрити вікно">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">Час у грі</div>
+                        <div class="stat-value" id="modalHours"></div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Статус</div>
+                        <div class="stat-value" id="modalStatus"></div>
+                    </div>
+                </div>
+                <div class="characteristic-box">
+                    <h2>Характеристика</h2>
+                    <p id="modalCharacteristic"></p>
+                </div>
+            </div>
         </div>
     </div>
 
     <footer>
-        <div class="footer">
-            <p>&copy; 2026 RUNEWORLD</p>
-        </div>
+        <p>&copy; 2026 RUNEWORLD</p>
     </footer>
 
     <script>
-        const playerData = {
-            'runecraft2287': { stats: 'Час у грі: 5760 год |', description: 'Характеристика: творець сервера, стрімер, ютубер, задрот виживання в майнкрафті, люблю копатися в шахті, будувати ферми, допомагати іншим гравцям, добрий, дуже люблю хованки та міні-ігри на The Hive' },
-            '💾kristoferUA💻': {
-                stats: 'Час у грі: 2647 год |',
-                description: 'Характеристика: ☢️😈Я технічний адміністратор сервера, розробник і кодер сервера, олд (граю з першого сезону), середній будівельник, креативний, комунікабельний.😈☢️'
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            preloader.style.opacity = '1';
+            setTimeout(() => {
+                preloader.style.transition = 'opacity 0.5s ease';
+                preloader.style.opacity = '0';
+                setTimeout(() => preloader.style.display = 'none', 500);
+            }, 300);
+        });
+    </script>
+
+    <script>
+        const players = [
+            {
+                        "name": "Runecraft2287",
+                        "hours": "5760 год",
+                        "characteristic": "творець сервера, стрімер, ютубер, задрот виживання в майнкрафті, люблю копатися в шахті, будувати ферми, допомагати іншим гравцям, добрий, дуже люблю хованки та міні-ігри на The Hive",
+                        "status": "Адмін"
             },
-            'luotettawa4503': { stats: 'Час у грі: 802 год |', description: 'Характеристика: Люблю виживання без грифа, будувати ферми, грати у міні-ігри на The Hive, допомагаю іншим гравцям, чесний і добрий, засуджую нецензурну лексику.' },
-            'nickmoytash': { stats: 'Час у грі: 644 год |', description: 'Характеристика: немає даних' },
-            'denis12096': { stats: 'Час у грі: 278 год |', description: 'Характеристика: Я звичайний гравець, який грає на RuneWorld з першого сезону. Займаюся будівництвом панельних будинків і доглядаю за ішаками.' },
-            'ggvplv1189': { stats: 'Час у грі: 17 год |', description: 'Характеристика: П’яний майстер без пива.' },
-            'moki8707': { stats: 'Час у грі: 2119 год |', description: 'Характеристика: немає даних' },
-            'sasha123490': { stats: 'Час у грі: 384 год |', description: 'Характеристика: Я пупсик, живу в Білорусі, люблю грати на сервері The Hive, також граю на RuneWorld 3. Був у Москві. Засуджую чіти, люблю довбити дівчат у колготках.' },
-            'sokibtw': { stats: 'Час у грі: 2052 год |', description: 'Характеристика: Радіант у Valorant, 10 рівень Faceit, добре стріляю камшоти.' },
-            'vlad_merea': { stats: 'Час у грі: 1076 год |', description: 'Характеристика: немає даних' },
-            'lidazub': { stats: 'Час у грі: немає даних |', description: 'Характеристика: немає даних' },
-            'wrongaura742120': { stats: 'Час у грі: немає даних |', description: 'Характеристика: немає даних' },
-            'andrusha513': { stats: 'Час у грі: немає даних |', description: 'Характеристика: немає даних' },
-            'radion6774': { stats: 'Час у грі: 1920 год |', description: 'Я радіатор, радіоприймач, радіо, Радик, рапік, білдер, який грає з 3 сезону, і депаю людей у казику ^^' },
+            {
+                        "name": "💾kristoferUA💻",
+                        "hours": "2647 год",
+                        "characteristic": "☢️😈Я технічний адміністратор сервера, розробник і кодер сервера, олд (граю з першого сезону), середній будівельник, креативний, комунікабельний.😈☢️",
+                        "status": "Технічний адмін"
+            },
+            {
+                        "name": "Luotettawa4503",
+                        "hours": "802 год",
+                        "characteristic": "Люблю виживання без грифа, будувати ферми, грати у міні-ігри на The Hive, допомагаю іншим гравцям, чесний і добрий, засуджую нецензурну лексику.",
+                        "status": "Ветеран"
+            },
+            {
+                        "name": "NickMoytash",
+                        "hours": "644 год",
+                        "characteristic": "немає даних",
+                        "status": "Ветеран"
+            },
+            {
+                        "name": "Denis12096",
+                        "hours": "278 год",
+                        "characteristic": "Я звичайний гравець, який грає на RuneWorld з першого сезону. Займаюся будівництвом панельних будинків і доглядаю за ішаками.",
+                        "status": "Ветеран"
+            },
+            {
+                        "name": "Moki8707",
+                        "hours": "2119 год",
+                        "characteristic": "немає даних",
+                        "status": "Гравець"
+            },
+            {
+                        "name": "Sasha123490",
+                        "hours": "384 год",
+                        "characteristic": "Я пупсик, живу в Білорусі, люблю грати на сервері The Hive, також граю на RuneWorld 3. Був у Москві. Засуджую чіти, люблю довбити дівчат у колготках.",
+                        "status": "Ветеран"
+            },
+            {
+                        "name": "sokibtw",
+                        "hours": "2052 год",
+                        "characteristic": "Радіант у Valorant, 10 рівень Faceit, добре стріляю камшоти.",
+                        "status": "Ветеран"
+            },
+            {
+                        "name": "Vlad_merea",
+                        "hours": "1076 год",
+                        "characteristic": "немає даних",
+                        "status": "Ветеран"
+            },
+            {
+                        "name": "LidaZub",
+                        "hours": "немає даних",
+                        "characteristic": "немає даних",
+                        "status": "Гравець"
+            },
+            {
+                        "name": "WrongAura742120",
+                        "hours": "немає даних",
+                        "characteristic": "немає даних",
+                        "status": "Гравець"
+            },
+            {
+                        "name": "andrusha513",
+                        "hours": "немає даних",
+                        "characteristic": "немає даних",
+                        "status": "Гравець"
+            },
+            {
+                        "name": "Radion6774",
+                        "hours": "1920 год",
+                        "characteristic": "Я радіатор, радіоприймач, радіо, Радик, рапік, білдер, який грає з 3 сезону, і депаю людей у казику ^^",
+                        "status": "Гравець"
+            },
+            {
+                        "name": "DADAS",
+                        "hours": "немає даних",
+                        "characteristic": "немає даних",
+                        "status": "Новачок"
+            }
+];
+        const emojiMap = {
+            "Runecraft2287": "👑",
+            "💾kristoferUA💻": "⚡",
+            "Freskacraft6746": "🌱",
+            "Luotettawa4503": "🌱",
+            "NickMoytash": "🎯",
+            "Denis12096": "🏗️",
+            "MyxaaXD": "🎮",
+            "Moki8707": "🎮",
+            "Sasha123490": "🐻",
+            "sokibtw": "🎯",
+            "Vlad_merea": "⚔️",
+            "Playcase1": "🏛️",
+            "LidaZub": "🌟",
+            "WrongAura742120": "🌟",
+            "andrusha513": "🎲",
+            "Radion6774": "📻",
+            "DADAS": "✨"
+};
+        const labels = {
+            time: "Час у грі",
+            status: "Статус",
+            noData: "Інформація про гравця поки недоступна"
         };
 
-        function showPlayerMenu(playerId) {
-            const menu = document.getElementById('player-menu');
-            const nameElem = document.getElementById('player-name');
-            const statsElem = document.getElementById('player-stats');
+        const playersGrid = document.getElementById('playersGrid');
+        const modal = document.getElementById('playerModal');
+        const closeModalButton = document.getElementById('closeModal');
 
-            const player = playerData[playerId];
-
-            nameElem.textContent = playerId.replace(/_/g, ' ');
-            statsElem.textContent = `${player.stats}\n${player.description}`;
-
-            menu.style.display = 'block';
+        function getPlayerEmoji(name) {
+            return emojiMap[name] || '🎮';
         }
+
+        function isNewbie(player) {
+            return player.status === 'Новичок' || player.status === 'Новачок';
+        }
+
+        function createPlayerCard(player, index) {
+            const card = document.createElement('button');
+            card.className = 'player-card';
+            card.type = 'button';
+            card.dataset.index = index;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'player-avatar';
+            avatar.textContent = getPlayerEmoji(player.name);
+
+            const name = document.createElement('div');
+            name.className = 'player-name';
+            name.textContent = player.name;
+
+            const meta = document.createElement('div');
+            meta.className = 'player-meta';
+
+            const hours = document.createElement('span');
+            hours.className = 'player-pill';
+            hours.textContent = `${labels.time}: ${player.hours}`;
+
+            const status = document.createElement('span');
+            status.className = isNewbie(player) ? 'player-pill status-newbie' : 'player-pill';
+            status.textContent = `${labels.status}: ${player.status}`;
+
+            meta.append(hours, status);
+            card.append(avatar, name, meta);
+
+            card.addEventListener('click', () => openModal(player));
+            return card;
+        }
+
+        function openModal(player) {
+            document.getElementById('modalAvatar').textContent = getPlayerEmoji(player.name);
+            document.getElementById('modalName').textContent = player.name;
+            document.getElementById('modalHours').textContent = player.hours;
+            document.getElementById('modalStatus').textContent = player.status;
+
+            const characteristicElement = document.getElementById('modalCharacteristic');
+            const characteristic = player.characteristic.trim();
+            const emptyValues = ['нет данных', 'немає даних'];
+
+            if (emptyValues.includes(characteristic.toLowerCase())) {
+                characteristicElement.textContent = labels.noData;
+                characteristicElement.classList.add('no-data-text');
+            } else {
+                characteristicElement.textContent = characteristic;
+                characteristicElement.classList.remove('no-data-text');
+            }
+
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('modal-open');
+        }
+
+        function closeModal() {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('modal-open');
+        }
+
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        closeModalButton.addEventListener('click', closeModal);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && modal.classList.contains('open')) {
+                closeModal();
+            }
+        });
+
+        players.forEach((player, index) => {
+            playersGrid.appendChild(createPlayerCard(player, index));
+        });
     </script>
 </body>
 </html>
- <!-- 🔹 Скрипт для прелоадера -->
-    <script>
-      window.addEventListener("load", () => {
-        const preloader = document.getElementById("preloader");
-        preloader.style.opacity = "1";
-        setTimeout(() => {
-          preloader.style.transition = "opacity 0.5s ease";
-          preloader.style.opacity = "0";
-          setTimeout(() => preloader.style.display = "none", 500);
-        }, 300); // маленькая задержка перед исчезновением
-      });
-    </script>
