@@ -80,15 +80,18 @@ button {
     top: 0;
     left: 0;
     width: 100%;
-    min-height: 80px;
+    min-height: 70px;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
+    padding: 10px 20px;
     color: #fff;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .logo-link {
@@ -99,7 +102,7 @@ button {
     display: flex;
     align-items: center;
     font-size: 24px;
-    font-weight: 700;
+    font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
     cursor: pointer;
 }
@@ -112,20 +115,20 @@ button {
 
 .desktop-menu {
     display: flex;
-    gap: 22px;
+    gap: 20px;
     align-items: center;
 }
 
 .desktop-menu a {
     color: #fff;
-    font-size: 15px;
-    font-weight: 500;
-    transition: color 0.3s, transform 0.2s;
+    font-size: 16px;
+    font-weight: 400;
+    padding: 5px 10px;
+    transition: color 0.3s ease, transform 0.2s ease;
     white-space: nowrap;
 }
 
-.desktop-menu a:hover,
-.desktop-menu a[aria-current="page"] {
+.desktop-menu a:hover {
     color: var(--rw-gold);
     transform: translateY(-2px);
 }
@@ -295,7 +298,7 @@ button {
 
 .seasons-hero {
     text-align: center;
-    padding: 46px 18px 34px;
+    padding: 46px 18px 26px;
     animation: fadeIn 0.9s ease both;
 }
 
@@ -331,11 +334,7 @@ button {
 }
 
 .hero-description {
-    max-width: 760px;
-    margin: 22px auto 0;
-    color: var(--rw-muted);
-    font-size: 18px;
-    line-height: 1.75;
+    display: none;
 }
 
 .downloads-panel {
@@ -399,15 +398,13 @@ button {
 }
 
 .card-content h2 {
-    margin: 7px 0 8px;
+    margin: 7px 0 0;
     font-size: clamp(24px, 3vw, 32px);
     line-height: 1.1;
 }
 
 .card-content p {
-    color: var(--rw-muted);
-    font-size: 16px;
-    line-height: 1.65;
+    display: none;
 }
 
 .download-button {
@@ -438,12 +435,13 @@ button {
 }
 
 .timer-section {
-    margin-top: 42px;
-    padding: 28px;
-    border: 1px solid var(--rw-border);
-    border-radius: 24px;
+    width: 100vw;
+    margin: 42px 0 0 calc(50% - 50vw);
+    padding: 30px max(24px, calc((100vw - 1120px) / 2 + 16px));
+    border-top: 1px solid var(--rw-border);
+    border-bottom: 1px solid var(--rw-border);
     background: var(--rw-surface);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+    box-shadow: none;
     backdrop-filter: blur(12px);
     animation: fadeInUp 0.8s ease both;
 }
@@ -461,22 +459,21 @@ button {
 .timer-card {
     max-width: 760px;
     margin: 0 auto;
-    padding: 18px;
-    border-radius: 18px;
-    background: rgba(0, 0, 0, 0.22);
-    border: 1px solid rgba(255, 255, 255, 0.10);
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: 0;
     overflow: hidden;
 }
 
 footer {
-    width: min(1120px, calc(100% - 32px));
-    margin: 0 auto 24px;
-    padding: 18px;
-    border-radius: 20px;
+    width: 100%;
+    margin: 0;
+    padding: 20px max(24px, calc((100vw - 1120px) / 2 + 16px));
     background: rgba(255, 255, 255, 0.08);
     color: var(--rw-muted);
     text-align: center;
-    border: 1px solid var(--rw-border);
+    border-top: 1px solid var(--rw-border);
 }
 
 /* ======================= */
@@ -568,15 +565,15 @@ footer {
 
 @media (max-width: 1180px) {
     .desktop-menu {
-        display: none;
+        display: flex;
     }
 
     .menu-button {
-        display: block;
+        display: none;
     }
 
     .header {
-        padding: 15px 20px;
+        padding: 10px 20px;
     }
 }
 
@@ -613,11 +610,11 @@ footer {
     }
 
     .timer-section {
-        padding: 20px;
+        padding: 24px 12px;
     }
 
     .timer-card {
-        padding: 12px;
+        padding: 0;
     }
 
     .tickcounter {
@@ -625,8 +622,14 @@ footer {
     }
 
     footer {
-        width: min(100% - 24px, 1120px);
-    }
+    width: 100%;
+    margin: 0;
+    padding: 20px max(24px, calc((100vw - 1120px) / 2 + 16px));
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--rw-muted);
+    text-align: center;
+    border-top: 1px solid var(--rw-border);
+}
 }
 
 @media (max-width: 420px) {
