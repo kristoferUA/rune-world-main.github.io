@@ -32,14 +32,14 @@
 }
 
 .screen:nth-child(1) {
-  background-image: url("qwer1.png"), linear-gradient(135deg, #6a11cb, #2575fc);
+  background-image: url("../images/qwer1.png"), linear-gradient(135deg, #6a11cb, #2575fc);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .screen:nth-child(2) {
-  background-image: url("qwer2.png"), linear-gradient(135deg, #2575fc, #6a11cb);
+  background-image: url("../images/qwer2.png"), linear-gradient(135deg, #2575fc, #6a11cb);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -825,7 +825,7 @@ footer {
     margin: 60px auto 20px;
     padding: 20px;
     min-height: calc(90vh - 70px);
-    background-image: url("opsilence1.png");
+    background-image: url("../images/opsilence1.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
