@@ -109,60 +109,60 @@ limitations under the License. -->
                         "name": "Runecraft2287",
                         "hours": "5760 год",
                         "characteristic": "творець сервера, стрімер, ютубер, задрот виживання в майнкрафті, люблю копатися в шахті, будувати ферми, допомагати іншим гравцям, добрий, дуже люблю хованки та міні-ігри на The Hive",
-                        "status": "Адмін"
+                        "status": "Гравець"
             },
             {
                         "name": "💾kristoferUA💻",
                         "hours": "2647 год",
                         "characteristic": "☢️😈Я технічний адміністратор сервера, розробник і кодер сервера, олд (граю з першого сезону), середній будівельник, креативний, комунікабельний.😈☢️",
-                        "status": "Технічний адмін"
+                        "status": "Тех. адмін"
             },
             {
-                        "name": "Luotettawa4503",
+                        "name": "Freskacraft6746",
                         "hours": "802 год",
-                        "characteristic": "Люблю виживання без грифа, будувати ферми, грати у міні-ігри на The Hive, допомагаю іншим гравцям, чесний і добрий, засуджую нецензурну лексику.",
-                        "status": "Ветеран"
+                        "characteristic": "Люблю виживання без грифа, будувати ферми, грати у міні-ігри на The Hive, допомагаю іншим гравцям, чесний і добрий, засуджую мат.",
+                        "status": "Гравець"
             },
             {
                         "name": "NickMoytash",
                         "hours": "644 год",
                         "characteristic": "немає даних",
-                        "status": "Ветеран"
+                        "status": "Гравець"
             },
             {
                         "name": "Denis12096",
                         "hours": "278 год",
-                        "characteristic": "Я звичайний гравець, який грає на RuneWorld з першого сезону. Займаюся будівництвом панельних будинків і доглядаю за ішаками.",
-                        "status": "Ветеран"
+                        "characteristic": "Я звичайний гравець, який грає на RuneWorld з першого сезону. Я займаюся будівництвом панельних будинків і тримаю віслюків.",
+                        "status": "Гравець"
             },
             {
-                        "name": "Moki8707",
-                        "hours": "2119 год",
+                        "name": "MyxaaXD",
+                        "hours": "немає даних",
                         "characteristic": "немає даних",
                         "status": "Гравець"
             },
             {
                         "name": "Sasha123490",
                         "hours": "384 год",
-                        "characteristic": "Я пупсик, живу в Білорусі, люблю грати на сервері The Hive, також граю на RuneWorld 3. Був у Москві. Засуджую чіти, люблю довбити дівчат у колготках.",
-                        "status": "Ветеран"
+                        "characteristic": "Я пупсик, живу в Білорусі, люблю грати на сервері The Hive, також граю на Rune World 3. Був у Москві. Засуджую чіти, не люблю буділду і люблю довбати дівчат у колготках)",
+                        "status": "Гравець"
             },
             {
                         "name": "sokibtw",
                         "hours": "2052 год",
                         "characteristic": "Радіант у Valorant, 10 рівень Faceit, добре стріляю камшоти.",
-                        "status": "Технічний адмін"
+                        "status": "Тех. адмін"
             },
             {
                         "name": "Vlad_merea",
                         "hours": "1076 год",
                         "characteristic": "немає даних",
-                        "status": "Ветеран"
+                        "status": "Гравець"
             },
             {
-                        "name": "LidaZub",
-                        "hours": "немає даних",
-                        "characteristic": "немає даних",
+                        "name": "Playcase1",
+                        "hours": "1442 год",
+                        "characteristic": "я в минулому основний білдер на політичних серверах, креативний, досить комунікабельний, людина доброї душі, яка допоможе чим зможе.",
                         "status": "Гравець"
             },
             {
@@ -194,16 +194,13 @@ limitations under the License. -->
             "Runecraft2287": "👑",
             "💾kristoferUA💻": "⚡",
             "Freskacraft6746": "🌱",
-            "Luotettawa4503": "🌱",
             "NickMoytash": "🎯",
             "Denis12096": "🏗️",
             "MyxaaXD": "🎮",
-            "Moki8707": "🎮",
             "Sasha123490": "🐻",
-            "sokibtw": "🎯",
+            "sokibtw": "⚡",
             "Vlad_merea": "⚔️",
             "Playcase1": "🏛️",
-            "LidaZub": "🌟",
             "WrongAura742120": "🌟",
             "andrusha513": "🎲",
             "Radion6774": "📻",
@@ -249,7 +246,7 @@ limitations under the License. -->
             hours.textContent = `${labels.time}: ${player.hours}`;
 
             const status = document.createElement('span');
-            status.className = isNewbie(player) ? 'player-pill status-newbie' : 'player-pill';
+            status.className = 'player-pill';
             status.textContent = `${labels.status}: ${player.status}`;
 
             meta.append(hours, status);
