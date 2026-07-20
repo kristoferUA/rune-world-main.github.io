@@ -1,83 +1,3 @@
-/* Стилі для спливаючого повідомлення */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #ff4757;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
-            z-index: 1000;
-            transform: translateX(400px);
-            opacity: 0;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            max-width: 350px;
-            font-weight: 500;
-        }
-
-        .notification.success {
-            background: #2ed573;
-            box-shadow: 0 10px 30px rgba(46, 213, 115, 0.3);
-        }
-
-        .notification.show {
-            transform: translateX(0);
-            opacity: 1;
-        }
-
-        .notification .close-btn {
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 0;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .notification .close-btn:hover {
-            opacity: 0.7;
-        }
-
-        .notification-icon {
-            display: inline-block;
-            margin-right: 10px;
-            font-size: 18px;
-        }
-
-        .form-note {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            .notification {
-                right: 10px;
-                left: 10px;
-                max-width: none;
-                transform: translateY(-100px);
-            }
-
-            .notification.show {
-                transform: translateY(0);
-            }
-        }
-
-
-
-
 .logo-link {
     text-decoration: none;
     color: inherit;
@@ -97,146 +17,6 @@
     color: inherit; /* предотвращаем подсветку текста */
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-}
-.application {
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 40px 0;
-    color: #fff;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    animation: slideIn 1.5s ease-in-out;
-}
-.but-appl {
-    --clr-font-main: hsla(0 0% 20% / 100);
-    --btn-bg-1: hsl(219.14deg 95.45% 56.86%);
-    --btn-bg-2: hsl(267.57deg 82.96% 43.73%);
-    --btn-bg-color: hsla(360 100% 100% / 1);
-    --radii: 0.5em;
-    cursor: pointer;
-    padding: 0.9em 1.4em;
-    min-width: 120px;
-    min-height: 44px;
-    font-size: var(--size, 1rem);
-    font-weight: 500;
-    transition: 0.8s;
-    background-size: 280% auto;
-    background-image: linear-gradient(325deg, var(--btn-bg-2) 0%, var(--btn-bg-1) 55%, var(--btn-bg-2) 90%);
-    border: none;
-    border-radius: var(--radii);
-    color: var(--btn-bg-color);
-    box-shadow: 0px 0px 20px rgba(71, 184, 255, 0.5), 0px 5px 5px -1px rgba(58, 125, 233, 0.25), inset 4px 4px 8px rgba(175, 230, 255, 0.5), inset -4px -4px 8px rgba(19, 95, 216, 0.35);
-}
-
-.but-appl:hover {
-  background-position: right top;
-}
-
-.but-appl:is(:focus, :focus-visible, :active) {
-  outline: none;
-  box-shadow:
-    0 0 0 3px var(--btn-bg-color),
-    0 0 0 6px var(--btn-bg-2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .but-appl {
-    transition: linear;
-  }
-}
-.application h2, .application p {
-    text-align: center;
-    color: #6a11cb;
-}
-/* Анімація для мечів */
-@keyframes slideInLeft {
-    from {
-        transform: translateX(-100%) translateY(-50%);
-    }
-    to {
-        transform: translateX(0) translateY(-50%);
-    }
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%) translateY(-50%);
-    }
-    to {
-        transform: translateX(0) translateY(-50%);
-    }
-}
-
-/* Стилі для мечів */
-.swords {
-    display: none; /* По замовчуванню ховаємо мечі */
-}
-
-.sword-left, .sword-right {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 200px; /* Збільшуємо розмір мечів */
-    height: auto;
-    z-index: 0;
-    animation-duration: 1.5s; /* Тривалість анімації */
-    animation-timing-function: ease-out; /* Плавність анімації */
-    animation-fill-mode: forwards; /* Зберігаємо кінцевий стан анімації */
-}
-
-.sword-left {
-    left: -310px; /* Відступ від тексту до середини чорного поля */
-    animation-name: slideInLeft; /* Анімація для лівого меча */
-}
-
-.sword-right {
-    right: -310px; /* Відступ від тексту до середини чорного поля */
-    animation-name: slideInRight; /* Анімація для правого меча */
-}
-
-/* Показуємо мечі тільки на великих екранах */
-@media (min-width: 1653px) {
-    .swords {
-        display: block;
-    }
-}
-.clan-description h2 {
-    color: #6a11cb;
-    margin-bottom: 15px;
-}
-.clan-description {
-    color: #fff;
-}
-.clan-art {
-    background-color: #333;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    font-size: 20px;
-}
-/* Стили для арта клана */
-.clan-art-image {
-    width: 100%; /* Арт будет занимать всю ширину контейнера */
-    height: auto; /* Сохраняем пропорции */
-    border-radius: 10px; /* Скругляем углы */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Добавляем тень */
-}
-.clan-section {
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    margin: 20px auto;
-    max-width: 800px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
 .player-list {
     display: flex;
     justify-content: center;
@@ -299,6 +79,7 @@ form {
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-right: 10px;
+    min-width: 100px;
 }
 
 .seasons-buttons button:hover {
@@ -325,9 +106,8 @@ body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #1a1a1a;
+    background-color: #f0f0f0;
     color: #fff;
-    overflow-x: hidden; /* Скрываем горизонтальный скролл */
 }
 
 a {
@@ -337,7 +117,7 @@ a {
 }
 
 a:not(.logo-link):hover {
-    color: #FFD700;
+    color: #FFD700; /* Optional: Change color on hover */
 }
 
 .logo {
@@ -362,7 +142,7 @@ a:not(.logo-link):hover {
 .header {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 0; /* Убедитесь, что элемент не выходит за пределы слева */
     width: 100%;
     background: linear-gradient(135deg, #6a11cb, #2575fc);
     display: flex;
@@ -373,8 +153,8 @@ a:not(.logo-link):hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 1000;
     transition: all 0.3s ease;
-    box-sizing: border-box;
-    overflow: hidden;
+    box-sizing: border-box; /* Учитывать паддинги и бордюры в общей ширине */
+    overflow: hidden; /* Препятствует выходу элементов за пределы */
 }
 
 .header .logo {
@@ -423,7 +203,7 @@ a:not(.logo-link):hover {
 
 /* Стили для основного заголовка */
 .main-title {
-    color: #6a11cb;
+    color: #3751d9;
     text-align: center;
     font-size: 35px;
     margin-top: 120px;
@@ -477,6 +257,7 @@ a:not(.logo-link):hover {
 
 /* Стили для формы заявки */
 .application {
+    background-color: #6a11cb;
     padding: 40px 0;
     color: #fff;
     border-radius: 10px;
@@ -493,7 +274,6 @@ form {
 }
 
 input, button {
-    background-color: rgb(26 26 26);
     padding: 15px;
     margin-bottom: 15px;
     border-radius: 5px;
@@ -502,7 +282,7 @@ input, button {
 }
 
 input {
-    border: 1px solid hsla(0 0% 20% / 100);
+    border: 1px solid #ccc;
 }
 
 button {
@@ -555,23 +335,13 @@ footer {
     margin: 60px auto 20px;
     padding: 20px;
     min-height: calc(100vh - 90px);
-    background-image: url("MonolithBackground.jpg");
+    background-image: url("../images/main-background.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
     border-radius: 10px;
     position: relative;
     animation: fadeIn 1.5s ease-in-out;
-}
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
 /* Фон прелоадера */
 #preloader {
