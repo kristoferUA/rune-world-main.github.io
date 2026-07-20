@@ -1,0 +1,645 @@
+/* ======================= */
+/*     SEASONS PAGE        */
+/* ======================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --rw-bg: #070b1f;
+    --rw-surface: rgba(255, 255, 255, 0.08);
+    --rw-surface-strong: rgba(255, 255, 255, 0.12);
+    --rw-border: rgba(255, 255, 255, 0.16);
+    --rw-text: #ffffff;
+    --rw-muted: rgba(255, 255, 255, 0.72);
+    --rw-purple: #6a11cb;
+    --rw-blue: #2575fc;
+    --rw-violet-readable: #8b5cf6;
+    --rw-gold: #ffd700;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Montserrat', sans-serif;
+    background: var(--rw-bg);
+    color: var(--rw-text);
+    overflow-x: hidden;
+}
+
+body::before,
+body::after {
+    content: '';
+    position: fixed;
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.26;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body::before {
+    top: -160px;
+    left: -120px;
+    background: var(--rw-purple);
+}
+
+body::after {
+    right: -130px;
+    bottom: -170px;
+    background: var(--rw-blue);
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button {
+    font-family: inherit;
+}
+
+.body-no-scroll {
+    overflow: hidden;
+}
+
+/* ======================= */
+/*        HEADER           */
+/* ======================= */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 80px;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.logo-link {
+    color: inherit;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+}
+
+.logo-image {
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+}
+
+.desktop-menu {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+}
+
+.desktop-menu a {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    transition: color 0.3s, transform 0.2s;
+    white-space: nowrap;
+}
+
+.desktop-menu a:hover,
+.desktop-menu a[aria-current="page"] {
+    color: var(--rw-gold);
+    transform: translateY(-2px);
+}
+
+.dropdown-container {
+    position: relative;
+}
+
+.dropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.dropdown-arrow {
+    transition: transform 0.3s;
+}
+
+.dropdown-trigger.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-10px) scale(0.95);
+    min-width: 190px;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 16px;
+    color: #1f2937;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(135deg, rgba(106, 17, 203, 0.12), rgba(37, 117, 252, 0.10));
+    color: var(--rw-violet-readable);
+}
+
+.menu-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    z-index: 999;
+}
+
+.menu-overlay.active {
+    display: block;
+}
+
+.menu-button {
+    display: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    background: linear-gradient(325deg, hsl(267.57deg 82.96% 43.73%) 0%, hsl(219.14deg 95.45% 56.86%) 55%, hsl(267.57deg 82.96% 43.73%) 90%);
+    background-size: 280% auto;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(71, 184, 255, 0.5);
+    transition: background-position 0.8s, transform 0.2s;
+}
+
+.menu-button:hover {
+    background-position: right top;
+    transform: translateY(-1px);
+}
+
+.mobile-menu-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(320px, 86vw);
+    height: 100%;
+    background: linear-gradient(180deg, #6a11cb, #2575fc);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    z-index: 1200;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.65, 0.01, 0.05, 0.99);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-menu.open {
+    transform: translateX(0);
+}
+
+.close-menu {
+    align-self: flex-end;
+    width: 42px;
+    height: 42px;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 34px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.mobile-menu a {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 0;
+    transition: transform 0.2s;
+}
+
+.mobile-menu a:hover {
+    transform: translateX(5px);
+}
+
+/* ======================= */
+/*      MAIN CONTENT       */
+/* ======================= */
+
+.seasons-page {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 132px 0 56px;
+}
+
+.seasons-hero {
+    text-align: center;
+    padding: 46px 18px 34px;
+    animation: fadeIn 0.9s ease both;
+}
+
+.hero-badge,
+.card-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #bcd6ff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.hero-badge {
+    padding: 8px 14px;
+    border: 1px solid var(--rw-border);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    margin-bottom: 18px;
+}
+
+.minecraft-title {
+    font-size: clamp(36px, 6vw, 64px);
+    line-height: 1.04;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffffff 0%, #c7d9ff 45%, #b388ff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 28px rgba(106, 17, 203, 0.28);
+}
+
+.hero-description {
+    max-width: 760px;
+    margin: 22px auto 0;
+    color: var(--rw-muted);
+    font-size: 18px;
+    line-height: 1.75;
+}
+
+.downloads-panel {
+    display: grid;
+    gap: 18px;
+    margin-top: 18px;
+}
+
+.download-card {
+    display: grid;
+    grid-template-columns: 84px 1fr auto;
+    align-items: center;
+    gap: 22px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.045));
+    border: 1px solid var(--rw-border);
+    border-radius: 22px;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(12px);
+    transition: transform 0.25s ease, border-color 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+    animation: fadeInUp 0.7s ease both;
+}
+
+.download-card:nth-child(2) { animation-delay: 0.05s; }
+.download-card:nth-child(3) { animation-delay: 0.1s; }
+.download-card:nth-child(4) { animation-delay: 0.15s; }
+.download-card:nth-child(5) { animation-delay: 0.2s; }
+.download-card:nth-child(6) { animation-delay: 0.25s; }
+.download-card:nth-child(7) { animation-delay: 0.3s; }
+
+.download-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(139, 92, 246, 0.48);
+    background: linear-gradient(135deg, rgba(106, 17, 203, 0.17), rgba(37, 117, 252, 0.10));
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.28);
+}
+
+.featured-card {
+    border-color: rgba(255, 215, 0, 0.34);
+}
+
+.mods-card {
+    border-color: rgba(37, 117, 252, 0.34);
+}
+
+.locked-card {
+    opacity: 0.76;
+}
+
+.card-number {
+    display: grid;
+    place-items: center;
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--rw-purple), var(--rw-blue));
+    color: #fff;
+    font-size: 22px;
+    font-weight: 800;
+    box-shadow: 0 0 22px rgba(71, 184, 255, 0.24);
+}
+
+.card-content h2 {
+    margin: 7px 0 8px;
+    font-size: clamp(24px, 3vw, 32px);
+    line-height: 1.1;
+}
+
+.card-content p {
+    color: var(--rw-muted);
+    font-size: 16px;
+    line-height: 1.65;
+}
+
+.download-button {
+    min-width: 138px;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 18px;
+    background: linear-gradient(325deg, hsl(267.57deg 82.96% 43.73%) 0%, hsl(219.14deg 95.45% 56.86%) 55%, hsl(267.57deg 82.96% 43.73%) 90%);
+    background-size: 280% auto;
+    color: #fff;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    box-shadow: 0 0 20px rgba(71, 184, 255, 0.32);
+    transition: background-position 0.8s, transform 0.2s, opacity 0.2s;
+}
+
+.download-button:hover:not(:disabled) {
+    background-position: right top;
+    transform: translateY(-2px);
+}
+
+.download-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.52;
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: none;
+}
+
+.timer-section {
+    margin-top: 42px;
+    padding: 28px;
+    border: 1px solid var(--rw-border);
+    border-radius: 24px;
+    background: var(--rw-surface);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(12px);
+    animation: fadeInUp 0.8s ease both;
+}
+
+.section-heading {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.section-heading h2 {
+    margin-top: 8px;
+    font-size: clamp(26px, 4vw, 38px);
+}
+
+.timer-card {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 18px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+}
+
+footer {
+    width: min(1120px, calc(100% - 32px));
+    margin: 0 auto 24px;
+    padding: 18px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--rw-muted);
+    text-align: center;
+    border: 1px solid var(--rw-border);
+}
+
+/* ======================= */
+/*       PRELOADER         */
+/* ======================= */
+
+#preloader {
+    position: fixed;
+    inset: 0;
+    background: #0f0f1f;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.spinner-box {
+    position: relative;
+    width: 115px;
+    height: 115px;
+    margin: 0 auto;
+}
+
+.configure-border-1,
+.configure-border-2 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 115px;
+    height: 115px;
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform-origin: center;
+}
+
+.configure-border-1 {
+    background: #6912cb;
+    animation: rotate-clockwise 3s linear infinite;
+}
+
+.configure-border-2 {
+    background: rgb(38 116 252);
+    animation: rotate-counter 3s linear infinite;
+}
+
+.configure-core {
+    width: 100%;
+    height: 100%;
+    background-color: #1d2630;
+}
+
+@keyframes rotate-clockwise {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes rotate-counter {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ======================= */
+/*       RESPONSIVE        */
+/* ======================= */
+
+@media (max-width: 1180px) {
+    .desktop-menu {
+        display: none;
+    }
+
+    .menu-button {
+        display: block;
+    }
+
+    .header {
+        padding: 15px 20px;
+    }
+}
+
+@media (max-width: 740px) {
+    .seasons-page {
+        width: min(100% - 24px, 1120px);
+        padding-top: 112px;
+    }
+
+    .seasons-hero {
+        padding: 28px 4px 24px;
+    }
+
+    .hero-description {
+        font-size: 16px;
+        line-height: 1.65;
+    }
+
+    .download-card {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .card-number {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        font-size: 20px;
+    }
+
+    .download-button {
+        width: 100%;
+    }
+
+    .timer-section {
+        padding: 20px;
+    }
+
+    .timer-card {
+        padding: 12px;
+    }
+
+    .tickcounter {
+        padding-bottom: 34% !important;
+    }
+
+    footer {
+        width: min(100% - 24px, 1120px);
+    }
+}
+
+@media (max-width: 420px) {
+    .logo {
+        font-size: 20px;
+    }
+
+    .logo-image {
+        width: 42px;
+        height: 42px;
+    }
+
+    .mobile-menu {
+        width: 88vw;
+    }
+}
