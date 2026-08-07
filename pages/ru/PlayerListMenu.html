@@ -16,10 +16,29 @@ limitations under the License. -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Список игроков - RuneWorld</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Список игроков RuneWorld — участники Minecraft-сервера</title>
+    <meta name="description" content="Список игроков Minecraft-сервера RuneWorld: участники сообщества, их роли, игровой опыт и краткие профили.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#111827">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/players-modern.css">
+    <link rel="stylesheet" href="../../assets/css/site-navigation.css">
     <link rel="icon" href="../../assets/images/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/PlayerListMenu.html">
+    <link rel="alternate" hreflang="ru" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/PlayerListMenu.html">
+    <link rel="alternate" hreflang="uk" href="https://kristoferua.github.io/rune-world-main.github.io/pages/uk/PlayerListMenuUkr.html">
+    <link rel="alternate" hreflang="x-default" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/PlayerListMenu.html">
+    <meta property="og:title" content="Список игроков RuneWorld">
+    <meta property="og:description" content="Участники сообщества RuneWorld, их роли, игровой опыт и краткие профили.">
+    <meta property="og:image" content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png">
+    <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="Список игроков RuneWorld">
+    <meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/PlayerListMenu.html">
+    <meta property="og:type" content="website"><meta property="og:site_name" content="RuneWorld"><meta property="og:locale" content="ru_RU">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Список игроков RuneWorld">
+    <meta name="twitter:description" content="Участники сообщества RuneWorld, их роли и игровой опыт.">
+    <meta name="twitter:image" content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png"><meta name="twitter:image:alt" content="Список игроков RuneWorld">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"Список игроков RuneWorld","url":"https://kristoferua.github.io/rune-world-main.github.io/pages/ru/PlayerListMenu.html","description":"Список участников Minecraft-сервера RuneWorld, их роли и игровой опыт.","inLanguage":"ru","isPartOf":{"@id":"https://kristoferua.github.io/rune-world-main.github.io/#website"}}</script>
+    <script src="../../assets/js/site-navigation.js" defer></script>
 </head>
 <body>
     <div id="preloader">
@@ -33,19 +52,18 @@ limitations under the License. -->
         </div>
     </div>
 
-    <header>
-        <div class="header">
-            <a href="../../index.html" class="logo-link">
-                <div class="logo">
-                    RuneWorld
-                    <img src="../../assets/images/iconrw.png" alt="RuneWorld Logo" class="logo-image">
-                </div>
-            </a>
-            <nav class="desktop-menu">
-                <a href="../../index.html">Главная</a>
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="site-brand" href="../../index.html" aria-label="RuneWorld — главная страница"><span>RuneWorld</span><img src="../../assets/images/iconrw.png" alt="Логотип RuneWorld" class="site-brand__image" width="48" height="48"></a>
+            <button class="site-menu-button" type="button" aria-controls="site-mobile-menu" aria-expanded="false" data-site-menu-button><span class="site-menu-button__icon" aria-hidden="true">☰</span><span class="site-menu-button__label">Меню</span></button>
+            <nav class="site-desktop-nav" aria-label="Основная навигация">
+                <a href="seasons.html">Карты сезонов</a><a href="PlayerListMenu.html">Список игроков</a>
+                <div class="site-nav-dropdown" data-site-dropdown><button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-clans-menu" data-site-dropdown-button>Кланы <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg></button><div class="site-nav-dropdown__menu" id="site-clans-menu" data-site-dropdown-menu hidden><a href="MonolithPage.html">⚔️ Монолит</a><a href="moytash.html">🗡️ Мойташбуд</a></div></div>
+                <a href="events.html">Ивенты</a><a href="../uk/ukrindex.html" hreflang="uk">Украинская версия</a>
             </nav>
         </div>
     </header>
+    <div class="site-mobile-overlay" data-site-menu-overlay hidden><nav class="site-mobile-nav" id="site-mobile-menu" data-site-menu-drawer aria-label="Мобильная навигация" aria-hidden="true"><div class="site-mobile-nav__top"><span>Навигация</span><button class="site-menu-close" type="button" aria-label="Закрыть меню" data-site-menu-close>×</button></div><div class="site-mobile-links" data-site-mobile-links></div></nav></div>
 
     <main class="players-page">
         <section class="players-hero">
