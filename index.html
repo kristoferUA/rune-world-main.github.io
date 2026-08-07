@@ -17,15 +17,68 @@ limitations under the License. -->
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>RuneWorld</title>
+<title>RuneWorld — ванильный Minecraft-сервер</title>
+<meta name="description" content="RuneWorld — ванильный Minecraft-сервер с дружелюбным сообществом, сезонными мирами, ивентами и честной игрой. Узнайте о сервере и подайте заявку."/>
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/>
+<meta name="theme-color" content="#111827"/>
 <link href="assets/css/runeworld_css.css" rel="stylesheet"/>
+<link href="assets/css/site-navigation.css" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="assets/images/favicon.ico" rel="icon" type="image/x-icon"/>
-<meta content="RuneWorld - Сервер с ламповой атмосферой Minecraft" property="og:title"/>
-<meta content="RuneWorld - ванильный сервер Minecraft с доброй атмосферой, низким пингом и дружелюбным комьюнити. Присоединяйтесь к нам!" property="og:description"/>
+<link rel="canonical" href="https://kristoferua.github.io/rune-world-main.github.io/"/>
+<link rel="alternate" hreflang="ru" href="https://kristoferua.github.io/rune-world-main.github.io/"/>
+<link rel="alternate" hreflang="uk" href="https://kristoferua.github.io/rune-world-main.github.io/pages/uk/ukrindex.html"/>
+<link rel="alternate" hreflang="x-default" href="https://kristoferua.github.io/rune-world-main.github.io/"/>
+<meta content="RuneWorld — ванильный Minecraft-сервер" property="og:title"/>
+<meta content="Ванильный Minecraft-сервер с дружелюбным сообществом, сезонными мирами, ивентами и честной игрой." property="og:description"/>
 <meta content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png" property="og:image"/>
-<meta content="https://kristoferua.github.io/rune-world-main.github.io/index.html?v=1" property="og:url"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="RuneWorld — ванильный Minecraft-сервер" property="og:image:alt"/>
+<meta content="https://kristoferua.github.io/rune-world-main.github.io/" property="og:url"/>
 <meta content="website" property="og:type"/>
+<meta content="RuneWorld" property="og:site_name"/>
+<meta content="ru_RU" property="og:locale"/>
+<meta content="uk_UA" property="og:locale:alternate"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="RuneWorld — ванильный Minecraft-сервер"/>
+<meta name="twitter:description" content="Дружелюбное сообщество, сезонные миры, ивенты и честная игра в Minecraft."/>
+<meta name="twitter:image" content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png"/>
+<meta name="twitter:image:alt" content="RuneWorld — ванильный Minecraft-сервер"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://kristoferua.github.io/rune-world-main.github.io/#organization",
+      "name": "RuneWorld",
+      "url": "https://kristoferua.github.io/rune-world-main.github.io/",
+      "logo": "https://kristoferua.github.io/rune-world-main.github.io/assets/images/iconrw.png"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://kristoferua.github.io/rune-world-main.github.io/#website",
+      "url": "https://kristoferua.github.io/rune-world-main.github.io/",
+      "name": "RuneWorld",
+      "inLanguage": ["ru", "uk"],
+      "publisher": {"@id": "https://kristoferua.github.io/rune-world-main.github.io/#organization"}
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://kristoferua.github.io/rune-world-main.github.io/#webpage",
+      "url": "https://kristoferua.github.io/rune-world-main.github.io/",
+      "name": "RuneWorld — ванильный Minecraft-сервер",
+      "description": "Ванильный Minecraft-сервер с дружелюбным сообществом, сезонными мирами, ивентами и честной игрой.",
+      "inLanguage": "ru",
+      "isPartOf": {"@id": "https://kristoferua.github.io/rune-world-main.github.io/#website"}
+    }
+  ]
+}
+</script>
+<script src="assets/js/site-navigation.js" defer></script>
 </head>
 <body>
 <div id="preloader">
@@ -38,58 +91,51 @@ limitations under the License. -->
 </div>
 </div>
 </div>
-<header>
-<div class="header">
-<a class="logo-link" href="index.html">
-<div class="logo">
-                    RuneWorld
-                    <img alt="RuneWorld Logo" class="logo-image" src="assets/images/iconrw.png"/>
-</div>
+<header class="site-header">
+<div class="site-header__inner">
+<a class="site-brand" href="index.html" aria-label="RuneWorld — главная страница">
+<span>RuneWorld</span>
+<img alt="Логотип RuneWorld" class="site-brand__image" src="assets/images/iconrw.png" width="48" height="48"/>
 </a>
-<button class="menu-button" id="menu-button">Меню</button>
-<nav class="desktop-menu">
+<button class="site-menu-button" type="button" aria-controls="site-mobile-menu" aria-expanded="false" data-site-menu-button>
+<span class="site-menu-button__icon" aria-hidden="true">☰</span><span class="site-menu-button__label">Меню</span>
+</button>
+<nav class="site-desktop-nav" aria-label="Основная навигация">
 <a href="#application">Подать заявку</a>
 <a href="#reviews">Отзывы</a>
 <a href="#about">Античит</a>
 <a href="pages/ru/seasons.html">Карты сезонов</a>
 <a href="pages/ru/PlayerListMenu.html">Список игроков</a>
-<div class="dropdown-container">
-<a class="dropdown-trigger" href="#" onclick="toggleDropdown(event)">
-                        Кланы
-                        <svg class="dropdown-arrow" height="16" viewBox="0 0 24 24" width="16">
-<path d="M7 10l5 5 5-5z" fill="currentColor"></path>
-</svg>
-</a>
-<div class="dropdown-menu" id="clansDropdown">
-<a class="dropdown-item" href="pages/ru/MonolithPage.html">
-<span class="dropdown-icon">⚔️</span>
-                            Монолит
-                        </a>
-<a class="dropdown-item" href="pages/ru/moytash.html">
-<span class="dropdown-icon">🗡️</span>
-                            Мойташбуд
-                        </a>
+<div class="site-nav-dropdown" data-site-dropdown>
+<button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-clans-menu" data-site-dropdown-button>Кланы
+<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+</button>
+<div class="site-nav-dropdown__menu" id="site-clans-menu" data-site-dropdown-menu hidden>
+<a href="pages/ru/MonolithPage.html">⚔️ Монолит</a>
+<a href="pages/ru/moytash.html">🗡️ Мойташбуд</a>
 </div>
 </div>
 <a href="pages/ru/events.html">Ивенты</a>
-<a href="pages/uk/ukrindex.html">Украинская версия</a>
+<a href="pages/uk/ukrindex.html" hreflang="uk">Украинская версия</a>
 </nav>
-<div class="menu-overlay" id="menu-overlay"></div>
 </div>
 </header>
-<div class="mobile-menu-overlay" id="mobile-menu-overlay">
-<div class="mobile-menu" id="mobile-menu">
-<button class="close-menu" id="close-menu">×</button>
+<div class="site-mobile-overlay" data-site-menu-overlay hidden>
+<nav class="site-mobile-nav" id="site-mobile-menu" data-site-menu-drawer aria-label="Мобильная навигация" aria-hidden="true">
+<div class="site-mobile-nav__top"><span>Навигация</span><button class="site-menu-close" type="button" aria-label="Закрыть меню" data-site-menu-close>×</button></div>
 <a href="#application">Подать заявку</a>
 <a href="#reviews">Отзывы</a>
 <a href="#about">Античит</a>
 <a href="pages/ru/seasons.html">Карты сезонов</a>
 <a href="pages/ru/PlayerListMenu.html">Список игроков</a>
-<a href="pages/ru/MonolithPage.html">Монолит</a>
-<a href="pages/ru/moytash.html">Мойташбуд</a>
-<a href="pages/ru/events.html">Ивенты</a>
-<a href="pages/uk/ukrindex.html">Украинская версия</a>
+<div class="site-mobile-nav__label">Кланы</div>
+<div class="site-mobile-nav__group">
+<a href="pages/ru/MonolithPage.html">⚔️ Монолит</a>
+<a href="pages/ru/moytash.html">🗡️ Мойташбуд</a>
 </div>
+<a href="pages/ru/events.html">Ивенты</a>
+<a href="pages/uk/ukrindex.html" hreflang="uk">Украинская версия</a>
+</nav>
 </div>
 <main class="main-container">
 <section class="hero-section">
@@ -99,7 +145,7 @@ limitations under the License. -->
 <p>Сервер RuneWorld - это ванильный майнкрафт-сервер с ламповой атмосферой, хорошим хостингом, дружелюбными игроками и добрыми админами. Наш сервер работает на хостинге Minecraft Realms благодаря чему, все игроки имеют бесперебойный доступ к серверу, из любой страны. На нашем сервере всегда низкий пинг в любой точке мира, так как сервер держится на хостинге от Microsoft. На нашем сервере ламповая атмосфера и добрые игроки, проводятся ивенты, строятся мега-проекты, развивается инфраструктура. В основе сервера лежит система сезонов, которые завершаются и начинаются каждый год, актуальный сезон - это 5 сезон. Присоединяйтесь к нам и станьте частью нашего дружного сообщества!</p>
 </div>
 <div class="hero-image">
-<img alt="Creeper on Block" class="creeper-img" src="assets/images/creeper-img.png"/>
+<img alt="Крипер — персонаж Minecraft" class="creeper-img" src="assets/images/creeper-img.png" width="1280" height="832" fetchpriority="high"/>
 </div>
 </div>
 </section>
@@ -119,7 +165,7 @@ limitations under the License. -->
 </svg>
 </div>
 <h2 class="minecraft-title">YouTube канал сервера RuneWorld</h2>
-<a class="youtube-button" href="https://www.youtube.com/@rune_craft2287?si=9OCK7hWKA1nPm93C" target="_blank">Посетить канал RuneWorld на YouTube</a>
+<a class="youtube-button" href="https://www.youtube.com/@rune_craft2287?si=9OCK7hWKA1nPm93C" target="_blank" rel="noopener noreferrer">Посетить канал RuneWorld на YouTube</a>
 </div>
 </div>
 </section>
@@ -139,7 +185,7 @@ limitations under the License. -->
 </div>
 </div>
 <div class="characters-image">
-<img alt="Minecraft Characters" class="characters-img" src="assets/images/minecraft-characters.png"/>
+<img alt="Персонажи Minecraft сообщества RuneWorld" class="characters-img" src="assets/images/minecraft-characters.png" width="860" height="732" loading="lazy"/>
 </div>
 </div>
 </div>
@@ -161,7 +207,7 @@ limitations under the License. -->
 <div class="section-container">
 <h2 class="minecraft-title">Discord канал сервера</h2>
 <div class="discord-widget">
-<iframe allowtransparency="true" frameborder="0" height="500" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" src="https://discord.com/widget?id=1062052663002398790&amp;theme=dark" width="350"></iframe>
+<iframe title="Виджет сообщества RuneWorld в Discord" loading="lazy" allowtransparency="true" frameborder="0" height="500" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" src="https://discord.com/widget?id=1062052663002398790&amp;theme=dark" width="350"></iframe>
 </div>
 <div class="runeworld-logo">
 <img alt="RuneWorld Logo" class="rw-logo" src="assets/images/runeworld.png"/>
