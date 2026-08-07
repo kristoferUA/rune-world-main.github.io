@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kristoferua.github.io/rune-world-main.github.io/sitemap.xml
