@@ -32,6 +32,17 @@ body.site-menu-open {
     box-sizing: border-box;
 }
 
+/* Защищаем кнопки навигации от общих стилей форм на отдельных страницах. */
+.site-header button,
+.site-mobile-overlay button,
+.site-header button:hover,
+.site-header button:active,
+.site-mobile-overlay button:hover,
+.site-mobile-overlay button:active {
+    margin: 0;
+    transform: none;
+}
+
 .site-header__inner {
     box-sizing: border-box;
     display: flex;
@@ -102,6 +113,7 @@ body.site-menu-open {
 .site-desktop-nav > a:focus-visible,
 .site-nav-dropdown__trigger:hover,
 .site-nav-dropdown__trigger:focus-visible,
+.site-nav-dropdown__trigger:active,
 .site-desktop-nav [aria-current="page"],
 .site-nav-dropdown.is-current > .site-nav-dropdown__trigger {
     border-color: rgba(134, 239, 172, 0.45);
