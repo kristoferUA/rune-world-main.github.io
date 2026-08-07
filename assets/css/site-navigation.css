@@ -1,5 +1,5 @@
 :root {
-    --site-nav-bg: rgba(17, 24, 39, 0.96);
+    --site-nav-bg: linear-gradient(135deg, #6a11cb, #2575fc);
     --site-nav-panel: #162033;
     --site-nav-text: #f8fafc;
     --site-nav-muted: #cbd5e1;
