@@ -88,5 +88,8 @@
   <url>
     <loc>https://kristoferua.github.io/rune-world-main.github.io/pages/ru/intmap.html</loc>
     <lastmod>2026-08-07</lastmod>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/intmap.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/intmap.html"/>
+    <!-- <xhtml:link rel="alternate" hreflang="uk" href="https://kristoferua.github.io/rune-world-main.github.io/pages/uk/ukrintmap.html"/> -->
   </url>
 </urlset>
