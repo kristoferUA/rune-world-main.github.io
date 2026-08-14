@@ -1,0 +1,96 @@
+.application {
+    background-color: rgba(37, 44, 47, 0.86);
+}
+
+.application h2,
+.application p,
+.clan-description h2,
+.main-title,
+.text-overlay h1,
+.text-overlay strong {
+    color: #eadb91;
+}
+
+.but-appl {
+    --btn-bg-1: #2a7180;
+    --btn-bg-2: #354044;
+    --btn-bg-color: #f4eab7;
+    box-shadow: 0 0 20px rgba(42, 113, 128, 0.5),
+                0 5px 5px -1px rgba(30, 78, 88, 0.3),
+                inset 4px 4px 8px rgba(121, 174, 182, 0.35),
+                inset -4px -4px 8px rgba(22, 53, 59, 0.4);
+}
+
+body {
+    background-color: #252b2e;
+}
+
+a:not(.logo-link):hover {
+    color: #eadb91;
+}
+
+.clan-art {
+    background-color: #30383b;
+}
+
+.main-title {
+    background-color: rgba(37, 44, 47, 0.86);
+}
+
+.video,
+footer {
+    background-color: #1f6676;
+}
+
+.but-appl:hover,
+.but-appl:active {
+    background-color: #174e5a;
+}
+
+#appl-form input {
+    background-color: #252b2e;
+}
+
+#appl-form input {
+    border-color: #596468;
+    color: #ffffff;
+}
+
+#appl-form input::placeholder {
+    color: #c2c7c8;
+}
+
+.main {
+    background-image: url("../images/lor_background.jpg");
+    display: flex;
+    flex-direction: column;
+}
+
+.main .clan-section {
+    background-color: rgba(37, 44, 47, 0.86);
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: 20px;
+    box-shadow: none;
+}
+
+.main .clan-description {
+    background-color: transparent;
+}
+
+#preloader {
+    background: #252b2e;
+}
+
+.configure-border-1 {
+    background: #eadb91;
+}
+
+.configure-border-2 {
+    background: #1f6676;
+}
+
+.configure-core {
+    background-color: #30383b;
+}
