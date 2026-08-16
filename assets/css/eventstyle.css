@@ -12,13 +12,13 @@
 
 .screens-container {
   display: flex;
-  width: 200%;
+  width: 400%;
   height: 100%;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .screen {
-  width: 50%;
+  width: 25%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -40,6 +40,20 @@
 
 .screen:nth-child(2) {
   background-image: url("../images/qwer2.png"), linear-gradient(135deg, #2575fc, #6a11cb);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.screen:nth-child(3) {
+  background-image: url("../images/qwer3.jpg"), linear-gradient(135deg, #6a11cb, #2575fc);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.screen:nth-child(4) {
+  background-image: url("../images/qwer4.jpg"), linear-gradient(135deg, #2575fc, #6a11cb);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

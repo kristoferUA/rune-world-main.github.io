@@ -73,6 +73,18 @@ limitations under the License. -->
                     <div class="screen-subtitle"></div>
                 </div>
             </div>
+            <div class="screen">
+                <div class="screen-content">
+                    <div class="screen-title"></div>
+                    <div class="screen-subtitle"></div>
+                </div>
+            </div>
+            <div class="screen">
+                <div class="screen-content">
+                    <div class="screen-title"></div>
+                    <div class="screen-subtitle"></div>
+                </div>
+            </div>
         </div>
         
         <button class="nav-button prev" id="prevBtn">‹</button>
@@ -81,6 +93,8 @@ limitations under the License. -->
         <div class="indicators">
             <div class="indicator active" data-screen="0"></div>
             <div class="indicator" data-screen="1"></div>
+            <div class="indicator" data-screen="2"></div>
+            <div class="indicator" data-screen="3"></div>
         </div>
     </div>
     <section class="application" id="application">
@@ -249,7 +263,7 @@ document.addEventListener("DOMContentLoaded", () => {
         class ScreenCarousel {
             constructor() {
                 this.currentScreen = 0;
-                this.totalScreens = 2;
+                this.totalScreens = 4;
                 this.container = document.getElementById('screensContainer');
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
@@ -295,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             
             updateCarousel() {
-                const translateX = -this.currentScreen * 50;
+                const translateX = -this.currentScreen * 25;
                 this.container.style.transform = `translateX(${translateX}%)`;
                 this.updateUI();
             }
