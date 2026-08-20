@@ -1,0 +1,97 @@
+<!-- Copyright 2024-2026 kristoferUA
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RuneWorld Server Interactive Map</title>
+    <meta name="description" content="A live interactive world map of the RuneWorld Minecraft server: explore server territories, builds, and locations.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+    <meta name="theme-color" content="#111827">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&amp;display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../../assets/css/seasons.css">
+    <link rel="stylesheet" href="../../assets/css/site-navigation.css">
+    <link rel="icon" href="../../assets/images/favicon.ico" type="image/x-icon">
+    <link rel="canonical" href="https://kristoferua.github.io/rune-world-main.github.io/pages/en/intmap.html">
+    <link rel="alternate" hreflang="ru" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/intmap.html"><link rel="alternate" hreflang="en" href="https://kristoferua.github.io/rune-world-main.github.io/pages/en/intmap.html"><link rel="alternate" hreflang="x-default" href="https://kristoferua.github.io/rune-world-main.github.io/pages/ru/intmap.html">
+    <meta property="og:title" content="RuneWorld Interactive Map"><meta property="og:description" content="Explore the territories, builds, and locations of the RuneWorld Minecraft server in real time."><meta property="og:image" content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="RuneWorld Server Interactive Map"><meta property="og:url" content="https://kristoferua.github.io/rune-world-main.github.io/pages/en/intmap.html"><meta property="og:type" content="website"><meta property="og:site_name" content="RuneWorld"><meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="RuneWorld Interactive Map"><meta name="twitter:description" content="A real-time world map of the RuneWorld Minecraft server."><meta name="twitter:image" content="https://kristoferua.github.io/rune-world-main.github.io/assets/images/tgimg1.png"><meta name="twitter:image:alt" content="RuneWorld Server Interactive Map">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"RuneWorld Server Interactive Map","url":"https://kristoferua.github.io/rune-world-main.github.io/pages/en/intmap.html","description":"A real-time world map of the RuneWorld Minecraft server.","inLanguage":"en","isPartOf":{"@id":"https://kristoferua.github.io/rune-world-main.github.io/#website"}}</script>
+    <script src="../../assets/js/site-navigation.js" defer></script>
+    <style>
+        /* 🔹 Стили для контейнера карты */
+        .map-container {
+            width: 100%;
+            height: 75vh; /* Карта занимает 75% высоты экрана */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="preloader">
+      <div class="spinner-box">
+        <div class="configure-border-1">
+          <div class="configure-core"></div>
+        </div>
+        <div class="configure-border-2">
+          <div class="configure-core"></div>
+        </div>
+      </div>
+    </div>
+
+    <header class="site-header">
+        <div class="site-header__inner">
+            <a class="site-brand" href="index.html" aria-label="RuneWorld — home page"><span>RuneWorld</span><img src="../../assets/images/iconrw.png" alt="RuneWorld logo" class="site-brand__image" width="48" height="48"></a>
+            <button class="site-menu-button" type="button" aria-controls="site-mobile-menu" aria-expanded="false" data-site-menu-button><span class="site-menu-button__icon" aria-hidden="true">☰</span><span class="site-menu-button__label">Menu</span></button>
+            <nav class="site-desktop-nav" aria-label="Main navigation"><a href="seasons.html">Season maps</a><a href="PlayerListMenu.html">Player list</a><div class="site-nav-dropdown" data-site-dropdown><button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-clans-menu" data-site-dropdown-button>Clans <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg></button><div class="site-nav-dropdown__menu" id="site-clans-menu" data-site-dropdown-menu hidden><a href="MonolithPage.html">⚔️ Monolith</a><a href="moytash.html">🗡️ Moytashbud</a><a href="LorPage.html">⭐ L.O.R.</a></div></div><a href="events.html">Events</a><div class="site-nav-dropdown" data-site-dropdown><button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-lang-menu" data-site-dropdown-button>lang <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg></button><div class="site-nav-dropdown__menu" id="site-lang-menu" data-site-dropdown-menu hidden><a href="../ru/intmap.html" hreflang="ru" lang="ru">Русский</a><a href="../uk/ukrindex.html" hreflang="uk" lang="uk">Українська</a><a href="intmap.html" hreflang="en" lang="en">English</a></div></div></nav>
+        </div>
+    </header>
+    <div class="site-mobile-overlay" data-site-menu-overlay hidden><nav class="site-mobile-nav" id="site-mobile-menu" data-site-menu-drawer aria-label="Mobile navigation" aria-hidden="true"><div class="site-mobile-nav__top"><span>Navigation</span><button class="site-menu-close" type="button" aria-label="Close menu" data-site-menu-close>×</button></div><div class="site-mobile-links" data-site-mobile-links></div></nav></div>
+
+    <div class="main">
+        <h1 class="main-title">Live Interactive Map</h1>
+
+        <div class="map-container">
+            <iframe src="https://runeworld.dynmap.xyz" title="RuneWorld live world map" loading="lazy"></iframe>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer">
+            <p>&copy; 2026 RUNEWORLD</p>
+        </div>
+    </footer>
+
+    <script>
+      window.addEventListener("load", () => {
+        const preloader = document.getElementById("preloader");
+        preloader.style.opacity = "1";
+        setTimeout(() => {
+          preloader.style.transition = "opacity 0.5s ease";
+          preloader.style.opacity = "0";
+          setTimeout(() => preloader.style.display = "none", 500);
+        }, 300); // маленькая задержка перед исчезновением
+      });
+    </script>
+</body>
+</html>

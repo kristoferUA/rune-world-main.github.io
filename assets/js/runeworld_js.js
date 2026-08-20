@@ -182,6 +182,30 @@ function wipeDecrypted(referenceObj) {
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.querySelector("#appl-form");
     if (form) {
+        const formMessages = {
+            ru: {
+                name: "Введите корректный ник! Используйте только латинские буквы, цифры, дефисы и подчёркивания.",
+                email: "Введите корректный email! Проверьте формат адреса электронной почты.",
+                discord: "Введите корректный Discord! Используйте формат username#1234.",
+                telegram: "Введите корректный Telegram! Используйте формат @username.",
+                success: "✅ Форма успешно отправлена! Спасибо за заявку."
+            },
+            uk: {
+                name: "Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення.",
+                email: "Введіть коректний email! Перевірте формат адреси електронної пошти.",
+                discord: "Введіть коректний Discord! Використовуйте формат username#1234.",
+                telegram: "Введіть коректний Telegram! Використовуйте формат @username.",
+                success: "✅ Форма успішно відправлена! Дякуємо за заявку."
+            },
+            en: {
+                name: "Enter a valid username using only Latin letters, numbers, hyphens, and underscores.",
+                email: "Enter a valid email address.",
+                discord: "Enter a valid Discord username in the username#1234 format.",
+                telegram: "Enter a valid Telegram username in the @username format.",
+                success: "✅ The form was submitted successfully. Thank you for applying."
+            }
+        };
+        const messages = formMessages[document.documentElement.lang] || formMessages.en;
         form.action = PLACEHOLDER_ACTION;
 
         form.addEventListener('submit', function(e) {
@@ -200,29 +224,29 @@ document.addEventListener('DOMContentLoaded', () => {
             const telegramPattern = /^[a-zA-Z0-9-_@]{3,}$/;
 
             if (!namePattern.test(name) || badPatterns.test(name) || cyrillic.test(name)) {
-                showNotification("Введіть коректний нік! Використовуйте тільки латинські літери, цифри, дефіси та підкреслення.");
+                showNotification(messages.name);
                 return;
             }
             if (!emailPattern.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || cyrillic.test(email)) {
-                showNotification("Введіть коректний email! Перевірте формат адреси електронної пошти.");
+                showNotification(messages.email);
                 return;
             }
             if (!discordPattern.test(discord) || badPatterns.test(discord) || cyrillic.test(discord)) {
-                showNotification("Введіть коректний Discord! Використовуйте формат username#1234.");
+                showNotification(messages.discord);
                 return;
             }
             if (!telegramPattern.test(telegram) || badPatterns.test(telegram) || cyrillic.test(telegram)) {
-                showNotification("Введіть коректний Telegram! Використовуйте формат @username.");
+                showNotification(messages.telegram);
                 return;
             }
 
             const realAction = decryptToken();
             form.action = realAction;
 
-            showNotification("✅ Форма успішно відправлена! Дякуємо за заявку.");
+            showNotification(messages.success);
 
             setTimeout(() => {
-                try { form.submit(); } catch(err) { console.error('Не вдалося відправити форму програмно:', err); }
+                try { form.submit(); } catch(err) { console.error('Unable to submit the form programmatically:', err); }
             }, 0);
 
             setTimeout(() => {

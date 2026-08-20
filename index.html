@@ -56,6 +56,11 @@ limitations under the License. -->
     />
     <link
       rel="alternate"
+      hreflang="en"
+      href="https://kristoferua.github.io/rune-world-main.github.io/pages/en/index.html"
+    />
+    <link
+      rel="alternate"
       hreflang="x-default"
       href="https://kristoferua.github.io/rune-world-main.github.io/"
     />
@@ -85,6 +90,7 @@ limitations under the License. -->
     <meta content="RuneWorld" property="og:site_name" />
     <meta content="ru_RU" property="og:locale" />
     <meta content="uk_UA" property="og:locale:alternate" />
+    <meta content="en_US" property="og:locale:alternate" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       name="twitter:title"
@@ -118,7 +124,7 @@ limitations under the License. -->
             "@id": "https://kristoferua.github.io/rune-world-main.github.io/#website",
             "url": "https://kristoferua.github.io/rune-world-main.github.io/",
             "name": "RuneWorld",
-            "inLanguage": ["ru", "uk"],
+            "inLanguage": ["ru", "uk", "en"],
             "publisher": {
               "@id": "https://kristoferua.github.io/rune-world-main.github.io/#organization"
             }
@@ -207,7 +213,17 @@ limitations under the License. -->
             </div>
           </div>
           <a href="pages/ru/events.html">Ивенты</a>
-          <a href="pages/uk/ukrindex.html" hreflang="uk">Украинская версия</a>
+          <div class="site-nav-dropdown" data-site-dropdown>
+            <button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-lang-menu" data-site-dropdown-button>
+              lang
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor" /></svg>
+            </button>
+            <div class="site-nav-dropdown__menu" id="site-lang-menu" data-site-dropdown-menu hidden>
+              <a href="index.html" hreflang="ru" lang="ru">Русский</a>
+              <a href="pages/uk/ukrindex.html" hreflang="uk" lang="uk">Українська</a>
+              <a href="pages/en/index.html" hreflang="en" lang="en">English</a>
+            </div>
+          </div>
         </nav>
       </div>
     </header>
@@ -242,7 +258,12 @@ limitations under the License. -->
           <a href="pages/ru/LorPage.html">⭐ Л.О.Р.</a>
         </div>
         <a href="pages/ru/events.html">Ивенты</a>
-        <a href="pages/uk/ukrindex.html" hreflang="uk">Украинская версия</a>
+        <div class="site-mobile-nav__label">lang</div>
+        <div class="site-mobile-nav__group">
+          <a href="index.html" hreflang="ru" lang="ru">Русский</a>
+          <a href="pages/uk/ukrindex.html" hreflang="uk" lang="uk">Українська</a>
+          <a href="pages/en/index.html" hreflang="en" lang="en">English</a>
+        </div>
       </nav>
     </div>
     <main class="main-container">
