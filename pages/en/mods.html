@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Build RuneWorld Modpack — Minecraft Java</title>
+    <meta name="description" content="Choose mods and create a personal ZIP or MRPACK modpack for RuneWorld." />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="../../assets/css/site-navigation.css" rel="stylesheet" />
+    <link href="../../assets/css/mods.css" rel="stylesheet" />
+    <link href="../../assets/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <script src="../../assets/js/site-navigation.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="index.html" aria-label="RuneWorld — home page">
+          <span>RuneWorld</span><img src="../../assets/images/iconrw.png" alt="RuneWorld logo" class="site-brand__image" width="48" height="48" />
+        </a>
+        <button class="site-menu-button" type="button" aria-controls="site-mobile-menu" aria-expanded="false" data-site-menu-button>
+          <span class="site-menu-button__icon" aria-hidden="true">☰</span><span class="site-menu-button__label">Menu</span>
+        </button>
+        <nav class="site-desktop-nav" aria-label="Main navigation">
+          <a href="seasons.html">Season maps</a>
+          <a href="PlayerListMenu.html">Player list</a>
+          <div class="site-nav-dropdown" data-site-dropdown>
+            <button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-clans-menu" data-site-dropdown-button>Clans
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+            </button>
+            <div class="site-nav-dropdown__menu" id="site-clans-menu" data-site-dropdown-menu hidden>
+              <a href="MonolithPage.html">⚔️ Monolith</a><a href="moytash.html">🗡️ Moytashbud</a><a href="LorPage.html">⭐ L.O.R.</a>
+            </div>
+          </div>
+          <a href="events.html">Events</a>
+          <a href="mods.html" aria-current="page">Build modpack</a>
+          <div class="site-nav-dropdown" data-site-dropdown>
+            <button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-lang-menu" data-site-dropdown-button>lang
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+            </button>
+            <div class="site-nav-dropdown__menu" id="site-lang-menu" data-site-dropdown-menu hidden>
+              <a href="../../modpack.html" hreflang="ru" lang="ru">Русский</a>
+              <a href="../uk/ukrmods.html" hreflang="uk" lang="uk">Українська</a>
+              <a href="mods.html" hreflang="en" lang="en">English</a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <div class="site-mobile-overlay" data-site-menu-overlay hidden>
+      <nav class="site-mobile-nav" id="site-mobile-menu" data-site-menu-drawer aria-label="Mobile navigation" aria-hidden="true">
+        <div class="site-mobile-nav__top"><span>Navigation</span><button class="site-menu-close" type="button" aria-label="Close menu" data-site-menu-close>×</button></div>
+        <div data-site-mobile-links></div>
+      </nav>
+    </div>
+    <main class="builder-container">
+      <div class="header-top"><div><h1>RuneWorld Modpack Builder</h1><p id="pack-env-info" class="env-badge">Loading pack settings...</p></div><a class="back-link" href="index.html">← Home</a></div>
+      <div class="builder-controls">
+        <input id="search-input" type="search" placeholder="Search mods..." autocomplete="off" />
+        <div id="category-filters" class="chips" aria-label="Category filter"></div>
+        <div class="presets-row"><span class="presets-label">Preset packs:</span><div id="preset-buttons" class="presets"></div></div>
+      </div>
+      <div id="builder-alert" class="builder-alert" role="alert" hidden></div>
+      <div class="builder-layout">
+        <section id="mods-grid" class="mods-grid" aria-label="Mod catalog"></section>
+        <aside class="pack-summary" aria-label="Current pack">
+          <h2>Your modpack</h2>
+          <div class="pack-stats"><span><strong id="selected-count">0</strong> items</span><span id="selected-size">0.0 MB</span></div>
+          <ul id="selected-list" class="selected-list"></ul>
+          <div class="pack-actions">
+            <div class="bulk-actions"><button id="add-all-btn" class="btn-ghost" type="button">Add all</button><button id="remove-all-btn" class="btn-ghost" type="button">Remove all</button></div>
+            <button id="download-zip-btn" class="btn-primary" type="button" disabled>Download ZIP</button>
+            <button id="download-mrpack-btn" class="btn-secondary" type="button" disabled>Download MRPACK</button>
+            <div class="secondary-row"><button id="share-link-btn" class="btn-ghost" type="button">Copy link</button><button id="reset-pack-btn" class="btn-ghost" type="button">Reset</button></div>
+          </div>
+          <progress id="download-progress" max="100" value="0" hidden></progress><p id="download-status" class="download-status" aria-live="polite"></p>
+        </aside>
+      </div>
+    </main>
+    <script src="../../assets/js/jszip.min.js"></script>
+    <script src="../../assets/js/mods.js"></script>
+  </body>
+</html>

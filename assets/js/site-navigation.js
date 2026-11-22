@@ -14,6 +14,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return decodedPath.replace(/\/index\.html$/, '/').replace(/\/$/, '') || '/';
     };
 
+    const deduplicateNavigationLinks = (nav) => {
+        if (!nav) return;
+        const seen = new Set();
+        nav.querySelectorAll('a[href]').forEach((link) => {
+            const key = `${link.origin}${new URL(link.href, window.location.href).pathname}`;
+            if (seen.has(key)) {
+                link.remove();
+            } else {
+                seen.add(key);
+            }
+        });
+    };
+
+    deduplicateNavigationLinks(desktopNav);
+    deduplicateNavigationLinks(menuDrawer);
+
     const currentPath = normalizePath(window.location.pathname);
     document.querySelectorAll('.site-desktop-nav a, .site-mobile-nav a').forEach((link) => {
         const linkUrl = new URL(link.href, window.location.href);
