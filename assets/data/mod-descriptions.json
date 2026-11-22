@@ -1,0 +1,254 @@
+{
+  "better-f3": {
+    "uk": "Розширений екран налагодження F3 із налаштуванням відображуваних даних.",
+    "en": "An enhanced F3 debug screen with configurable information."
+  },
+  "better-screenshots": {
+    "uk": "Додає зручніші можливості для створення та керування знімками екрана.",
+    "en": "Adds improved tools for taking and managing screenshots."
+  },
+  "forge-config-api": {
+    "uk": "Бібліотека сумісності для модів, що використовують конфігураційний API Forge.",
+    "en": "A compatibility library for mods that use Forge's configuration API."
+  },
+  "ias": {
+    "uk": "Дозволяє перемикати облікові записи Minecraft без перезапуску гри.",
+    "en": "Switch Minecraft accounts without restarting the game."
+  },
+  "inventory-particles": {
+    "uk": "Додає візуальні ефекти частинок до інтерфейсу інвентаря.",
+    "en": "Adds particle effects to the inventory interface."
+  },
+  "minecraft-capes": {
+    "uk": "Додає підтримку плащів Minecraft, зокрема плащів OptiFine.",
+    "en": "Adds support for Minecraft capes, including OptiFine capes."
+  },
+  "mossy-lib": {
+    "uk": "Допоміжна бібліотека, необхідна для роботи сумісних модів.",
+    "en": "A shared library required by compatible mods."
+  },
+  "mouse-tweaks": {
+    "uk": "Покращує керування предметами в інвентарі за допомогою миші.",
+    "en": "Improves mouse controls for moving items in inventories."
+  },
+  "no-chat-reports": {
+    "uk": "Надає налаштування приватності та керування звітами ігрового чату.",
+    "en": "Provides privacy settings and control over in-game chat reporting."
+  },
+  "resourcify": {
+    "uk": "Допомагає переглядати, встановлювати й керувати ресурспаками та шейдерами.",
+    "en": "Browse, install, and manage resource packs and shaders."
+  },
+  "subtle-effects": {
+    "uk": "Додає ненав'язливі атмосферні візуальні ефекти.",
+    "en": "Adds subtle ambient visual effects."
+  },
+  "apple-skin": {
+    "uk": "Показує рівень голоду та насичення, які відновлює їжа.",
+    "en": "Displays hunger and saturation values restored by food."
+  },
+  "baguette-lib": {
+    "uk": "Допоміжна бібліотека для модів, які її використовують.",
+    "en": "A shared library for mods that depend on it."
+  },
+  "better-stats": {
+    "uk": "Покращує екран статистики та робить його зручнішим для перегляду.",
+    "en": "Improves the statistics screen and makes it easier to browse."
+  },
+  "bobby": {
+    "uk": "Зберігає вже завантажені фрагменти світу, щоб показувати їх на відстані.",
+    "en": "Caches previously loaded chunks so they remain visible at a distance."
+  },
+  "c2me": {
+    "uk": "Оптимізує генерацію та завантаження фрагментів світу.",
+    "en": "Optimizes world chunk generation and loading."
+  },
+  "chat-heads": {
+    "uk": "Показує голови гравців поруч із їхніми повідомленнями в чаті.",
+    "en": "Shows player heads beside their messages in chat."
+  },
+  "chat-animation": {
+    "uk": "Додає анімацію появи повідомлень у чаті.",
+    "en": "Adds animations when chat messages appear."
+  },
+  "cherished-worlds": {
+    "uk": "Дозволяє позначати улюблені світи в списку світів.",
+    "en": "Lets you mark favorite worlds in the world list."
+  },
+  "cloth-config": {
+    "uk": "Бібліотека інтерфейсів налаштування для інших модів.",
+    "en": "A configuration screen library used by other mods."
+  },
+  "cool-rain": {
+    "uk": "Змінює візуальні ефекти дощу та атмосферу негоди.",
+    "en": "Changes rain visuals and the atmosphere during bad weather."
+  },
+  "dynamic-fps": {
+    "uk": "Зменшує використання ресурсів, коли гра неактивна або згорнута.",
+    "en": "Reduces resource usage while the game is idle or minimized."
+  },
+  "entity-model-features": {
+    "uk": "Додає підтримку користувацьких моделей сутностей із ресурспаків.",
+    "en": "Adds support for custom entity models from resource packs."
+  },
+  "entity-texture-features": {
+    "uk": "Додає підтримку розширених текстур сутностей із ресурспаків.",
+    "en": "Adds support for enhanced entity textures from resource packs."
+  },
+  "entity-culling": {
+    "uk": "Не відображає прихованих стінами сутностей, зменшуючи навантаження на графіку.",
+    "en": "Skips rendering entities hidden behind walls to reduce graphics workload."
+  },
+  "fabric-api": {
+    "uk": "Базова бібліотека, необхідна для роботи багатьох модів Fabric.",
+    "en": "A core library required by many Fabric mods."
+  },
+  "fabric-kotlin": {
+    "uk": "Забезпечує підтримку модів Fabric, написаних мовою Kotlin.",
+    "en": "Provides Kotlin language support for Fabric mods."
+  },
+  "falling-leaves": {
+    "uk": "Додає анімацію падаючого листя біля дерев.",
+    "en": "Adds falling-leaf effects around trees."
+  },
+  "fzzy-config": {
+    "uk": "Бібліотека для створення та керування налаштуваннями модів.",
+    "en": "A library for creating and managing mod configuration."
+  },
+  "iris": {
+    "uk": "Додає підтримку шейдерів і працює разом із Sodium.",
+    "en": "Adds shader support and works alongside Sodium."
+  },
+  "lambdynamiclights": {
+    "uk": "Створює динамічне освітлення від предметів і сутностей.",
+    "en": "Adds dynamic lighting from held items and entities."
+  },
+  "language-reload": {
+    "uk": "Дозволяє швидко перезавантажувати мовні ресурси гри.",
+    "en": "Lets you quickly reload the game's language resources."
+  },
+  "litematica": {
+    "uk": "Дозволяє переглядати схеми побудов і використовувати їх у грі.",
+    "en": "Displays building schematics and helps use them in-game."
+  },
+  "lithium": {
+    "uk": "Оптимізує ігрову логіку для підвищення продуктивності.",
+    "en": "Optimizes game logic to improve performance."
+  },
+  "malilib": {
+    "uk": "Бібліотека, необхідна для Litematica та деяких інших модів.",
+    "en": "A library required by Litematica and some other mods."
+  },
+  "mod-menu": {
+    "uk": "Показує список встановлених модів і відкриває їхні налаштування.",
+    "en": "Lists installed mods and provides access to their configuration screens."
+  },
+  "more-chat-history": {
+    "uk": "Збільшує кількість повідомлень, доступних в історії чату.",
+    "en": "Increases the number of messages kept in chat history."
+  },
+  "mru": {
+    "uk": "Допоміжна бібліотека, потрібна деяким модам.",
+    "en": "A shared library required by some mods."
+  },
+  "notenoughanimations": {
+    "uk": "Додає додаткові анімації гравців та їхніх дій.",
+    "en": "Adds extra player and action animations."
+  },
+  "offline-tab-head": {
+    "uk": "Показує голови гравців у списку гравців, навіть коли вони не в мережі.",
+    "en": "Shows player heads in the player list, including for offline players."
+  },
+  "ok-zoomer": {
+    "uk": "Додає налаштовуване наближення камери.",
+    "en": "Adds configurable camera zoom."
+  },
+  "particle-rain": {
+    "uk": "Додає погодні ефекти частинок дощу та снігу.",
+    "en": "Adds rain and snow weather particle effects."
+  },
+  "particular": {
+    "uk": "Додає декоративні частинки для ефектів і довкілля.",
+    "en": "Adds decorative particles for effects and the environment."
+  },
+  "placeholder-api": {
+    "uk": "API для використання динамічних текстових заповнювачів у модах.",
+    "en": "An API for using dynamic text placeholders in mods."
+  },
+  "random-block-placement": {
+    "uk": "Дозволяє випадково обирати блок для розміщення з доступних слотів.",
+    "en": "Randomly selects a block to place from available hotbar slots."
+  },
+  "rrls": {
+    "uk": "Зменшує або приховує екран очікування під час перезавантаження ресурсів.",
+    "en": "Reduces or hides the waiting screen while resources reload."
+  },
+  "shulker-tooltip": {
+    "uk": "Показує вміст шалкерового ящика в підказці без його відкриття.",
+    "en": "Shows a shulker box's contents in a tooltip without opening it."
+  },
+  "skinlayers3d": {
+    "uk": "Робить другий шар скіна гравця об'ємним у 3D.",
+    "en": "Renders the player's outer skin layer in 3D."
+  },
+  "smooth-gui": {
+    "uk": "Додає плавні анімації до графічного інтерфейсу.",
+    "en": "Adds smooth animations to the graphical user interface."
+  },
+  "smooth-scroll": {
+    "uk": "Додає плавне прокручування списків та екранів інтерфейсу.",
+    "en": "Adds smooth scrolling to lists and interface screens."
+  },
+  "sodium-extra": {
+    "uk": "Додає додаткові налаштування графіки до Sodium.",
+    "en": "Adds extra graphics settings for Sodium."
+  },
+  "sodium": {
+    "uk": "Оптимізує відображення гри, щоб підвищити частоту кадрів.",
+    "en": "Optimizes game rendering to improve frame rates."
+  },
+  "sodium-beta": {
+    "uk": "Бета-версія Sodium із новішими експериментальними змінами.",
+    "en": "A beta Sodium build with newer experimental changes."
+  },
+  "sounds": {
+    "uk": "Додає налаштовувані звукові ефекти інтерфейсу та довкілля.",
+    "en": "Adds configurable interface and ambient sound effects."
+  },
+  "tcdcommons": {
+    "uk": "Спільна бібліотека для модів, які її використовують.",
+    "en": "A shared library for mods that depend on it."
+  },
+  "visuality": {
+    "uk": "Додає нові візуальні ефекти частинок у світі.",
+    "en": "Adds new visual particle effects to the world."
+  },
+  "voicechat-fabric": {
+    "uk": "Додає голосовий чат із просторовим звуком для спілкування в грі.",
+    "en": "Adds proximity voice chat with positional audio for in-game communication."
+  },
+  "voicechat-fabric-new": {
+    "uk": "Альтернативна версія Simple Voice Chat; не встановлюйте її разом з іншою версією.",
+    "en": "An alternate Simple Voice Chat build; do not install it alongside the other version."
+  },
+  "voicechat-names": {
+    "uk": "Показує імена гравців у контексті голосового чату.",
+    "en": "Displays player names in the voice chat context."
+  },
+  "voice-messages": {
+    "uk": "Додає можливість записувати та надсилати голосові повідомлення.",
+    "en": "Adds the ability to record and send voice messages."
+  },
+  "w-waypoints": {
+    "uk": "Додає інструменти для створення та використання маршрутних точок.",
+    "en": "Adds tools for creating and using waypoints."
+  },
+  "xaero-world-map": {
+    "uk": "Додає карту світу з позначками та дослідженими територіями.",
+    "en": "Adds a world map with waypoints and explored terrain."
+  },
+  "yet-another-config-lib": {
+    "uk": "Бібліотека для сучасних екранів налаштування модів.",
+    "en": "A library for modern mod configuration screens."
+  }
+}

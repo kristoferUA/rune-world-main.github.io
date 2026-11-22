@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Зібрати модпак RuneWorld — Minecraft Java</title>
+    <meta name="description" content="Оберіть моди та створіть персональний ZIP або MRPACK модпак для сервера RuneWorld." />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="../../assets/css/site-navigation.css" rel="stylesheet" />
+    <link href="../../assets/css/mods.css" rel="stylesheet" />
+    <link href="../../assets/images/favicon.ico" rel="icon" type="image/x-icon" />
+    <script src="../../assets/js/site-navigation.js" defer></script>
+  </head>
+  <body>
+    <div id="preloader" role="status" aria-label="Завантаження конструктора модпака">
+      <div class="spinner-box">
+        <div class="configure-border-1"><div class="configure-core"></div></div>
+        <div class="configure-border-2"><div class="configure-core"></div></div>
+      </div>
+    </div>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="site-brand" href="ukrindex.html" aria-label="RuneWorld — головна сторінка">
+          <span>RuneWorld</span>
+          <img src="../../assets/images/iconrw.png" alt="Логотип RuneWorld" class="site-brand__image" width="48" height="48" />
+        </a>
+        <button class="site-menu-button" type="button" aria-controls="site-mobile-menu" aria-expanded="false" data-site-menu-button>
+          <span class="site-menu-button__icon" aria-hidden="true">☰</span><span class="site-menu-button__label">Меню</span>
+        </button>
+        <nav class="site-desktop-nav" aria-label="Основна навігація">
+          <a href="ukrseasons.html">Мапи сезонів</a>
+          <a href="PlayerListMenuUkr.html">Список гравців</a>
+          <div class="site-nav-dropdown" data-site-dropdown>
+            <button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-clans-menu" data-site-dropdown-button>Клани
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+            </button>
+            <div class="site-nav-dropdown__menu" id="site-clans-menu" data-site-dropdown-menu hidden>
+              <a href="ukrMonolithPage.html">⚔️ Моноліт</a>
+              <a href="ukrmoytash.html">🗡️ Мойташбуд</a>
+              <a href="ukrLorPage.html">⭐ Л.О.Р.</a>
+            </div>
+          </div>
+          <a href="ukrEvents.html">Івенти</a>
+          <a href="ukrmods.html" aria-current="page">Зібрати модпак</a>
+          <div class="site-nav-dropdown" data-site-dropdown>
+            <button class="site-nav-dropdown__trigger" type="button" aria-expanded="false" aria-controls="site-lang-menu" data-site-dropdown-button>lang
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
+            </button>
+            <div class="site-nav-dropdown__menu" id="site-lang-menu" data-site-dropdown-menu hidden>
+              <a href="../../modpack.html" hreflang="ru" lang="ru">Русский</a>
+              <a href="ukrmods.html" hreflang="uk" lang="uk">Українська</a>
+              <a href="../en/mods.html" hreflang="en" lang="en">English</a>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <div class="site-mobile-overlay" data-site-menu-overlay hidden>
+      <nav class="site-mobile-nav" id="site-mobile-menu" data-site-menu-drawer aria-label="Мобільна навігація" aria-hidden="true">
+        <div class="site-mobile-nav__top"><span>Навігація</span><button class="site-menu-close" type="button" aria-label="Закрити меню" data-site-menu-close>×</button></div>
+        <div data-site-mobile-links></div>
+      </nav>
+    </div>
+    <main class="builder-container">
+      <div class="header-top"><div><h1>Конструктор модпака RuneWorld</h1><p id="pack-env-info" class="env-badge">Завантаження параметрів збірки...</p></div></div>
+      <div class="builder-controls">
+        <input id="search-input" type="search" placeholder="Пошук модів..." autocomplete="off" />
+        <div id="category-filters" class="chips" aria-label="Фільтр за категоріями"></div>
+        <div class="presets-row"><span class="presets-label">Готові збірки:</span><div id="preset-buttons" class="presets"></div></div>
+      </div>
+      <div id="builder-alert" class="builder-alert" role="alert" hidden></div>
+      <div class="builder-layout">
+        <section id="mods-grid" class="mods-grid" aria-label="Каталог модів"></section>
+        <aside class="pack-summary" aria-label="Поточна збірка">
+          <h2>Ваш модпак</h2>
+          <div class="pack-stats"><span><strong id="selected-count">0</strong> <span id="selected-items-label">елементів</span></span><span id="selected-size">0 KB</span></div>
+          <ul id="selected-list" class="selected-list"></ul>
+          <div class="pack-actions">
+            <div class="bulk-actions"><button id="add-all-btn" class="btn-ghost" type="button">Додати всі</button><button id="remove-all-btn" class="btn-ghost" type="button">Прибрати всі</button></div>
+            <button id="download-zip-btn" class="btn-primary" type="button" disabled>Завантажити ZIP</button>
+            <button id="download-mrpack-btn" class="btn-secondary" type="button" disabled>Завантажити MRPACK</button>
+            <div class="secondary-row"><button id="share-link-btn" class="btn-ghost" type="button">Скопіювати посилання</button><button id="reset-pack-btn" class="btn-ghost" type="button">Скинути</button></div>
+          </div>
+          <progress id="download-progress" max="100" value="0" hidden></progress><p id="download-status" class="download-status" aria-live="polite"></p>
+        </aside>
+      </div>
+    </main>
+    <script src="../../assets/js/jszip.min.js"></script>
+    <script src="../../assets/js/mods.js"></script>
+  </body>
+</html>
