@@ -12,6 +12,12 @@
     <script src="../../assets/js/site-navigation.js" defer></script>
   </head>
   <body>
+    <div id="preloader" role="status" aria-label="Loading the modpack builder">
+      <div class="spinner-box">
+        <div class="configure-border-1"><div class="configure-core"></div></div>
+        <div class="configure-border-2"><div class="configure-core"></div></div>
+      </div>
+    </div>
     <header class="site-header">
       <div class="site-header__inner">
         <a class="site-brand" href="index.html" aria-label="RuneWorld — home page">
@@ -53,7 +59,7 @@
       </nav>
     </div>
     <main class="builder-container">
-      <div class="header-top"><div><h1>RuneWorld Modpack Builder</h1><p id="pack-env-info" class="env-badge">Loading pack settings...</p></div><a class="back-link" href="index.html">← Home</a></div>
+      <div class="header-top"><div><h1>RuneWorld Modpack Builder</h1><p id="pack-env-info" class="env-badge">Loading pack settings...</p></div></div>
       <div class="builder-controls">
         <input id="search-input" type="search" placeholder="Search mods..." autocomplete="off" />
         <div id="category-filters" class="chips" aria-label="Category filter"></div>
@@ -64,7 +70,7 @@
         <section id="mods-grid" class="mods-grid" aria-label="Mod catalog"></section>
         <aside class="pack-summary" aria-label="Current pack">
           <h2>Your modpack</h2>
-          <div class="pack-stats"><span><strong id="selected-count">0</strong> items</span><span id="selected-size">0.0 MB</span></div>
+          <div class="pack-stats"><span><strong id="selected-count">0</strong> <span id="selected-items-label">items</span></span><span id="selected-size">0 KB</span></div>
           <ul id="selected-list" class="selected-list"></ul>
           <div class="pack-actions">
             <div class="bulk-actions"><button id="add-all-btn" class="btn-ghost" type="button">Add all</button><button id="remove-all-btn" class="btn-ghost" type="button">Remove all</button></div>

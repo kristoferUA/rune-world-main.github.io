@@ -1,6 +1,7 @@
 (() => {
   const pageDepth = window.location.pathname.includes('/pages/') ? '../../' : '';
   const DATA_URL = `${pageDepth}assets/data/mods.json`;
+  const DESCRIPTIONS_URL = `${pageDepth}assets/data/mod-descriptions.json`;
   const STORAGE_KEY = 'runeworld_java_modpack_v1';
   const language = document.documentElement.lang === 'uk'
     ? 'uk'
@@ -17,6 +18,7 @@
       cannotRemove: 'Нельзя убрать', neededFor: 'так как он нужен для',
       conflictAlert: 'конфликтует с', disableConflicts: 'Сначала отключите конфликтующие моды.',
       items: 'элементов', removeButton: 'Убрать',
+      loadingPage: 'Загрузка конструктора модпака...',
       addAll: 'Добавить все', removeAll: 'Убрать все',
       zip: 'Скачать ZIP', mrpack: 'Скачать MRPACK',
       share: 'Скопировать ссылку', reset: 'Сбросить',
@@ -37,6 +39,7 @@
       cannotRemove: 'Не можна прибрати', neededFor: 'оскільки він потрібен для',
       conflictAlert: 'конфліктує з', disableConflicts: 'Спочатку вимкніть конфліктуючі моди.',
       items: 'елементів', removeButton: 'Прибрати',
+      loadingPage: 'Завантаження конструктора модпака...',
       addAll: 'Додати всі', removeAll: 'Прибрати всі',
       zip: 'Завантажити ZIP', mrpack: 'Завантажити MRPACK',
       share: 'Скопіювати посилання', reset: 'Скинути',
@@ -57,6 +60,7 @@
       cannotRemove: 'Cannot remove', neededFor: 'because it is required for',
       conflictAlert: 'conflicts with', disableConflicts: 'Disable conflicting mods first.',
       items: 'items', removeButton: 'Remove',
+      loadingPage: 'Loading the modpack builder...',
       addAll: 'Add all', removeAll: 'Remove all',
       zip: 'Download ZIP', mrpack: 'Download MRPACK',
       share: 'Copy link', reset: 'Reset',
@@ -150,6 +154,7 @@
   };
 
   let modsById = new Map();
+  let modDescriptions = {};
   let selectedIds = new Set();
   let activeCategory = t.all;
   let searchQuery = '';
@@ -173,13 +178,32 @@
     progress: document.getElementById('download-progress'),
     status: document.getElementById('download-status'),
   };
+  const itemsLabel = document.getElementById('selected-items-label');
+  const formatKB = value => `${Math.ceil(Number(value) || 0).toLocaleString(language)} KB`;
+
+  function hidePreloader() {
+    const preloader = document.getElementById('preloader');
+    if (!preloader) return;
+    preloader.classList.add('is-hidden');
+    window.setTimeout(() => {
+      preloader.hidden = true;
+    }, 500);
+  }
 
   async function init() {
     try {
-      const res = await fetch(DATA_URL);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      catalog = await res.json();
+      const [catalogResponse, descriptionsResponse] = await Promise.all([
+        fetch(DATA_URL),
+        fetch(DESCRIPTIONS_URL)
+      ]);
+      if (!catalogResponse.ok) throw new Error(`Catalog HTTP ${catalogResponse.status}`);
+      if (!descriptionsResponse.ok) throw new Error(`Translations HTTP ${descriptionsResponse.status}`);
+      [catalog, modDescriptions] = await Promise.all([
+        catalogResponse.json(),
+        descriptionsResponse.json()
+      ]);
       modsById = new Map(catalog.mods.map(m => [m.id, m]));
+      if (itemsLabel) itemsLabel.textContent = t.items;
 
       els.envInfo.textContent = catalog.loaderVersion
         ? `Minecraft ${catalog.mcVersion} • ${catalog.loaderName} ${catalog.loaderVersion}`
@@ -191,6 +215,7 @@
       renderPresets();
       renderAll();
       bindEvents();
+      hidePreloader();
     } catch (err) {
       if (window.location.protocol === 'file:') {
         showAlert(language === 'uk'
@@ -201,6 +226,7 @@
       } else {
         showAlert(`${t.catalogError} (${err.message}). ${t.catalogHint}`);
       }
+      hidePreloader();
     }
   }
 
@@ -237,8 +263,12 @@
   }
 
   function ensureRequiredAndDependencies() {
-    catalog.mods.forEach(m => {
-      if (m.required) addModWithDeps(m.id);
+    const requiredMods = catalog.mods.filter(mod => mod.required);
+    requiredMods.forEach(mod => {
+      getConflictsFor(mod.id).forEach(conflictId => {
+        if (!modsById.get(conflictId)?.required) selectedIds.delete(conflictId);
+      });
+      addModWithDeps(mod.id);
     });
     Array.from(selectedIds).forEach(id => addModWithDeps(id));
     saveSelection();
@@ -312,8 +342,7 @@
 
   function applyPreset(preset) {
     hideAlert();
-    selectedIds.clear();
-    catalog.mods.filter(m => m.required).forEach(m => selectedIds.add(m.id));
+    catalog.mods.filter(m => m.required).forEach(m => addModWithDeps(m.id));
     preset.mods.forEach(id => addModWithDeps(id));
     saveSelection();
     renderAll();
@@ -421,11 +450,12 @@
     const q = searchQuery.trim().toLowerCase();
 
     const filtered = catalog.mods.filter(mod => {
+      const description = modDescriptions[mod.id]?.[language] || mod.description;
       const matchCat = activeCategory === t.all || mod.category === activeCategory;
       const matchSearch =
         !q ||
         mod.name.toLowerCase().includes(q) ||
-        mod.description.toLowerCase().includes(q) ||
+        description.toLowerCase().includes(q) ||
         mod.category.toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
@@ -453,7 +483,7 @@
 
       const badge = document.createElement('span');
       badge.className = `mod-badge ${mod.required ? 'badge-required' : ''}`;
-      badge.textContent = mod.required ? t.required : `${mod.sizeMB} MB`;
+      badge.textContent = mod.required ? t.required : formatKB(mod.sizeKB);
 
       header.append(title, badge);
 
@@ -482,7 +512,7 @@
 
       const desc = document.createElement('p');
       desc.className = 'mod-desc';
-      desc.textContent = mod.description;
+      desc.textContent = modDescriptions[mod.id]?.[language] || mod.description;
 
       const meta = document.createElement('div');
       meta.className = 'mod-meta';
@@ -528,11 +558,11 @@
     Array.from(selectedIds).forEach(id => {
       const mod = modsById.get(id);
       if (!mod) return;
-      totalSize += Number(mod.sizeMB || 0);
+      totalSize += Number(mod.sizeKB || 0);
 
       const li = document.createElement('li');
       const nameSpan = document.createElement('span');
-      nameSpan.textContent = `${mod.name} (${mod.sizeMB} MB)`;
+      nameSpan.textContent = `${mod.name} (${formatKB(mod.sizeKB)})`;
       li.appendChild(nameSpan);
 
       if (!mod.required) {
@@ -548,7 +578,7 @@
     });
 
     els.count.textContent = String(selectedIds.size);
-    els.size.textContent = `${totalSize.toFixed(1)} MB`;
+    els.size.textContent = formatKB(totalSize);
 
     const empty = selectedIds.size === 0;
     els.downloadZipBtn.disabled = empty;

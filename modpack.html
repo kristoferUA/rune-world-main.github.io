@@ -25,6 +25,12 @@ You may obtain a copy of the License at
     <script src="assets/js/site-navigation.js" defer></script>
   </head>
   <body>
+    <div id="preloader" role="status" aria-label="Загрузка конструктора модпака">
+      <div class="spinner-box">
+        <div class="configure-border-1"><div class="configure-core"></div></div>
+        <div class="configure-border-2"><div class="configure-core"></div></div>
+      </div>
+    </div>
     <header class="site-header">
       <div class="site-header__inner">
         <a
@@ -137,7 +143,6 @@ You may obtain a copy of the License at
           <h1>Конструктор модпака RuneWorld</h1>
           <p id="pack-env-info" class="env-badge">Загрузка параметров сборки...</p>
         </div>
-        <a class="back-link" href="index.html">← На главную</a>
       </div>
 
       <div class="builder-controls">
@@ -162,8 +167,8 @@ You may obtain a copy of the License at
         <aside class="pack-summary" aria-label="Текущая сборка">
           <h2>Ваш модпак</h2>
           <div class="pack-stats">
-            <span><strong id="selected-count">0</strong> элементов</span>
-            <span id="selected-size">0.0 MB</span>
+            <span><strong id="selected-count">0</strong> <span id="selected-items-label">элементов</span></span>
+            <span id="selected-size">0 KB</span>
           </div>
           <ul id="selected-list" class="selected-list"></ul>
           <div class="pack-actions">

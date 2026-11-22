@@ -21,6 +21,86 @@ body {
   line-height: 1.5;
 }
 
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0f0f1f;
+  transition: opacity 0.5s ease;
+}
+
+#preloader.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.spinner-box {
+  position: relative;
+  width: 115px;
+  height: 115px;
+  margin: 0 auto;
+}
+
+.configure-border-1,
+.configure-border-2 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 115px;
+  height: 115px;
+  padding: 3px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform-origin: center;
+}
+
+.configure-border-1 {
+  background: #6912cb;
+  animation: rotate-clockwise 3s linear infinite;
+}
+
+.configure-border-2 {
+  background: rgb(38 116 252);
+  animation: rotate-counter 3s linear infinite;
+}
+
+.configure-core {
+  width: 100%;
+  height: 100%;
+  background-color: #1d2630;
+}
+
+@keyframes rotate-clockwise {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-counter {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+#preloader[hidden] {
+  display: none;
+}
+
+.builder-spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: builder-spin 0.8s linear infinite;
+}
+
+@keyframes builder-spin {
+  to { transform: rotate(360deg); }
+}
+
 .builder-container {
   max-width: 1280px;
   margin: 0 auto;
@@ -195,7 +275,7 @@ body {
 
 .pack-summary {
   position: sticky;
-  top: 20px;
+  top: 96px;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;

@@ -14,11 +14,49 @@ document.addEventListener('DOMContentLoaded', () => {
         return decodedPath.replace(/\/index\.html$/, '/').replace(/\/$/, '') || '/';
     };
 
+    const isPagesPath = window.location.pathname.includes('/pages/');
+    const pageLanguage = document.documentElement.lang.split('-')[0];
+    const pagesRoot = isPagesPath ? '../../' : '';
+    const builderHref = !isPagesPath
+        ? 'modpack.html'
+        : pageLanguage === 'en'
+            ? 'mods.html'
+            : pageLanguage === 'uk'
+                ? 'ukrmods.html'
+                : `${pagesRoot}modpack.html`;
+    const builderLabel = pageLanguage === 'en'
+        ? 'Build modpack'
+        : pageLanguage === 'uk'
+            ? 'Зібрати модпак'
+            : 'Собрать модпак';
+    const builderPath = normalizePath(new URL(builderHref, window.location.href).pathname);
+
+    const ensureBuilderLink = (nav) => {
+        if (!nav) return null;
+        const existing = Array.from(nav.querySelectorAll('a[href]')).find((link) =>
+            normalizePath(new URL(link.href, window.location.href).pathname) === builderPath
+        );
+        if (existing) return existing;
+
+        const link = document.createElement('a');
+        link.href = builderHref;
+        link.textContent = builderLabel;
+        link.dataset.siteBuilderLink = '';
+        const languageDropdown = Array.from(nav.querySelectorAll('[data-site-dropdown]')).find((dropdown) =>
+            dropdown.querySelector('[data-site-dropdown-button]')?.textContent.trim().toLowerCase() === 'lang'
+        );
+        nav.insertBefore(link, languageDropdown || null);
+        return link;
+    };
+
+    const builderLink = ensureBuilderLink(desktopNav);
+
     const deduplicateNavigationLinks = (nav) => {
         if (!nav) return;
         const seen = new Set();
         nav.querySelectorAll('a[href]').forEach((link) => {
-            const key = `${link.origin}${new URL(link.href, window.location.href).pathname}`;
+            const url = new URL(link.href, window.location.href);
+            const key = `${url.origin}${url.pathname}`;
             if (seen.has(key)) {
                 link.remove();
             } else {
@@ -68,6 +106,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    if (menuDrawer && builderLink && !Array.from(menuDrawer.querySelectorAll('a[href]')).some((link) =>
+        normalizePath(new URL(link.href, window.location.href).pathname) === builderPath
+    )) {
+        const mobileBuilderLink = builderLink.cloneNode(true);
+        mobileBuilderLink.removeAttribute('aria-current');
+        const languageLabel = Array.from(menuDrawer.querySelectorAll('.site-mobile-nav__label')).find((label) =>
+            label.textContent.trim().toLowerCase() === 'lang'
+        );
+        menuDrawer.insertBefore(mobileBuilderLink, languageLabel || null);
+    }
+
+    deduplicateNavigationLinks(desktopNav);
+    deduplicateNavigationLinks(menuDrawer);
 
     const openMobileMenu = () => {
         if (!menuButton || !menuOverlay || !menuDrawer) return;
